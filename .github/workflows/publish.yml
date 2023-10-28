@@ -24,8 +24,8 @@ jobs:
       matrix:
         target: [x86_64, x86, aarch64, armv7, s390x, ppc64le]
     steps:
-      - name: Install requirements
-        run: sudo apt-get install libssl-dev pkg-config
+      - name: Install requirements for i386
+        run: sudo dpkg --add-architecture i386 && sudo apt-get update && sudo apt-get install libssl-dev:i386 clang
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
         with:
