@@ -1,2 +1,10 @@
 # xvc.py
-Xvc Python Bindings
+Python bindings for Xvc
+
+## Installation and Usage
+
+```
+$ pip install xvc
+```
+
+
