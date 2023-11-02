@@ -23,7 +23,7 @@ jobs:
     strategy:
       matrix:
         target:
-            - x86
+          # - x86 -- reflinks are not supported
             - x86_64
             - aarch64
             - armv7
