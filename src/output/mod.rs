@@ -1,16 +1,16 @@
-use std::{io, path::Path, sync::RwLock};
+use std::{io, path::Path};
 
 use crossbeam::thread;
 use crossbeam_channel::bounded;
 use log::LevelFilter;
 use pyo3::PyResult;
 use xvc_rust::{
-    cli::{XvcCLI, XvcSubCommand},
+    cli::{handle_git_automation, XvcCLI, XvcSubCommand},
     config::{XvcConfigInitParams, XvcVerbosity},
     core::{aliases, check_ignore, default_project_config, root, types::xvcroot::load_xvc_root},
-    file, init,
+    error, file, git_checkout_ref, init,
     logging::{debug, setup_logging, uwr, XvcOutputLine},
-    pipeline, storage, Error,
+    pipeline, storage, AbsolutePath, Error, Result,
 };
 
 use crate::XvcPyError;
@@ -19,7 +19,7 @@ const CHANNEL_BOUND: usize = 10000;
 
 /// Runs the supplied xvc command.
 pub fn run(args: &[&str]) -> PyResult<String> {
-    let cli_options = XvcCLI::from_str_slice(args).map_err(|e| XvcPyError(e))?;
+    let cli_options = XvcCLI::from_str_slice(args).map_err(XvcPyError)?;
     dispatch(cli_options)
 }
 
@@ -167,14 +167,15 @@ pub fn dispatch(cli_opts: XvcCLI) -> PyResult<String> {
             match cli_opts.command {
                 XvcSubCommand::Init(opts) => {
                     let use_git = !opts.no_git;
-                    let xvc_root = init::run(xvc_root_opt.as_ref(), opts).map_err(|e| e.into())?;
+                    let xvc_root = init::run(xvc_root_opt.as_ref(), opts).map_err(XvcPyError)?;
                     if use_git {
                         handle_git_automation(
                             &output_snd,
                             xvc_root,
                             cli_opts.to_branch.as_deref(),
                             &cli_opts.command_string,
-                        )?;
+                        )
+                        .map_err(XvcPyError)?;
                     }
                     Result::Ok(())
                 }
@@ -188,7 +189,7 @@ pub fn dispatch(cli_opts: XvcCLI) -> PyResult<String> {
                     &output_snd,
                     xvc_root_opt
                         .as_ref()
-                        .ok_or_else(|| Error::RequiresXvcRepository)?,
+                        .ok_or_else(|| XvcPyError(Error::RequiresXvcRepository))?,
                     opts,
                 )
                 .map_err(|e| XvcPyError(e.into()))?),
@@ -204,7 +205,9 @@ pub fn dispatch(cli_opts: XvcCLI) -> PyResult<String> {
                     Ok(pipeline::cmd_pipeline(
                         input,
                         &output_snd,
-                        xvc_root_opt.as_ref().ok_or(Error::RequiresXvcRepository)?,
+                        xvc_root_opt
+                            .as_ref()
+                            .ok_or(XvcPyError(Error::RequiresXvcRepository))?,
                         opts,
                     )
                     .map_err(|e| XvcPyError(e.into()))?)
@@ -217,7 +220,9 @@ pub fn dispatch(cli_opts: XvcCLI) -> PyResult<String> {
                     Ok(check_ignore::cmd_check_ignore(
                         input,
                         &output_snd,
-                        xvc_root_opt.as_ref().ok_or(Error::RequiresXvcRepository)?,
+                        xvc_root_opt
+                            .as_ref()
+                            .ok_or(XvcPyError(Error::RequiresXvcRepository))?,
                         opts,
                     )
                     .map_err(|e| XvcPyError(e.into()))?)
@@ -229,16 +234,18 @@ pub fn dispatch(cli_opts: XvcCLI) -> PyResult<String> {
                     Ok(storage::cmd_storage(
                         input,
                         &output_snd,
-                        xvc_root_opt.as_ref().ok_or(Error::RequiresXvcRepository)?,
+                        xvc_root_opt
+                            .as_ref()
+                            .ok_or(XvcPyError(Error::RequiresXvcRepository))?,
                         opts,
-                    )?)
+                    )
+                    .map_err(|e| XvcPyError(e.into()))?)
                 }
-            }?;
+            }
+            .map_err(XvcPyError)?;
 
-            watch!("Before handle_git_automation");
             match xvc_root_opt {
                 Some(xvc_root) => {
-                    watch!(&cli_opts.command_string);
                     if cli_opts.skip_git {
                         debug!(output_snd, "Skipping Git operations");
                     } else {
@@ -247,7 +254,8 @@ pub fn dispatch(cli_opts: XvcCLI) -> PyResult<String> {
                             xvc_root,
                             cli_opts.to_branch.as_deref(),
                             &cli_opts.command_string,
-                        )?;
+                        )
+                        .map_err(XvcPyError)?;
                     }
                 }
                 None => {
