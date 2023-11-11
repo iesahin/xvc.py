@@ -3321,9 +3321,13 @@ dependencies = [
 name = "xvc-py"
 version = "0.6.3"
 dependencies = [
+ "crossbeam",
+ "crossbeam-channel",
+ "log",
  "openssl",
  "pyo3",
  "xvc",
+ "xvc-logging",
 ]
 
 [[package]]
