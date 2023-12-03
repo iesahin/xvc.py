@@ -1,4 +1,6 @@
 pub mod output;
+pub mod pipeline;
+pub mod storage;
 
 use std::collections::HashMap;
 
@@ -8,9 +10,11 @@ use pyo3::types::{PyDict, PyTuple};
 use xvc_rust::cli;
 use xvc_rust::error::Error as XvcError;
 
+pub use pipeline::XvcPipeline;
+
 /// Call Xvc with the command line arguments
 #[pyfunction]
-fn run(args: Vec<&str>) -> PyResult<String> {
+pub fn run(args: Vec<&str>) -> PyResult<String> {
     let opts = cli::XvcCLI::from_str_slice(args.as_ref()).map_err(|e| XvcPyError(e.into()))?;
     dispatch(opts)
 }
@@ -40,7 +44,7 @@ struct XvcOptions {
 
 #[pyclass]
 #[derive(Clone)]
-struct Xvc {
+pub struct Xvc {
     verbosity: Option<u8>,
     quiet: Option<bool>,
     debug: Option<bool>,
@@ -426,492 +430,6 @@ impl XvcFile {
     }
 }
 
-#[pyclass]
-#[derive(Clone)]
-struct XvcPipeline {
-    xvc_opts: Xvc,
-    pipeline_name: Option<String>,
-}
-
-impl XvcPipeline {
-    fn init(xvc_opts: &Xvc, pipeline_name: Option<String>) -> PyResult<Self> {
-        Ok(Self {
-            xvc_opts: xvc_opts.clone(),
-            pipeline_name,
-        })
-    }
-
-    fn cli(&self) -> PyResult<Vec<String>> {
-        let mut cli_opts = self.xvc_opts.cli()?;
-        cli_opts.push("pipeline".to_string());
-        if let Some(pipeline_name) = &self.pipeline_name {
-            cli_opts.push("--pipeline-name".to_string());
-            cli_opts.push(pipeline_name.to_string());
-        }
-
-        Ok(cli_opts)
-    }
-}
-
-#[pymethods]
-impl XvcPipeline {
-    fn new(&self, opts: Option<&PyDict>) -> PyResult<String> {
-        let mut cli_opts = self.cli()?;
-        cli_opts.push("new".to_string());
-        update_cli_opt(
-            opts,
-            &mut cli_opts,
-            &["name", "pipeline_name", "pipeline-name"],
-            "--pipeline-name",
-        )?;
-        update_cli_opt(opts, &mut cli_opts, &["workdir"], "--workdir")?;
-        run(cli_opts.iter().map(|s| s.as_str()).collect())
-    }
-
-    fn update(&self, opts: Option<&PyDict>) -> PyResult<String> {
-        let mut cli_opts = self.cli()?;
-        cli_opts.push("update".to_string());
-        update_cli_opt(
-            opts,
-            &mut cli_opts,
-            &["name", "pipeline_name", "pipeline-name"],
-            "--pipeline-name",
-        )?;
-        update_cli_opt(opts, &mut cli_opts, &["rename"], "--rename")?;
-        update_cli_opt(opts, &mut cli_opts, &["workdir"], "--workdir")?;
-        update_cli_flag(
-            opts,
-            &mut cli_opts,
-            &["set_default", "set-default"],
-            "--set-default",
-        )?;
-        run(cli_opts.iter().map(|s| s.as_str()).collect())
-    }
-
-    fn delete(&self, opts: Option<&PyDict>) -> PyResult<String> {
-        let mut cli_opts = self.cli()?;
-        cli_opts.push("delete".to_string());
-        update_cli_opt(
-            opts,
-            &mut cli_opts,
-            &["name", "pipeline_name", "pipeline-name"],
-            "--pipeline-name",
-        )?;
-        run(cli_opts.iter().map(|s| s.as_str()).collect())
-    }
-
-    fn run(&self, opts: Option<&PyDict>) -> PyResult<String> {
-        let mut cli_opts = self.cli()?;
-        cli_opts.push("run".to_string());
-        update_cli_opt(
-            opts,
-            &mut cli_opts,
-            &["name", "pipeline_name", "pipeline-name"],
-            "--pipeline-name",
-        )?;
-        run(cli_opts.iter().map(|s| s.as_str()).collect())
-    }
-
-    fn list(&self) -> PyResult<String> {
-        let mut cli_opts = self.cli()?;
-        cli_opts.push("list".to_string());
-        run(cli_opts.iter().map(|s| s.as_str()).collect())
-    }
-
-    fn dag(&self, opts: Option<&PyDict>) -> PyResult<String> {
-        let mut cli_opts = self.cli()?;
-        cli_opts.push("dag".to_string());
-        update_cli_opt(
-            opts,
-            &mut cli_opts,
-            &["name", "pipeline_name", "pipeline-name"],
-            "--pipeline-name",
-        )?;
-        update_cli_opt(opts, &mut cli_opts, &["file"], "--file")?;
-        update_cli_opt(opts, &mut cli_opts, &["format"], "--format")?;
-        run(cli_opts.iter().map(|s| s.as_str()).collect())
-    }
-
-    fn export(&self, opts: Option<&PyDict>) -> PyResult<String> {
-        let mut cli_opts = self.cli()?;
-        cli_opts.push("export".to_string());
-        update_cli_opt(
-            opts,
-            &mut cli_opts,
-            &["name", "pipeline_name", "pipeline-name"],
-            "--pipeline-name",
-        )?;
-        update_cli_opt(opts, &mut cli_opts, &["file"], "--file")?;
-        update_cli_opt(opts, &mut cli_opts, &["format"], "--format")?;
-        run(cli_opts.iter().map(|s| s.as_str()).collect())
-    }
-
-    fn import(&self, opts: Option<&PyDict>) -> PyResult<String> {
-        let mut cli_opts = self.cli()?;
-        cli_opts.push("import".to_string());
-        update_cli_opt(
-            opts,
-            &mut cli_opts,
-            &["name", "pipeline_name", "pipeline-name"],
-            "--pipeline-name",
-        )?;
-        update_cli_opt(opts, &mut cli_opts, &["file"], "--file")?;
-        update_cli_opt(opts, &mut cli_opts, &["format"], "--format")?;
-        update_cli_flag(opts, &mut cli_opts, &["overwrite"], "--overwrite")?;
-        run(cli_opts.iter().map(|s| s.as_str()).collect())
-    }
-
-    fn step(&self, opts: Option<&PyDict>) -> PyResult<XvcPipelineStep> {
-        Ok(XvcPipelineStep {
-            xvc_pipeline_opts: self.clone(),
-        })
-    }
-}
-
-#[pyclass]
-struct XvcPipelineStep {
-    xvc_pipeline_opts: XvcPipeline,
-}
-
-impl XvcPipelineStep {
-    fn cli(&self) -> PyResult<Vec<String>> {
-        let mut cli_opts = self.xvc_pipeline_opts.cli()?;
-        cli_opts.push("step".to_string());
-        Ok(cli_opts)
-    }
-}
-
-#[pymethods]
-impl XvcPipelineStep {
-    fn new(&self, opts: Option<&PyDict>) -> PyResult<String> {
-        let mut cli_opts = self.cli()?;
-        cli_opts.push("new".to_string());
-        update_cli_opt(
-            opts,
-            &mut cli_opts,
-            &["name", "step_name", "step-name"],
-            "--step-name",
-        )?;
-        update_cli_opt(opts, &mut cli_opts, &["command"], "--command")?;
-        update_cli_opt(opts, &mut cli_opts, &["when"], "--when")?;
-        run(cli_opts.iter().map(|s| s.as_str()).collect())
-    }
-
-    fn update(&self, opts: Option<&PyDict>) -> PyResult<String> {
-        let mut cli_opts = self.cli()?;
-        cli_opts.push("update".to_string());
-        update_cli_opt(
-            opts,
-            &mut cli_opts,
-            &["name", "step_name", "step-name"],
-            "--step-name",
-        )?;
-        update_cli_opt(opts, &mut cli_opts, &["command"], "--command")?;
-        update_cli_opt(opts, &mut cli_opts, &["when"], "--when")?;
-        run(cli_opts.iter().map(|s| s.as_str()).collect())
-    }
-
-    fn dependency(&self, opts: Option<&PyDict>) -> PyResult<String> {
-        let mut cli_opts = self.cli()?;
-        cli_opts.push("dependency".to_string());
-        update_cli_opt(
-            opts,
-            &mut cli_opts,
-            &["name", "step_name", "step-name"],
-            "--step-name",
-        )?;
-        update_cli_opt(opts, &mut cli_opts, &["file"], "--file")?;
-        update_cli_opt(opts, &mut cli_opts, &["url"], "--url")?;
-        update_cli_opt(opts, &mut cli_opts, &["glob"], "--glob")?;
-        update_cli_opt(opts, &mut cli_opts, &["glob-items"], "--glob-items")?;
-        update_cli_opt(opts, &mut cli_opts, &["step"], "--step")?;
-        update_cli_opt(opts, &mut cli_opts, &["param"], "--param")?;
-        update_cli_opt(opts, &mut cli_opts, &["regex"], "--regex")?;
-        update_cli_opt(opts, &mut cli_opts, &["regex-items"], "--regex-items")?;
-        update_cli_opt(opts, &mut cli_opts, &["line", "lines"], "--line")?;
-        update_cli_opt(opts, &mut cli_opts, &["line-items"], "--line-items")?;
-        update_cli_opt(opts, &mut cli_opts, &["generic"], "--generic")?;
-        run(cli_opts.iter().map(|s| s.as_str()).collect())
-    }
-
-    fn output(&self, opts: Option<&PyDict>) -> PyResult<String> {
-        let mut cli_opts = self.cli()?;
-        cli_opts.push("output".to_string());
-        update_cli_opt(
-            opts,
-            &mut cli_opts,
-            &["name", "step_name", "step-name"],
-            "--step-name",
-        )?;
-        update_cli_opt(opts, &mut cli_opts, &["file"], "--output-file")?;
-        update_cli_opt(opts, &mut cli_opts, &["metric"], "--output-metric")?;
-        update_cli_opt(opts, &mut cli_opts, &["image"], "--output-images")?;
-        run(cli_opts.iter().map(|s| s.as_str()).collect())
-    }
-
-    fn show(&self, opts: Option<&PyDict>) -> PyResult<String> {
-        let mut cli_opts = self.cli()?;
-        cli_opts.push("show".to_string());
-        update_cli_opt(
-            opts,
-            &mut cli_opts,
-            &["name", "step_name", "step-name"],
-            "--step-name",
-        )?;
-        run(cli_opts.iter().map(|s| s.as_str()).collect())
-    }
-}
-
-#[pyclass]
-struct XvcStorage {
-    xvc_opts: Xvc,
-}
-
-impl XvcStorage {
-    fn init(xvc_opts: &Xvc) -> PyResult<Self> {
-        Ok(Self {
-            xvc_opts: xvc_opts.clone(),
-        })
-    }
-
-    fn cli(&self) -> PyResult<Vec<String>> {
-        let mut cli_opts = self.xvc_opts.cli()?;
-        cli_opts.push("file".to_string());
-        Ok(cli_opts)
-    }
-}
-
-#[pymethods]
-impl XvcStorage {
-    fn list(&self) -> PyResult<String> {
-        let mut cli_opts = self.cli()?;
-        cli_opts.push("list".to_string());
-        run(cli_opts.iter().map(|s| s.as_str()).collect())
-    }
-    fn remove(&self, name: &str) -> PyResult<String> {
-        let mut cli_opts = self.cli()?;
-        cli_opts.push("remove".to_string());
-        cli_opts.push(name.to_string());
-        run(cli_opts.iter().map(|s| s.as_str()).collect())
-    }
-
-    fn new_local(&self, opts: Option<&PyDict>) -> PyResult<String> {
-        let mut cli_opts = self.cli()?;
-        cli_opts.push("new".to_string());
-        cli_opts.push("local".to_string());
-
-        update_cli_opt(opts, &mut cli_opts, &["name"], "--name")?;
-        update_cli_opt(opts, &mut cli_opts, &["path"], "--path")?;
-
-        run(cli_opts.iter().map(|s| s.as_str()).collect())
-    }
-
-    fn new_generic(&self, opts: Option<&PyDict>) -> PyResult<String> {
-        let mut cli_opts = self.cli()?;
-        cli_opts.push("new".to_string());
-        cli_opts.push("generic".to_string());
-
-        update_cli_opt(opts, &mut cli_opts, &["name"], "--name")?;
-        update_cli_opt(
-            opts,
-            &mut cli_opts,
-            &["init", "init_command", "init-command"],
-            "--init",
-        )?;
-        update_cli_opt(
-            opts,
-            &mut cli_opts,
-            &["list", "list_command", "list-command"],
-            "--list",
-        )?;
-        update_cli_opt(
-            opts,
-            &mut cli_opts,
-            &["download", "download_command", "download-command"],
-            "--download",
-        )?;
-        update_cli_opt(
-            opts,
-            &mut cli_opts,
-            &["upload", "upload_command", "upload-command"],
-            "--upload",
-        )?;
-        update_cli_opt(
-            opts,
-            &mut cli_opts,
-            &["delete", "delete_command", "delete-command"],
-            "--delete",
-        )?;
-        update_cli_opt(
-            opts,
-            &mut cli_opts,
-            &["processes", "max_processes", "max-processes"],
-            "--processes",
-        )?;
-        update_cli_opt(opts, &mut cli_opts, &["url"], "--url")?;
-        update_cli_opt(
-            opts,
-            &mut cli_opts,
-            &["storage_dir", "storage-dir"],
-            "--storage-dir",
-        )?;
-
-        run(cli_opts.iter().map(|s| s.as_str()).collect())
-    }
-
-    fn new_rsync(&self, opts: Option<&PyDict>) -> PyResult<String> {
-        let mut cli_opts = self.cli()?;
-        cli_opts.push("new".to_string());
-        cli_opts.push("rsync".to_string());
-
-        update_cli_opt(opts, &mut cli_opts, &["name"], "--name")?;
-        update_cli_opt(opts, &mut cli_opts, &["host"], "--host")?;
-        update_cli_opt(opts, &mut cli_opts, &["port"], "--port")?;
-        update_cli_opt(opts, &mut cli_opts, &["user"], "--user")?;
-        update_cli_opt(
-            opts,
-            &mut cli_opts,
-            &["storage_dir", "storage-dir"],
-            "--storage-dir",
-        )?;
-
-        run(cli_opts.iter().map(|s| s.as_str()).collect())
-    }
-
-    fn new_s3(&self, opts: Option<&PyDict>) -> PyResult<String> {
-        let mut cli_opts = self.cli()?;
-        cli_opts.push("new".to_string());
-        cli_opts.push("s3".to_string());
-
-        update_cli_opt(opts, &mut cli_opts, &["name"], "--name")?;
-        update_cli_opt(
-            opts,
-            &mut cli_opts,
-            &["storage_prefix", "storage-prefix"],
-            "--storage-prefix",
-        )?;
-        update_cli_opt(
-            opts,
-            &mut cli_opts,
-            &["bucket_name", "bucket-name"],
-            "--bucket-name",
-        )?;
-        update_cli_opt(opts, &mut cli_opts, &["region"], "--region")?;
-        run(cli_opts.iter().map(|s| s.as_str()).collect())
-    }
-
-    fn new_minio(&self, opts: Option<&PyDict>) -> PyResult<String> {
-        let mut cli_opts = self.cli()?;
-        cli_opts.push("new".to_string());
-        cli_opts.push("minio".to_string());
-        update_cli_opt(opts, &mut cli_opts, &["name"], "--name")?;
-        update_cli_opt(
-            opts,
-            &mut cli_opts,
-            &["storage_prefix", "storage-prefix"],
-            "--storage-prefix",
-        )?;
-        update_cli_opt(
-            opts,
-            &mut cli_opts,
-            &["bucket_name", "bucket-name"],
-            "--bucket-name",
-        )?;
-        update_cli_opt(opts, &mut cli_opts, &["endpoint"], "--endpoint")?;
-        update_cli_opt(opts, &mut cli_opts, &["region"], "--region")?;
-        run(cli_opts.iter().map(|s| s.as_str()).collect())
-    }
-
-    fn new_digital_ocean(&self, opts: Option<&PyDict>) -> PyResult<String> {
-        let mut cli_opts = self.cli()?;
-        cli_opts.push("new".to_string());
-        cli_opts.push("digital-ocean".to_string());
-        update_cli_opt(opts, &mut cli_opts, &["name"], "--name")?;
-        update_cli_opt(
-            opts,
-            &mut cli_opts,
-            &["storage_prefix", "storage-prefix"],
-            "--storage-prefix",
-        )?;
-        update_cli_opt(
-            opts,
-            &mut cli_opts,
-            &["bucket_name", "bucket-name"],
-            "--bucket-name",
-        )?;
-        update_cli_opt(opts, &mut cli_opts, &["region"], "--region")?;
-        run(cli_opts.iter().map(|s| s.as_str()).collect())
-    }
-
-    fn new_r2(&self, opts: Option<&PyDict>) -> PyResult<String> {
-        let mut cli_opts = self.cli()?;
-        cli_opts.push("new".to_string());
-        cli_opts.push("r2".to_string());
-        update_cli_opt(opts, &mut cli_opts, &["name"], "--name")?;
-        update_cli_opt(
-            opts,
-            &mut cli_opts,
-            &["storage_prefix", "storage-prefix"],
-            "--storage-prefix",
-        )?;
-        update_cli_opt(
-            opts,
-            &mut cli_opts,
-            &["account_id", "account-id"],
-            "--account-id",
-        )?;
-        update_cli_opt(
-            opts,
-            &mut cli_opts,
-            &["bucket_name", "bucket-name"],
-            "--bucket-name",
-        )?;
-        run(cli_opts.iter().map(|s| s.as_str()).collect())
-    }
-
-    fn new_gcs(&self, opts: Option<&PyDict>) -> PyResult<String> {
-        let mut cli_opts = self.cli()?;
-        cli_opts.push("new".to_string());
-        cli_opts.push("gcs".to_string());
-        update_cli_opt(opts, &mut cli_opts, &["name"], "--name")?;
-        update_cli_opt(
-            opts,
-            &mut cli_opts,
-            &["storage_prefix", "storage-prefix"],
-            "--storage-prefix",
-        )?;
-        update_cli_opt(
-            opts,
-            &mut cli_opts,
-            &["bucket_name", "bucket-name"],
-            "--bucket-name",
-        )?;
-        update_cli_opt(opts, &mut cli_opts, &["region"], "--region")?;
-        run(cli_opts.iter().map(|s| s.as_str()).collect())
-    }
-
-    fn new_wasabi(&self, opts: Option<&PyDict>) -> PyResult<String> {
-        let mut cli_opts = self.cli()?;
-        cli_opts.push("new".to_string());
-        cli_opts.push("wasabi".to_string());
-        update_cli_opt(opts, &mut cli_opts, &["name"], "--name")?;
-        update_cli_opt(
-            opts,
-            &mut cli_opts,
-            &["storage_prefix", "storage-prefix"],
-            "--storage-prefix",
-        )?;
-        update_cli_opt(
-            opts,
-            &mut cli_opts,
-            &["bucket_name", "bucket-name"],
-            "--bucket-name",
-        )?;
-        update_cli_opt(opts, &mut cli_opts, &["endpoint"], "--endpoint")?;
-        run(cli_opts.iter().map(|s| s.as_str()).collect())
-    }
-}
-
 fn get_bool(dict: Option<&PyDict>, keys: &[&str]) -> PyResult<Option<bool>> {
     if let Some(dict) = dict {
         for key in keys {
@@ -934,7 +452,7 @@ fn get_string(dict: Option<&PyDict>, keys: &[&str]) -> PyResult<Option<String>> 
     Ok(None)
 }
 
-fn update_cli_flag(
+pub fn update_cli_flag(
     dict: Option<&PyDict>,
     cli: &mut Vec<String>,
     keys: &[&str],
@@ -948,7 +466,7 @@ fn update_cli_flag(
     Ok(())
 }
 
-fn update_cli_opt(
+pub fn update_cli_opt(
     dict: Option<&PyDict>,
     cli: &mut Vec<String>,
     keys: &[&str],
@@ -961,7 +479,7 @@ fn update_cli_opt(
     Ok(())
 }
 
-fn update_targets(tuple: &PyTuple, cli: &mut Vec<String>) -> PyResult<()> {
+pub fn update_targets(tuple: &PyTuple, cli: &mut Vec<String>) -> PyResult<()> {
     for target in tuple.iter() {
         cli.push(target.extract::<String>()?);
     }

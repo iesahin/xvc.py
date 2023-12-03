@@ -3056,7 +3056,7 @@ dependencies = [
 
 [[package]]
 name = "xvc"
-version = "0.6.3"
+version = "0.6.4-alpha.0"
 dependencies = [
  "anyhow",
  "assert_cmd",
@@ -3132,7 +3132,7 @@ dependencies = [
 
 [[package]]
 name = "xvc-core"
-version = "0.6.3"
+version = "0.6.4-alpha.0"
 dependencies = [
  "anyhow",
  "blake2",
@@ -3197,7 +3197,7 @@ dependencies = [
 
 [[package]]
 name = "xvc-file"
-version = "0.6.3"
+version = "0.6.4-alpha.0"
 dependencies = [
  "anyhow",
  "blake2",
@@ -3259,7 +3259,7 @@ dependencies = [
 
 [[package]]
 name = "xvc-pipeline"
-version = "0.6.3"
+version = "0.6.4-alpha.0"
 dependencies = [
  "anyhow",
  "blake2",
@@ -3321,11 +3321,12 @@ dependencies = [
  "pyo3",
  "xvc",
  "xvc-logging",
+ "xvc-walker",
 ]
 
 [[package]]
 name = "xvc-storage"
-version = "0.6.3"
+version = "0.6.4-alpha.0"
 dependencies = [
  "anyhow",
  "blake2",
