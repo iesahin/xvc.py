@@ -1,16 +1,16 @@
 #[pyclass]
-struct XvcStorage {
+pub struct XvcStorage {
     xvc_opts: Xvc,
 }
 
 impl XvcStorage {
-    fn init(xvc_opts: &Xvc) -> PyResult<Self> {
+    pub fn init(xvc_opts: &Xvc) -> PyResult<Self> {
         Ok(Self {
             xvc_opts: xvc_opts.clone(),
         })
     }
 
-    fn cli(&self) -> PyResult<Vec<String>> {
+    pub fn cli(&self) -> PyResult<Vec<String>> {
         let mut cli_opts = self.xvc_opts.cli()?;
         cli_opts.push("file".to_string());
         Ok(cli_opts)

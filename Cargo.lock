@@ -3321,7 +3321,6 @@ dependencies = [
  "pyo3",
  "xvc",
  "xvc-logging",
- "xvc-walker",
 ]
 
 [[package]]
