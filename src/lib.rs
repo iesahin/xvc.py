@@ -11,6 +11,7 @@ use xvc_rust::cli;
 use xvc_rust::error::Error as XvcError;
 
 pub use pipeline::XvcPipeline;
+pub use storage::XvcStorage;
 
 /// Call Xvc with the command line arguments
 #[pyfunction]
