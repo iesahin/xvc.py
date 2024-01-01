@@ -5,10 +5,10 @@ use crossbeam_channel::bounded;
 use log::LevelFilter;
 use pyo3::PyResult;
 use xvc_rust::{
-    cli::{handle_git_automation, XvcCLI, XvcSubCommand},
+    cli::{XvcCLI, XvcSubCommand},
     config::{XvcConfigInitParams, XvcVerbosity},
     core::{aliases, check_ignore, default_project_config, root, types::xvcroot::load_xvc_root},
-    error, file, git_checkout_ref, init,
+    error, file, git_checkout_ref, handle_git_automation, init,
     logging::{debug, setup_logging, uwr, XvcOutputLine},
     pipeline, storage, AbsolutePath, Error, Result,
 };
