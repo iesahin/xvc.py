@@ -17,6 +17,7 @@ pub use storage::XvcStorage;
 #[pyfunction]
 pub fn run(args: Vec<&str>) -> PyResult<String> {
     let opts = cli::XvcCLI::from_str_slice(args.as_ref()).map_err(|e| XvcPyError(e.into()))?;
+    println!("{:?}", opts);
     dispatch(opts)
 }
 
@@ -254,6 +255,8 @@ impl XvcFile {
         )?;
 
         update_targets(targets, cli_opts.as_mut())?;
+
+        println!("{:?}", cli_opts);
 
         run(cli_opts.iter().map(|s| s.as_str()).collect())
     }

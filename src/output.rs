@@ -163,7 +163,10 @@ pub fn dispatch(cli_opts: XvcCLI) -> PyResult<String> {
             }
         }
 
+        println!("Running command: {:?}", cli_opts.command);
+
         let command_thread = s.spawn(move |_| -> PyResult<()> {
+            println!("Running command: {:?}", cli_opts.command);
             match cli_opts.command {
                 XvcSubCommand::Init(opts) => {
                     let use_git = !opts.no_git;
