@@ -87,7 +87,7 @@ impl Xvc {
     }
 
     fn cli(&self) -> PyResult<Vec<String>> {
-        let mut cli_opts = Vec::new();
+        let mut cli_opts = ["xvc".to_string()];
         if let Some(verbosity) = self.verbosity {
             cli_opts.push(format!("-{}", "v".repeat(verbosity as usize)));
         }
