@@ -35,6 +35,8 @@ pub fn run(args: &[&str]) -> PyResult<String> {
 /// It doesn't recreate the whole configuration and this prevents errors regarding multiple
 /// initializations.
 pub fn dispatch(cli_opts: XvcCLI) -> PyResult<String> {
+    println!("Dispatching command: {:?}", cli_opts.command);
+
     let verbosity = if cli_opts.quiet {
         XvcVerbosity::Quiet
     } else {
@@ -84,6 +86,8 @@ pub fn dispatch(cli_opts: XvcCLI) -> PyResult<String> {
         }
     };
 
+    println!("XvcRoot: {:?}", xvc_root_opt);
+
     let output_str = thread::scope(move |s| {
         let (output_snd, output_rec) = bounded::<Option<XvcOutputLine>>(CHANNEL_BOUND);
 
@@ -100,7 +104,7 @@ pub fn dispatch(cli_opts: XvcCLI) -> PyResult<String> {
                         XvcOutputLine::Info(_) => {}
                         XvcOutputLine::Warn(_) => {}
                         XvcOutputLine::Error(_) => {}
-                        XvcOutputLine::Panic(m) => panic!("[PANIC] {}", m),
+                        XvcOutputLine::Panic(m) => eprintln!("[PANIC] {}", m),
                         XvcOutputLine::Tick(_) => todo!(),
                         XvcOutputLine::Debug(_) => {}
                     },
@@ -109,7 +113,7 @@ pub fn dispatch(cli_opts: XvcCLI) -> PyResult<String> {
                         XvcOutputLine::Info(_) => {}
                         XvcOutputLine::Warn(_) => {}
                         XvcOutputLine::Error(m) => eprintln!("[ERROR] {}", m),
-                        XvcOutputLine::Panic(m) => panic!("[PANIC] {}", m),
+                        XvcOutputLine::Panic(m) => eprintln!("[PANIC] {}", m),
                         XvcOutputLine::Tick(_) => todo!(),
                         XvcOutputLine::Debug(_) => {}
                     },
@@ -117,7 +121,7 @@ pub fn dispatch(cli_opts: XvcCLI) -> PyResult<String> {
                         XvcOutputLine::Output(m) => output_str.push_str(&m),
                         XvcOutputLine::Warn(m) => eprintln!("[WARN] {}", m),
                         XvcOutputLine::Error(m) => eprintln!("[ERROR] {}", m),
-                        XvcOutputLine::Panic(m) => panic!("[PANIC] {}", m),
+                        XvcOutputLine::Panic(m) => eprintln!("[PANIC] {}", m),
                         XvcOutputLine::Info(_) => {}
                         XvcOutputLine::Tick(_) => todo!(),
                         XvcOutputLine::Debug(_) => {}
@@ -127,7 +131,7 @@ pub fn dispatch(cli_opts: XvcCLI) -> PyResult<String> {
                         XvcOutputLine::Info(m) => eprintln!("[INFO] {}", m),
                         XvcOutputLine::Warn(m) => eprintln!("[WARN] {}", m),
                         XvcOutputLine::Error(m) => eprintln!("[ERROR] {}", m),
-                        XvcOutputLine::Panic(m) => panic!("[PANIC] {}", m),
+                        XvcOutputLine::Panic(m) => eprintln!("[PANIC] {}", m),
                         XvcOutputLine::Tick(_) => todo!(),
                         XvcOutputLine::Debug(_) => {}
                     },
@@ -136,7 +140,7 @@ pub fn dispatch(cli_opts: XvcCLI) -> PyResult<String> {
                         XvcOutputLine::Info(m) => eprintln!("[INFO] {}", m),
                         XvcOutputLine::Warn(m) => eprintln!("[WARN] {}", m),
                         XvcOutputLine::Error(m) => eprintln!("[ERROR] {}", m),
-                        XvcOutputLine::Panic(m) => panic!("[PANIC] {}", m),
+                        XvcOutputLine::Panic(m) => eprintln!("[PANIC] {}", m),
                         XvcOutputLine::Tick(_) => todo!(),
                         XvcOutputLine::Debug(m) => eprintln!("[DEBUG] {}", m),
                     },
@@ -146,7 +150,7 @@ pub fn dispatch(cli_opts: XvcCLI) -> PyResult<String> {
                         XvcOutputLine::Warn(m) => eprintln!("[WARN] {}", m),
                         XvcOutputLine::Error(m) => eprintln!("[ERROR] {}", m),
                         XvcOutputLine::Debug(m) => eprintln!("[DEBUG] {}", m),
-                        XvcOutputLine::Panic(m) => panic!("[PANIC] {}", m),
+                        XvcOutputLine::Panic(m) => eprintln!("[PANIC] {}", m),
                         XvcOutputLine::Tick(_) => todo!(),
                     },
                 }
