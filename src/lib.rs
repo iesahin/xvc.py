@@ -32,16 +32,7 @@ impl From<XvcPyError> for PyErr {
 #[pymodule]
 fn xvc(py: Python<'_>, m: &PyModule) -> PyResult<()> {
     m.add_class::<Xvc>()?;
-    // register_file_module(py, m)?;
-    // register_storage_module(py, m)?;
-    // register_pipeline_module(py, m)?;
     Ok(())
-}
-
-struct XvcOptions {
-    pub str_opt: HashMap<String, Option<String>>,
-    pub bool_opt: HashMap<String, Option<bool>>,
-    pub u8_opt: HashMap<String, Option<u8>>,
 }
 
 #[pyclass]
@@ -63,6 +54,7 @@ pub struct Xvc {
 
 #[pymethods]
 impl Xvc {
+    #[allow(clippy::too_many_arguments)]
     #[new]
     fn new(
         verbosity: Option<u8>,
@@ -162,7 +154,7 @@ impl Xvc {
         let mut cli_opts = self.cli()?;
         cli_opts.push("root".to_string());
         update_cli_flag(opts, &mut cli_opts, &["absolute"], "--absolute")?;
-
+        println!("{:?}", cli_opts);
         run(cli_opts.iter().map(|s| s.as_str()).collect())
     }
 
