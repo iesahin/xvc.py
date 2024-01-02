@@ -19,6 +19,7 @@ const CHANNEL_BOUND: usize = 10000;
 
 /// Runs the supplied xvc command.
 pub fn run(args: &[&str]) -> PyResult<String> {
+    println!("Running command: {:?}", args);
     let cli_options = XvcCLI::from_str_slice(args).map_err(XvcPyError)?;
     dispatch(cli_options)
 }
