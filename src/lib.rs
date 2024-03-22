@@ -2,8 +2,6 @@ pub mod output;
 pub mod pipeline;
 pub mod storage;
 
-use std::collections::HashMap;
-
 use output::dispatch;
 use pyo3::prelude::*;
 use pyo3::types::{PyDict, PyTuple};
@@ -16,7 +14,13 @@ pub use storage::XvcStorage;
 /// Call Xvc with the command line arguments
 #[pyfunction]
 pub fn run(args: Vec<&str>) -> PyResult<String> {
-    let opts = cli::XvcCLI::from_str_slice(args.as_ref()).map_err(|e| XvcPyError(e.into()))?;
+    let opts = match cli::XvcCLI::from_str_slice(args.as_ref()) {
+        Ok(opts) => opts,
+        Err(e) => {
+            return Ok(e.to_string());
+        }
+    };
+
     println!("{:?}", opts);
     dispatch(opts)
 }
@@ -30,7 +34,7 @@ impl From<XvcPyError> for PyErr {
 }
 
 #[pymodule]
-fn xvc(py: Python<'_>, m: &PyModule) -> PyResult<()> {
+fn xvc(_py: Python<'_>, m: &PyModule) -> PyResult<()> {
     m.add_class::<Xvc>()?;
     Ok(())
 }
@@ -100,7 +104,7 @@ impl Xvc {
         }
 
         if let Some(workdir) = &self.workdir {
-            cli_opts.push("--workdir".to_string());
+            cli_opts.push("-C".to_string());
             cli_opts.push(workdir.to_string());
         }
 
@@ -162,6 +166,7 @@ impl Xvc {
         let mut cli_opts = self.cli()?;
         cli_opts.push("check-ignore".to_string());
 
+        update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
         update_cli_flag(opts, &mut cli_opts, &["details"], "--details")?;
         update_cli_opt(
             opts,
@@ -177,19 +182,22 @@ impl Xvc {
     }
 
     /// Initialize an Xvc project
-    fn init(
-        &self,
-        path: Option<String>,
-        no_git: Option<bool>,
-        force: Option<bool>,
-    ) -> PyResult<String> {
+    fn init(&self) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("init".to_string());
 
+        update_cli_flag(None, &mut cli_opts, &["help"], "--help")?;
         update_cli_opt(None, &mut cli_opts, &["path"], "--path")?;
         update_cli_flag(None, &mut cli_opts, &["no-git"], "--no-git")?;
         update_cli_flag(None, &mut cli_opts, &["force"], "--force")?;
 
+        run(cli_opts.iter().map(|s| s.as_str()).collect())
+    }
+
+    /// Show help
+    fn help(&self) -> PyResult<String> {
+        let mut cli_opts = self.cli()?;
+        cli_opts.push("help".to_string());
         run(cli_opts.iter().map(|s| s.as_str()).collect())
     }
 }
@@ -220,6 +228,7 @@ impl XvcFile {
         let mut cli_opts = self.cli()?;
         cli_opts.push("track".to_string());
 
+        update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
         update_cli_opt(
             opts,
             &mut cli_opts,
@@ -258,6 +267,7 @@ impl XvcFile {
         let mut cli_opts = self.cli()?;
         cli_opts.push("hash".to_string());
 
+        update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
         update_cli_opt(opts, &mut cli_opts, &["algorithm"], "--algorithm")?;
         update_cli_opt(
             opts,
@@ -273,6 +283,8 @@ impl XvcFile {
     fn carry_in(&self, targets: &PyTuple, opts: Option<&PyDict>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("carry-in".to_string());
+        update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
+
         update_cli_opt(
             opts,
             &mut cli_opts,
@@ -294,6 +306,8 @@ impl XvcFile {
     fn recheck(&self, targets: &PyTuple, opts: Option<&PyDict>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("recheck".to_string());
+        update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
+
         update_cli_opt(
             opts,
             &mut cli_opts,
@@ -315,6 +329,8 @@ impl XvcFile {
     fn list(&self, targets: &PyTuple, opts: Option<&PyDict>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("list".to_string());
+        update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
+
         update_cli_opt(opts, &mut cli_opts, &["format"], "--format")?;
         update_cli_opt(opts, &mut cli_opts, &["sort"], "--sort")?;
         update_cli_flag(opts, &mut cli_opts, &["no-summary"], "--no-summary")?;
@@ -326,6 +342,8 @@ impl XvcFile {
     fn send(&self, targets: &PyTuple, opts: Option<&PyDict>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("send".to_string());
+        update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
+
         update_cli_opt(opts, &mut cli_opts, &["remote, to"], "--remote")?;
         update_cli_flag(opts, &mut cli_opts, &["force"], "--force")?;
         update_targets(targets, &mut cli_opts)?;
@@ -336,6 +354,8 @@ impl XvcFile {
     fn bring(&self, targets: &PyTuple, opts: Option<&PyDict>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("bring".to_string());
+        update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
+
         update_cli_opt(opts, &mut cli_opts, &["remote", "from"], "--remote")?;
         update_cli_flag(opts, &mut cli_opts, &["force"], "--force")?;
         update_cli_flag(opts, &mut cli_opts, &["no-recheck"], "--no-recheck")?;
@@ -353,6 +373,8 @@ impl XvcFile {
     fn copy(&self, opts: Option<&PyDict>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("copy".to_string());
+        update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
+
         update_cli_opt(
             opts,
             &mut cli_opts,
@@ -360,7 +382,6 @@ impl XvcFile {
             "--recheck-method",
         )?;
         update_cli_flag(opts, &mut cli_opts, &["force"], "--force")?;
-        update_cli_flag(opts, &mut cli_opts, &["no-recheck"], "--no-recheck")?;
         update_cli_flag(opts, &mut cli_opts, &["no-recheck"], "--no-recheck")?;
         update_cli_opt(opts, &mut cli_opts, &["source"], "--source")?;
         update_cli_opt(opts, &mut cli_opts, &["destination"], "--destination")?;
@@ -371,6 +392,8 @@ impl XvcFile {
     fn move_(&self, opts: Option<&PyDict>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("move".to_string());
+        update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
+
         update_cli_opt(
             opts,
             &mut cli_opts,
@@ -388,6 +411,8 @@ impl XvcFile {
     fn untrack(&self, targets: &PyTuple, opts: Option<&PyDict>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("untrack".to_string());
+        update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
+
         update_cli_opt(
             opts,
             &mut cli_opts,
@@ -402,6 +427,8 @@ impl XvcFile {
     fn remove(&self, targets: &PyTuple, opts: Option<&PyDict>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("remove".to_string());
+        update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
+
         update_cli_flag(opts, &mut cli_opts, &["force"], "--force")?;
         update_cli_opt(
             opts,
@@ -422,6 +449,17 @@ impl XvcFile {
             "--only-version",
         )?;
         update_targets(targets, &mut cli_opts)?;
+        run(cli_opts.iter().map(|s| s.as_str()).collect())
+    }
+
+    #[pyo3( signature = (*targets, **opts))]
+    fn share(&self, targets: &PyTuple, opts: Option<&PyDict>) -> PyResult<String> {
+        let mut cli_opts = self.cli()?;
+        cli_opts.push("share".to_string());
+        update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
+
+        update_cli_opt(opts, &mut cli_opts, &["remote"], "--remote")?;
+        update_cli_opt(opts, &mut cli_opts, &["duration"], "--duration")?;
         run(cli_opts.iter().map(|s| s.as_str()).collect())
     }
 }

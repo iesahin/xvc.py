@@ -25,15 +25,19 @@ impl XvcStorage {
 
 #[pymethods]
 impl XvcStorage {
-    fn list(&self) -> PyResult<String> {
+    fn list(&self, opts: Option<&PyDict>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("list".to_string());
+        update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
+
         run(cli_opts.iter().map(|s| s.as_str()).collect())
     }
-    fn remove(&self, name: &str) -> PyResult<String> {
+    fn remove(&self, name: &str, opts: Option<&PyDict>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("remove".to_string());
         cli_opts.push(name.to_string());
+        update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
+
         run(cli_opts.iter().map(|s| s.as_str()).collect())
     }
 
@@ -41,6 +45,7 @@ impl XvcStorage {
         let mut cli_opts = self.cli()?;
         cli_opts.push("new".to_string());
         cli_opts.push("local".to_string());
+        update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
 
         update_cli_opt(opts, &mut cli_opts, &["name"], "--name")?;
         update_cli_opt(opts, &mut cli_opts, &["path"], "--path")?;
@@ -52,6 +57,7 @@ impl XvcStorage {
         let mut cli_opts = self.cli()?;
         cli_opts.push("new".to_string());
         cli_opts.push("generic".to_string());
+        update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
 
         update_cli_opt(opts, &mut cli_opts, &["name"], "--name")?;
         update_cli_opt(
@@ -105,6 +111,7 @@ impl XvcStorage {
         let mut cli_opts = self.cli()?;
         cli_opts.push("new".to_string());
         cli_opts.push("rsync".to_string());
+        update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
 
         update_cli_opt(opts, &mut cli_opts, &["name"], "--name")?;
         update_cli_opt(opts, &mut cli_opts, &["host"], "--host")?;
@@ -124,6 +131,7 @@ impl XvcStorage {
         let mut cli_opts = self.cli()?;
         cli_opts.push("new".to_string());
         cli_opts.push("s3".to_string());
+        update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
 
         update_cli_opt(opts, &mut cli_opts, &["name"], "--name")?;
         update_cli_opt(
@@ -146,6 +154,8 @@ impl XvcStorage {
         let mut cli_opts = self.cli()?;
         cli_opts.push("new".to_string());
         cli_opts.push("minio".to_string());
+        update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
+
         update_cli_opt(opts, &mut cli_opts, &["name"], "--name")?;
         update_cli_opt(
             opts,
@@ -168,6 +178,8 @@ impl XvcStorage {
         let mut cli_opts = self.cli()?;
         cli_opts.push("new".to_string());
         cli_opts.push("digital-ocean".to_string());
+        update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
+
         update_cli_opt(opts, &mut cli_opts, &["name"], "--name")?;
         update_cli_opt(
             opts,
@@ -189,6 +201,8 @@ impl XvcStorage {
         let mut cli_opts = self.cli()?;
         cli_opts.push("new".to_string());
         cli_opts.push("r2".to_string());
+        update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
+
         update_cli_opt(opts, &mut cli_opts, &["name"], "--name")?;
         update_cli_opt(
             opts,
@@ -215,6 +229,8 @@ impl XvcStorage {
         let mut cli_opts = self.cli()?;
         cli_opts.push("new".to_string());
         cli_opts.push("gcs".to_string());
+        update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
+
         update_cli_opt(opts, &mut cli_opts, &["name"], "--name")?;
         update_cli_opt(
             opts,
@@ -236,6 +252,8 @@ impl XvcStorage {
         let mut cli_opts = self.cli()?;
         cli_opts.push("new".to_string());
         cli_opts.push("wasabi".to_string());
+        update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
+
         update_cli_opt(opts, &mut cli_opts, &["name"], "--name")?;
         update_cli_opt(
             opts,

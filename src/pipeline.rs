@@ -2,7 +2,7 @@ use pyo3::prelude::*;
 use pyo3::types::PyDict;
 
 use crate::Xvc;
-use crate::{update_cli_opt, update_cli_flag, run};
+use crate::{run, update_cli_flag, update_cli_opt};
 
 #[pyclass]
 #[derive(Clone)]
@@ -12,7 +12,7 @@ pub struct XvcPipeline {
 }
 
 impl XvcPipeline {
- pub fn init(xvc_opts: &Xvc, pipeline_name: Option<String>) -> PyResult<Self> {
+    pub fn init(xvc_opts: &Xvc, pipeline_name: Option<String>) -> PyResult<Self> {
         Ok(Self {
             xvc_opts: xvc_opts.clone(),
             pipeline_name,
@@ -36,6 +36,8 @@ impl XvcPipeline {
     fn new(&self, opts: Option<&PyDict>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("new".to_string());
+        update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
+
         update_cli_opt(
             opts,
             &mut cli_opts,
@@ -49,6 +51,8 @@ impl XvcPipeline {
     fn update(&self, opts: Option<&PyDict>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("update".to_string());
+        update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
+
         update_cli_opt(
             opts,
             &mut cli_opts,
@@ -69,6 +73,8 @@ impl XvcPipeline {
     fn delete(&self, opts: Option<&PyDict>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("delete".to_string());
+        update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
+
         update_cli_opt(
             opts,
             &mut cli_opts,
@@ -81,6 +87,8 @@ impl XvcPipeline {
     fn run(&self, opts: Option<&PyDict>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("run".to_string());
+        update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
+
         update_cli_opt(
             opts,
             &mut cli_opts,
@@ -90,15 +98,19 @@ impl XvcPipeline {
         run(cli_opts.iter().map(|s| s.as_str()).collect())
     }
 
-    fn list(&self) -> PyResult<String> {
+    fn list(&self, opts: Option<&PyDict>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("list".to_string());
+        update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
+
         run(cli_opts.iter().map(|s| s.as_str()).collect())
     }
 
     fn dag(&self, opts: Option<&PyDict>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("dag".to_string());
+        update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
+
         update_cli_opt(
             opts,
             &mut cli_opts,
@@ -113,6 +125,8 @@ impl XvcPipeline {
     fn export(&self, opts: Option<&PyDict>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("export".to_string());
+        update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
+
         update_cli_opt(
             opts,
             &mut cli_opts,
@@ -127,6 +141,8 @@ impl XvcPipeline {
     fn import(&self, opts: Option<&PyDict>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("import".to_string());
+        update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
+
         update_cli_opt(
             opts,
             &mut cli_opts,
@@ -164,6 +180,8 @@ impl XvcPipelineStep {
     fn new(&self, opts: Option<&PyDict>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("new".to_string());
+        update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
+
         update_cli_opt(
             opts,
             &mut cli_opts,
@@ -178,6 +196,8 @@ impl XvcPipelineStep {
     fn update(&self, opts: Option<&PyDict>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("update".to_string());
+        update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
+
         update_cli_opt(
             opts,
             &mut cli_opts,
@@ -192,6 +212,8 @@ impl XvcPipelineStep {
     fn dependency(&self, opts: Option<&PyDict>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("dependency".to_string());
+        update_cli_flag(opts, &mut cli_opts, &["no-recheck"], "--no-recheck")?;
+
         update_cli_opt(
             opts,
             &mut cli_opts,
@@ -215,6 +237,8 @@ impl XvcPipelineStep {
     fn output(&self, opts: Option<&PyDict>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("output".to_string());
+        update_cli_flag(opts, &mut cli_opts, &["no-recheck"], "--no-recheck")?;
+
         update_cli_opt(
             opts,
             &mut cli_opts,
@@ -230,6 +254,8 @@ impl XvcPipelineStep {
     fn show(&self, opts: Option<&PyDict>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("show".to_string());
+        update_cli_flag(opts, &mut cli_opts, &["no-recheck"], "--no-recheck")?;
+
         update_cli_opt(
             opts,
             &mut cli_opts,
@@ -239,4 +265,3 @@ impl XvcPipelineStep {
         run(cli_opts.iter().map(|s| s.as_str()).collect())
     }
 }
-

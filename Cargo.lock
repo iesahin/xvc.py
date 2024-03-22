@@ -1213,6 +1213,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "df3b46402a9d5adb4c86a0cf463f42e19994e3ee891101b1841f30a545cb49a9"
 
 [[package]]
+name = "humantime"
+version = "2.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9a3a5bfb195931eeb336b2a7b4d761daec841b97f947d34394601737a7bba5e4"
+
+[[package]]
 name = "hyper"
 version = "0.14.28"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3111,8 +3117,7 @@ dependencies = [
 
 [[package]]
 name = "xvc"
-version = "0.6.5-beta.0"
-source = "git+https://github.com/iesahin/xvc?branch=main#6bf5209ad970f2d1864911681d5024bdb7f3911a"
+version = "0.6.7"
 dependencies = [
  "anyhow",
  "assert_cmd",
@@ -3167,8 +3172,7 @@ dependencies = [
 
 [[package]]
 name = "xvc-config"
-version = "0.6.5-beta.0"
-source = "git+https://github.com/iesahin/xvc?branch=main#6bf5209ad970f2d1864911681d5024bdb7f3911a"
+version = "0.6.7"
 dependencies = [
  "crossbeam",
  "crossbeam-channel",
@@ -3190,8 +3194,7 @@ dependencies = [
 
 [[package]]
 name = "xvc-core"
-version = "0.6.5-beta.0"
-source = "git+https://github.com/iesahin/xvc?branch=main#6bf5209ad970f2d1864911681d5024bdb7f3911a"
+version = "0.6.7"
 dependencies = [
  "anyhow",
  "blake2",
@@ -3238,8 +3241,7 @@ dependencies = [
 
 [[package]]
 name = "xvc-ecs"
-version = "0.6.5-beta.0"
-source = "git+https://github.com/iesahin/xvc?branch=main#6bf5209ad970f2d1864911681d5024bdb7f3911a"
+version = "0.6.7"
 dependencies = [
  "crossbeam-channel",
  "fern",
@@ -3257,8 +3259,7 @@ dependencies = [
 
 [[package]]
 name = "xvc-file"
-version = "0.6.5-beta.0"
-source = "git+https://github.com/iesahin/xvc?branch=main#6bf5209ad970f2d1864911681d5024bdb7f3911a"
+version = "0.6.7"
 dependencies = [
  "anyhow",
  "blake2",
@@ -3274,6 +3275,7 @@ dependencies = [
  "fern",
  "glob",
  "hex",
+ "humantime",
  "itertools 0.11.0",
  "jwalk",
  "lazy_static",
@@ -3311,8 +3313,7 @@ dependencies = [
 
 [[package]]
 name = "xvc-logging"
-version = "0.6.5-beta.0"
-source = "git+https://github.com/iesahin/xvc?branch=main#6bf5209ad970f2d1864911681d5024bdb7f3911a"
+version = "0.6.7"
 dependencies = [
  "crossbeam-channel",
  "fern",
@@ -3321,8 +3322,7 @@ dependencies = [
 
 [[package]]
 name = "xvc-pipeline"
-version = "0.6.5-beta.0"
-source = "git+https://github.com/iesahin/xvc?branch=main#6bf5209ad970f2d1864911681d5024bdb7f3911a"
+version = "0.6.7"
 dependencies = [
  "anyhow",
  "blake2",
@@ -3375,7 +3375,7 @@ dependencies = [
 
 [[package]]
 name = "xvc-py"
-version = "0.6.5-beta.0"
+version = "0.6.7-alpha-1"
 dependencies = [
  "crossbeam",
  "crossbeam-channel",
@@ -3389,8 +3389,7 @@ dependencies = [
 
 [[package]]
 name = "xvc-storage"
-version = "0.6.5-beta.0"
-source = "git+https://github.com/iesahin/xvc?branch=main#6bf5209ad970f2d1864911681d5024bdb7f3911a"
+version = "0.6.7"
 dependencies = [
  "anyhow",
  "blake2",
@@ -3405,6 +3404,7 @@ dependencies = [
  "futures",
  "glob",
  "hex",
+ "humantime",
  "itertools 0.12.0",
  "jwalk",
  "lazy_static",
@@ -3444,8 +3444,7 @@ dependencies = [
 
 [[package]]
 name = "xvc-walker"
-version = "0.6.5-beta.0"
-source = "git+https://github.com/iesahin/xvc?branch=main#6bf5209ad970f2d1864911681d5024bdb7f3911a"
+version = "0.6.7"
 dependencies = [
  "anyhow",
  "crossbeam",
