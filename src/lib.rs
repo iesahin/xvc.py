@@ -182,14 +182,14 @@ impl Xvc {
     }
 
     /// Initialize an Xvc project
-    fn init(&self) -> PyResult<String> {
+    fn init(&self, opts: Option<&PyDict>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("init".to_string());
 
-        update_cli_flag(None, &mut cli_opts, &["help"], "--help")?;
-        update_cli_opt(None, &mut cli_opts, &["path"], "--path")?;
-        update_cli_flag(None, &mut cli_opts, &["no-git"], "--no-git")?;
-        update_cli_flag(None, &mut cli_opts, &["force"], "--force")?;
+        update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
+        update_cli_opt(opts, &mut cli_opts, &["path"], "--path")?;
+        update_cli_flag(opts, &mut cli_opts, &["no-git"], "--no-git")?;
+        update_cli_flag(opts, &mut cli_opts, &["force"], "--force")?;
 
         run(cli_opts.iter().map(|s| s.as_str()).collect())
     }
