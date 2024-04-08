@@ -37,6 +37,7 @@ pub fn run(args: &[&str]) -> PyResult<String> {
 /// initializations.
 pub fn dispatch(cli_opts: XvcCLI) -> PyResult<String> {
     println!("Dispatching command: {:?}", cli_opts.command);
+    println!("workdir: {:?}", cli_opts.workdir);
 
     let verbosity = if cli_opts.quiet {
         XvcVerbosity::Quiet
@@ -79,7 +80,11 @@ pub fn dispatch(cli_opts: XvcCLI) -> PyResult<String> {
         default_configuration: default_project_config(true),
     };
 
-    let xvc_root_opt = match load_xvc_root(Path::new(&cli_opts.workdir), xvc_config_params) {
+    println!("{:?}", &xvc_config_params.current_dir);
+
+    let current_dir = xvc_config_params.current_dir.clone();
+
+    let xvc_root_opt = match load_xvc_root(&current_dir, xvc_config_params) {
         Ok(r) => Some(r),
         Err(e) => {
             e.debug();
