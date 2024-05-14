@@ -82,9 +82,7 @@ pub fn dispatch(cli_opts: XvcCLI) -> PyResult<String> {
 
     println!("{:?}", &xvc_config_params.current_dir);
 
-    let current_dir = xvc_config_params.current_dir.clone();
-
-    let xvc_root_opt = match load_xvc_root(&current_dir, xvc_config_params) {
+    let xvc_root_opt = match load_xvc_root(xvc_config_params) {
         Ok(r) => Some(r),
         Err(e) => {
             e.debug();
@@ -181,10 +179,11 @@ pub fn dispatch(cli_opts: XvcCLI) -> PyResult<String> {
                 XvcSubCommand::Init(opts) => {
                     let use_git = !opts.no_git;
                     let xvc_root = init::run(xvc_root_opt.as_ref(), opts).map_err(XvcPyError)?;
+                    // FIXME: Do we need a separate xvc_root.record() here to record the EC state?
                     if use_git {
                         handle_git_automation(
                             &output_snd,
-                            xvc_root,
+                            &xvc_root,
                             cli_opts.to_branch.as_deref(),
                             &cli_opts.command_string,
                         )
@@ -259,12 +258,13 @@ pub fn dispatch(cli_opts: XvcCLI) -> PyResult<String> {
 
             match xvc_root_opt {
                 Some(xvc_root) => {
+                    xvc_root.record();
                     if cli_opts.skip_git {
                         debug!(output_snd, "Skipping Git operations");
                     } else {
                         handle_git_automation(
                             &output_snd,
-                            xvc_root,
+                            &xvc_root,
                             cli_opts.to_branch.as_deref(),
                             &cli_opts.command_string,
                         )
@@ -272,10 +272,6 @@ pub fn dispatch(cli_opts: XvcCLI) -> PyResult<String> {
                     }
                 }
                 None => {
-                    debug!(
-                        output_snd,
-                        "Xvc is outside of a project, no need to handle Git operations."
-                    );
                 }
             }
             Ok(())

@@ -13,10 +13,33 @@ use xvc_rust::error::Error as XvcError;
 pub use pipeline::XvcPipeline;
 pub use storage::XvcStorage;
 
+use git_version::git_version;
+const GIT_VERSION: &str = git_version!(cargo_prefix = "", fallback = "unknown");
+
+
+#[pyfunction]
+pub fn version() -> PyResult<String> {
+    Ok(GIT_VERSION.to_owned())
+}
+
 /// Call Xvc with the command line arguments
 #[pyfunction]
+pub fn run_xvc(cmd: String) -> PyResult<String> {
+    let args: Vec<&str> = cmd.split(' ').collect();
+    let opts = match cli::XvcCLI::from_str_slice(&args) {
+        Ok(opts) => opts,
+        Err(e) => {
+            return Ok(e.to_string());
+        }
+    };
+
+    println!("{:?}", opts);
+    dispatch(opts)
+}
+
 pub fn run(args: Vec<&str>) -> PyResult<String> {
-    let opts = match cli::XvcCLI::from_str_slice(args.as_ref()) {
+
+    let opts = match cli::XvcCLI::from_str_slice(&args) {
         Ok(opts) => opts,
         Err(e) => {
             return Ok(e.to_string());
@@ -38,6 +61,8 @@ impl From<XvcPyError> for PyErr {
 #[pymodule]
 fn xvc(_py: Python<'_>, m: &PyModule) -> PyResult<()> {
     m.add_class::<Xvc>()?;
+    m.add_function(wrap_pyfunction!(run_xvc, m)?)?;
+    m.add_function(wrap_pyfunction!(version, m)?)?;
     Ok(())
 }
 
