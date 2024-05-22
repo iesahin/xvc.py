@@ -2,7 +2,7 @@ use pyo3::prelude::*;
 use pyo3::types::PyDict;
 
 use crate::Xvc;
-use crate::{run, update_cli_flag, update_cli_opt};
+use crate::{update_cli_flag, update_cli_opt};
 
 #[pyclass]
 pub struct XvcStorage {
@@ -21,27 +21,31 @@ impl XvcStorage {
         cli_opts.push("file".to_string());
         Ok(cli_opts)
     }
+
+    fn xvc_run(&self, args: Vec<String>) -> PyResult<String> {
+        self.xvc_opts.run(args)
+    }
 }
 
 #[pymethods]
 impl XvcStorage {
-    fn list(&self, opts: Option<&PyDict>) -> PyResult<String> {
+    fn list(&self, opts: Option<&Bound<PyDict>>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("list".to_string());
         update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
 
-        run(cli_opts.iter().map(|s| s.as_str()).collect())
+        self.xvc_run(cli_opts)
     }
-    fn remove(&self, name: &str, opts: Option<&PyDict>) -> PyResult<String> {
+    fn remove(&self, name: &str, opts: Option<&Bound<PyDict>>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("remove".to_string());
         cli_opts.push(name.to_string());
         update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
 
-        run(cli_opts.iter().map(|s| s.as_str()).collect())
+        self.xvc_run(cli_opts)
     }
 
-    fn new_local(&self, opts: Option<&PyDict>) -> PyResult<String> {
+    fn new_local(&self, opts: Option<&Bound<PyDict>>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("new".to_string());
         cli_opts.push("local".to_string());
@@ -50,10 +54,10 @@ impl XvcStorage {
         update_cli_opt(opts, &mut cli_opts, &["name"], "--name")?;
         update_cli_opt(opts, &mut cli_opts, &["path"], "--path")?;
 
-        run(cli_opts.iter().map(|s| s.as_str()).collect())
+        self.xvc_run(cli_opts)
     }
 
-    fn new_generic(&self, opts: Option<&PyDict>) -> PyResult<String> {
+    fn new_generic(&self, opts: Option<&Bound<PyDict>>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("new".to_string());
         cli_opts.push("generic".to_string());
@@ -104,10 +108,10 @@ impl XvcStorage {
             "--storage-dir",
         )?;
 
-        run(cli_opts.iter().map(|s| s.as_str()).collect())
+        self.xvc_run(cli_opts)
     }
 
-    fn new_rsync(&self, opts: Option<&PyDict>) -> PyResult<String> {
+    fn new_rsync(&self, opts: Option<&Bound<PyDict>>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("new".to_string());
         cli_opts.push("rsync".to_string());
@@ -124,10 +128,10 @@ impl XvcStorage {
             "--storage-dir",
         )?;
 
-        run(cli_opts.iter().map(|s| s.as_str()).collect())
+        self.xvc_run(cli_opts)
     }
 
-    fn new_s3(&self, opts: Option<&PyDict>) -> PyResult<String> {
+    fn new_s3(&self, opts: Option<&Bound<PyDict>>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("new".to_string());
         cli_opts.push("s3".to_string());
@@ -147,10 +151,10 @@ impl XvcStorage {
             "--bucket-name",
         )?;
         update_cli_opt(opts, &mut cli_opts, &["region"], "--region")?;
-        run(cli_opts.iter().map(|s| s.as_str()).collect())
+        self.xvc_run(cli_opts)
     }
 
-    fn new_minio(&self, opts: Option<&PyDict>) -> PyResult<String> {
+    fn new_minio(&self, opts: Option<&Bound<PyDict>>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("new".to_string());
         cli_opts.push("minio".to_string());
@@ -171,10 +175,10 @@ impl XvcStorage {
         )?;
         update_cli_opt(opts, &mut cli_opts, &["endpoint"], "--endpoint")?;
         update_cli_opt(opts, &mut cli_opts, &["region"], "--region")?;
-        run(cli_opts.iter().map(|s| s.as_str()).collect())
+        self.xvc_run(cli_opts)
     }
 
-    fn new_digital_ocean(&self, opts: Option<&PyDict>) -> PyResult<String> {
+    fn new_digital_ocean(&self, opts: Option<&Bound<PyDict>>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("new".to_string());
         cli_opts.push("digital-ocean".to_string());
@@ -194,10 +198,10 @@ impl XvcStorage {
             "--bucket-name",
         )?;
         update_cli_opt(opts, &mut cli_opts, &["region"], "--region")?;
-        run(cli_opts.iter().map(|s| s.as_str()).collect())
+        self.xvc_run(cli_opts)
     }
 
-    fn new_r2(&self, opts: Option<&PyDict>) -> PyResult<String> {
+    fn new_r2(&self, opts: Option<&Bound<PyDict>>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("new".to_string());
         cli_opts.push("r2".to_string());
@@ -222,10 +226,10 @@ impl XvcStorage {
             &["bucket_name", "bucket-name"],
             "--bucket-name",
         )?;
-        run(cli_opts.iter().map(|s| s.as_str()).collect())
+        self.xvc_run(cli_opts)
     }
 
-    fn new_gcs(&self, opts: Option<&PyDict>) -> PyResult<String> {
+    fn new_gcs(&self, opts: Option<&Bound<PyDict>>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("new".to_string());
         cli_opts.push("gcs".to_string());
@@ -245,10 +249,10 @@ impl XvcStorage {
             "--bucket-name",
         )?;
         update_cli_opt(opts, &mut cli_opts, &["region"], "--region")?;
-        run(cli_opts.iter().map(|s| s.as_str()).collect())
+        self.xvc_run(cli_opts)
     }
 
-    fn new_wasabi(&self, opts: Option<&PyDict>) -> PyResult<String> {
+    fn new_wasabi(&self, opts: Option<&Bound<PyDict>>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("new".to_string());
         cli_opts.push("wasabi".to_string());
@@ -268,6 +272,6 @@ impl XvcStorage {
             "--bucket-name",
         )?;
         update_cli_opt(opts, &mut cli_opts, &["endpoint"], "--endpoint")?;
-        run(cli_opts.iter().map(|s| s.as_str()).collect())
+        self.xvc_run(cli_opts)
     }
 }

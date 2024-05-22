@@ -1,27 +1,27 @@
-use std::{io, path::Path};
+use std::io;
 
 use crossbeam::thread;
 use crossbeam_channel::bounded;
 use log::LevelFilter;
 use pyo3::PyResult;
 use xvc_rust::{
-    cli::{XvcCLI, XvcSubCommand},
-    config::{XvcConfigInitParams, XvcVerbosity},
-    core::{aliases, check_ignore, default_project_config, root, types::xvcroot::load_xvc_root},
-    error, file, git_checkout_ref, handle_git_automation, init,
-    logging::{debug, setup_logging, uwr, XvcOutputLine},
-    pipeline, storage, AbsolutePath, Error, Result,
+    cli::{XvcCLI, XvcSubCommand}, config::XvcVerbosity, core::{aliases, check_ignore, root}, error, file, git_checkout_ref, handle_git_automation, init, logging::{debug, setup_logging, uwr, XvcOutputLine}, pipeline, storage, Error, Result, XvcRootOpt
 };
 
 use crate::XvcPyError;
 
 const CHANNEL_BOUND: usize = 10000;
 
+pub struct PyCommandOutput {
+    pub output: String,
+    pub xvc_root_opt: XvcRootOpt
+}
+
 /// Runs the supplied xvc command.
-pub fn run(args: &[&str]) -> PyResult<String> {
+pub fn run(xvc_root_opt: XvcRootOpt, args: &[&str]) -> PyResult<PyCommandOutput> {
     println!("Running command: {:?}", args);
-    let cli_options = XvcCLI::from_str_slice(args).map_err(XvcPyError)?;
-    dispatch(cli_options)
+    let cli_opts = XvcCLI::from_str_slice(args).map_err(XvcPyError)?;
+    dispatch_with_root(xvc_root_opt, cli_opts)
 }
 
 /// Dispatch commands to respective functions in the API
@@ -35,7 +35,10 @@ pub fn run(args: &[&str]) -> PyResult<String> {
 /// A corresponding function to reuse the same [XvcRoot] object is [test_dispatch].
 /// It doesn't recreate the whole configuration and this prevents errors regarding multiple
 /// initializations.
-pub fn dispatch(cli_opts: XvcCLI) -> PyResult<String> {
+///
+/// The xvc_root_opt is passed within a cell to make it updatable in xvc init command. Otherwise
+/// the return value should be the same with sent value. 
+pub fn dispatch_with_root(xvc_root_opt: XvcRootOpt, cli_opts: XvcCLI) -> PyResult<PyCommandOutput> {
     println!("Dispatching command: {:?}", cli_opts.command);
     println!("workdir: {:?}", cli_opts.workdir);
 
@@ -69,30 +72,7 @@ pub fn dispatch(cli_opts: XvcCLI) -> PyResult<String> {
         },
     );
 
-    let xvc_config_params = XvcConfigInitParams {
-        current_dir: AbsolutePath::from(&cli_opts.workdir),
-        include_system_config: !cli_opts.no_system_config,
-        include_user_config: !cli_opts.no_user_config,
-        project_config_path: None,
-        local_config_path: None,
-        include_environment_config: !cli_opts.no_env_config,
-        command_line_config: Some(cli_opts.consolidate_config_options()),
-        default_configuration: default_project_config(true),
-    };
-
-    println!("{:?}", &xvc_config_params.current_dir);
-
-    let xvc_root_opt = match load_xvc_root(xvc_config_params) {
-        Ok(r) => Some(r),
-        Err(e) => {
-            e.debug();
-            None
-        }
-    };
-
-    println!("XvcRoot: {:?}", xvc_root_opt);
-
-    let output_str = thread::scope(move |s| {
+    let command_output = thread::scope(move |s| {
         let (output_snd, output_rec) = bounded::<Option<XvcOutputLine>>(CHANNEL_BOUND);
 
         let output_snd_clone = output_snd.clone();
@@ -173,9 +153,9 @@ pub fn dispatch(cli_opts: XvcCLI) -> PyResult<String> {
 
         println!("Running command: {:?}", cli_opts.command);
 
-        let command_thread = s.spawn(move |_| -> PyResult<()> {
+        let command_thread = s.spawn(move |_| -> PyResult<XvcRootOpt> {
             println!("Running command: {:?}", cli_opts.command);
-            match cli_opts.command {
+            let res_xvc_root_opt: Result<XvcRootOpt> = match cli_opts.command {
                 XvcSubCommand::Init(opts) => {
                     let use_git = !opts.no_git;
                     let xvc_root = init::run(xvc_root_opt.as_ref(), opts).map_err(XvcPyError)?;
@@ -189,32 +169,37 @@ pub fn dispatch(cli_opts: XvcCLI) -> PyResult<String> {
                         )
                         .map_err(XvcPyError)?;
                     }
-                    Result::Ok(())
+                    Ok(Some(xvc_root))
                 }
 
                 XvcSubCommand::Aliases(opts) => {
-                    Ok(aliases::run(&output_snd, opts).map_err(|e| XvcPyError(e.into()))?)
+                    aliases::run(&output_snd, opts).map_err(|e| XvcPyError(e.into()))?;
+                    Ok(xvc_root_opt)
+
                 }
 
                 // following commands can only be run inside a repository
-                XvcSubCommand::Root(opts) => Ok(root::run(
+                XvcSubCommand::Root(opts) => { root::run(
                     &output_snd,
                     xvc_root_opt
                         .as_ref()
                         .ok_or_else(|| XvcPyError(Error::RequiresXvcRepository))?,
                     opts,
                 )
-                .map_err(|e| XvcPyError(e.into()))?),
+                .map_err(|e| XvcPyError(e.into()))?;
+
+                    Ok(xvc_root_opt) }
 
                 XvcSubCommand::File(opts) => {
-                    Ok(file::run(&output_snd, xvc_root_opt.as_ref(), opts)
-                        .map_err(|e| XvcPyError(e.into()))?)
+                    file::run(&output_snd, xvc_root_opt.as_ref(), opts)
+                        .map_err(|e| XvcPyError(e.into()))?;
+                    Ok(xvc_root_opt)
                 }
 
                 XvcSubCommand::Pipeline(opts) => {
                     let stdin = io::stdin();
                     let input = stdin.lock();
-                    Ok(pipeline::cmd_pipeline(
+                    pipeline::cmd_pipeline(
                         input,
                         &output_snd,
                         xvc_root_opt
@@ -222,14 +207,15 @@ pub fn dispatch(cli_opts: XvcCLI) -> PyResult<String> {
                             .ok_or(XvcPyError(Error::RequiresXvcRepository))?,
                         opts,
                     )
-                    .map_err(|e| XvcPyError(e.into()))?)
+                    .map_err(|e| XvcPyError(e.into()))?;
+                    Ok(xvc_root_opt)
                 }
 
                 XvcSubCommand::CheckIgnore(opts) => {
                     let stdin = io::stdin();
                     let input = stdin.lock();
 
-                    Ok(check_ignore::cmd_check_ignore(
+                    check_ignore::cmd_check_ignore(
                         input,
                         &output_snd,
                         xvc_root_opt
@@ -237,13 +223,15 @@ pub fn dispatch(cli_opts: XvcCLI) -> PyResult<String> {
                             .ok_or(XvcPyError(Error::RequiresXvcRepository))?,
                         opts,
                     )
-                    .map_err(|e| XvcPyError(e.into()))?)
+                    .map_err(|e| XvcPyError(e.into()))?;
+
+                    Ok(xvc_root_opt)
                 }
 
                 XvcSubCommand::Storage(opts) => {
                     let stdin = io::stdin();
                     let input = stdin.lock();
-                    Ok(storage::cmd_storage(
+                    storage::cmd_storage(
                         input,
                         &output_snd,
                         xvc_root_opt
@@ -251,41 +239,46 @@ pub fn dispatch(cli_opts: XvcCLI) -> PyResult<String> {
                             .ok_or(XvcPyError(Error::RequiresXvcRepository))?,
                         opts,
                     )
-                    .map_err(|e| XvcPyError(e.into()))?)
-                }
-            }
-            .map_err(XvcPyError)?;
+                    .map_err(|e| XvcPyError(e.into()))?;
 
-            match xvc_root_opt {
-                Some(xvc_root) => {
+                    Ok(xvc_root_opt)
+                }
+            };
+
+            // FIXME: Handle error more gracefully
+            let xvc_root_opt = res_xvc_root_opt.unwrap();
+            
+
+            if let Some(ref xvc_root) = xvc_root_opt { 
+                if !cli_opts.skip_git {
                     xvc_root.record();
-                    if cli_opts.skip_git {
-                        debug!(output_snd, "Skipping Git operations");
-                    } else {
-                        handle_git_automation(
-                            &output_snd,
-                            &xvc_root,
-                            cli_opts.to_branch.as_deref(),
-                            &cli_opts.command_string,
-                        )
-                        .map_err(XvcPyError)?;
-                    }
-                }
-                None => {
-                }
+                    handle_git_automation(
+                        &output_snd,
+                        xvc_root,
+                        cli_opts.to_branch.as_deref(),
+                        &cli_opts.command_string,
+                        // FIXME: Handle this error more gracefully
+                    ).unwrap();
             }
-            Ok(())
-        });
+            }
 
-        match command_thread.join().unwrap() {
-            Ok(_) => debug!(output_snd_clone, "Command completed successfully."),
-            Err(e) => error!(output_snd_clone, "{}", e),
-        }
+            Ok(xvc_root_opt)
+        }).join();
+
+        let xvc_root_opt= match command_thread.unwrap() {
+            Ok(xvc_root_opt) => { debug!(output_snd_clone, "Command completed successfully."); 
+            xvc_root_opt }
+            Err(e) => { error!(output_snd_clone, "{}", e); None } 
+        };
 
         output_snd_clone.send(None).unwrap();
-        output_thread.join().unwrap()
+        let output = output_thread.join().unwrap();
+
+        let res = PyCommandOutput { output, xvc_root_opt };
+        Ok(res)
+
     })
     .unwrap();
 
-    Ok(output_str)
+    command_output
 }
