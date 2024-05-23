@@ -11,7 +11,7 @@ use pyo3::prelude::*;
 use pyo3::types::{PyDict, PyTuple};
 use xvc_rust::core::default_project_config;
 use xvc_rust::core::types::xvcroot::load_xvc_root;
-use xvc_rust::{cli, AbsolutePath, XvcConfigInitParams, XvcRootOpt};
+use xvc_rust::{cli, watch, AbsolutePath, XvcConfigInitParams, XvcRootOpt};
 use xvc_rust::error::Error as XvcError;
 
 pub use pipeline::XvcPipeline;
@@ -141,6 +141,8 @@ impl Xvc {
         default_configuration: default_project_config(true),
     };
 
+        println!("{:?}", xvc_config_init_params);
+        
     let xvc_root_opt = match load_xvc_root(xvc_config_init_params.clone()) {
         Ok(r) => RefCell::new(Some(r)),
         Err(e) => {
@@ -148,6 +150,7 @@ impl Xvc {
             RefCell::new(None)
         }
     };
+        watch!(xvc_root_opt);
 
         Ok(Self {
             xvc_config_init_params,
