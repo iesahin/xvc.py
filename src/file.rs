@@ -73,7 +73,6 @@ impl XvcFile {
         dbg!("{:?}", &cli_opts);
 
         update_targets(targets, cli_opts.as_mut())?;
-        watch!(cli_opts);
         watch!(self);
 
         Ok(format!("{:?}", cli_opts))
