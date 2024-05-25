@@ -132,11 +132,11 @@ impl Xvc {
 
     let xvc_config_init_params = XvcConfigInitParams {
         current_dir: AbsolutePath::from(workdir.clone().unwrap_or_else(|| ".".to_owned())),
-        include_system_config: no_system_config.unwrap_or_default(),
-        include_user_config: no_user_config.unwrap_or_default(),
+        include_system_config: !no_system_config.unwrap_or_default(),
+        include_user_config: !no_user_config.unwrap_or_default(),
         project_config_path: None,
         local_config_path: None,
-        include_environment_config: no_env_config.unwrap_or_default(),
+        include_environment_config: !no_env_config.unwrap_or_default(),
         command_line_config: None,
         default_configuration: default_project_config(true),
     };
