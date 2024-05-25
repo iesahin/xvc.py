@@ -80,7 +80,7 @@ fn xvc(_py: Python<'_>, m: &Bound<PyModule>) -> PyResult<()> {
 }
 
 #[pyclass]
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Xvc {
     xvc_config_init_params: XvcConfigInitParams,
     verbosity: Option<u8>,
@@ -150,7 +150,7 @@ impl Xvc {
             RefCell::new(None)
         }
     };
-        watch!(xvc_root_opt);
+        watch!(&xvc_root_opt);
 
         Ok(Self {
             xvc_config_init_params,
@@ -219,6 +219,7 @@ impl Xvc {
 
 
     fn file(&self) -> PyResult<XvcFile> {
+        watch!(self);
         XvcFile::new(self)
     }
 

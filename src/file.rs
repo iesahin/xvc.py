@@ -1,10 +1,12 @@
 use pyo3::prelude::*;
 use pyo3::types::{PyDict, PyTuple};
+use xvc_rust::watch;
 
 use crate::{update_cli_flag, update_cli_opt};
 use crate::{update_targets, Xvc};
 
 #[pyclass]
+#[derive(Clone, Debug)]
 pub struct XvcFile {
     xvc_opts: Xvc,
 }
@@ -23,6 +25,7 @@ impl XvcFile {
     }
 
     fn run(&self, args: Vec<String>) -> PyResult<String> {
+        watch!(args);
         self.xvc_opts.run(args)
     }
 }
@@ -32,40 +35,50 @@ impl XvcFile {
     #[pyo3( signature = (*targets, **opts))]
     fn track(&self, targets: &Bound<PyTuple>, opts: Option<&Bound<PyDict>>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
+        dbg!("{:?}", &cli_opts);
         cli_opts.push("track".to_string());
 
+        dbg!("{:?}", &cli_opts);
         update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
+        dbg!("{:?}", &cli_opts);
         update_cli_opt(
             opts,
             &mut cli_opts,
             &["recheck-method", "recheck_method"],
             "--recheck-method",
         )?;
+        dbg!("{:?}", &cli_opts);
         update_cli_flag(
             opts,
             &mut cli_opts,
             &["no-commit", "no_commit"],
             "--no-commit",
         )?;
+        dbg!("{:?}", &cli_opts);
         update_cli_opt(
             opts,
             &mut cli_opts,
             &["text-or-binary", "text_or_binary"],
             "--text-or-binary",
         )?;
+        dbg!("{:?}", &cli_opts);
         update_cli_flag(opts, &mut cli_opts, &["force"], "--force")?;
+        dbg!("{:?}", &cli_opts);
         update_cli_flag(
             opts,
             &mut cli_opts,
             &["no-parallel", "no_parallel"],
             "--no-parallel",
         )?;
+        dbg!("{:?}", &cli_opts);
 
         update_targets(targets, cli_opts.as_mut())?;
+        watch!(cli_opts);
+        watch!(self);
 
-        println!("{:?}", cli_opts);
-
-        self.run(cli_opts)
+        Ok(format!("{:?}", cli_opts))
+        
+        // self.run(cli_opts)
     }
 
     #[pyo3( signature = (*targets, **opts))]

@@ -5,7 +5,7 @@ use crate::Xvc;
 use crate::{update_cli_flag, update_cli_opt};
 
 #[pyclass]
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct XvcPipeline {
     xvc_opts: Xvc,
     pipeline_name: Option<String>,

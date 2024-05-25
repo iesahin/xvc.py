@@ -5,6 +5,7 @@ use crate::Xvc;
 use crate::{update_cli_flag, update_cli_opt};
 
 #[pyclass]
+#[derive(Clone, Debug)]
 pub struct XvcStorage {
     xvc_opts: Xvc,
 }
