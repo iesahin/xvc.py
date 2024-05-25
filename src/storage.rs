@@ -30,6 +30,7 @@ impl XvcStorage {
 
 #[pymethods]
 impl XvcStorage {
+    #[pyo3(signature = (**opts))]
     fn list(&self, opts: Option<&Bound<PyDict>>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("list".to_string());
@@ -37,6 +38,7 @@ impl XvcStorage {
 
         self.xvc_run(cli_opts)
     }
+    #[pyo3(signature = (name, **opts))]
     fn remove(&self, name: &str, opts: Option<&Bound<PyDict>>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("remove".to_string());
@@ -46,6 +48,7 @@ impl XvcStorage {
         self.xvc_run(cli_opts)
     }
 
+    #[pyo3(signature = (**opts))]
     fn new_local(&self, opts: Option<&Bound<PyDict>>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("new".to_string());
@@ -58,6 +61,7 @@ impl XvcStorage {
         self.xvc_run(cli_opts)
     }
 
+    #[pyo3(signature = (**opts))]
     fn new_generic(&self, opts: Option<&Bound<PyDict>>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("new".to_string());
@@ -112,6 +116,7 @@ impl XvcStorage {
         self.xvc_run(cli_opts)
     }
 
+    #[pyo3(signature = (**opts))]
     fn new_rsync(&self, opts: Option<&Bound<PyDict>>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("new".to_string());
@@ -132,6 +137,7 @@ impl XvcStorage {
         self.xvc_run(cli_opts)
     }
 
+    #[pyo3(signature = (**opts))]
     fn new_s3(&self, opts: Option<&Bound<PyDict>>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("new".to_string());
@@ -155,6 +161,7 @@ impl XvcStorage {
         self.xvc_run(cli_opts)
     }
 
+    #[pyo3(signature = (**opts))]
     fn new_minio(&self, opts: Option<&Bound<PyDict>>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("new".to_string());
@@ -179,6 +186,7 @@ impl XvcStorage {
         self.xvc_run(cli_opts)
     }
 
+    #[pyo3(signature = (**opts))]
     fn new_digital_ocean(&self, opts: Option<&Bound<PyDict>>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("new".to_string());
@@ -202,6 +210,7 @@ impl XvcStorage {
         self.xvc_run(cli_opts)
     }
 
+    #[pyo3(signature = (**opts))]
     fn new_r2(&self, opts: Option<&Bound<PyDict>>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("new".to_string());
@@ -230,6 +239,7 @@ impl XvcStorage {
         self.xvc_run(cli_opts)
     }
 
+    #[pyo3(signature = (**opts))]
     fn new_gcs(&self, opts: Option<&Bound<PyDict>>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("new".to_string());
@@ -253,6 +263,7 @@ impl XvcStorage {
         self.xvc_run(cli_opts)
     }
 
+    #[pyo3(signature = (**opts))]
     fn new_wasabi(&self, opts: Option<&Bound<PyDict>>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("new".to_string());

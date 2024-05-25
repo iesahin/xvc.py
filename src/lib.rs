@@ -233,6 +233,7 @@ impl Xvc {
     }
 
 
+    #[pyo3(signature = (**opts))]
     fn root(&self, opts: Option<&Bound<PyDict>>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("root".to_string());
@@ -241,6 +242,7 @@ impl Xvc {
         self.run(cli_opts)
     }
 
+    #[pyo3(signature = (*targets, **opts))]
     fn check_ignore(&self, targets: &Bound<PyTuple>, opts: Option<&Bound<PyDict>>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("check-ignore".to_string());
@@ -261,6 +263,7 @@ impl Xvc {
     }
 
     /// Initialize an Xvc project
+    #[pyo3(signature = (**opts))]
     fn init(&self, opts: Option<&Bound<PyDict>>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("init".to_string());

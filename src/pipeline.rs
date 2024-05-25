@@ -37,6 +37,8 @@ impl XvcPipeline {
 
 #[pymethods]
 impl XvcPipeline {
+
+    #[pyo3(signature = (**opts))]
     fn new(&self, opts: Option<&Bound<PyDict>>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("new".to_string());
@@ -52,6 +54,7 @@ impl XvcPipeline {
         self.xvc_run(cli_opts)
     }
 
+    #[pyo3(signature = (**opts))]
     fn update(&self, opts: Option<&Bound<PyDict>>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("update".to_string());
@@ -74,6 +77,7 @@ impl XvcPipeline {
         self.xvc_run(cli_opts)
     }
 
+    #[pyo3(signature = (**opts))]
     fn delete(&self, opts: Option<&Bound<PyDict>>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("delete".to_string());
@@ -88,6 +92,7 @@ impl XvcPipeline {
         self.xvc_run(cli_opts)
     }
 
+    #[pyo3(signature = (**opts))]
     fn run(&self, opts: Option<&Bound<PyDict>>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("run".to_string());
@@ -102,6 +107,7 @@ impl XvcPipeline {
         self.xvc_run(cli_opts)
     }
 
+    #[pyo3(signature = (**opts))]
     fn list(&self, opts: Option<&Bound<PyDict>>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("list".to_string());
@@ -110,6 +116,7 @@ impl XvcPipeline {
         self.xvc_run(cli_opts)
     }
 
+    #[pyo3(signature = (**opts))]
     fn dag(&self, opts: Option<&Bound<PyDict>>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("dag".to_string());
@@ -126,6 +133,7 @@ impl XvcPipeline {
         self.xvc_run(cli_opts)
     }
 
+    #[pyo3(signature = (**opts))]
     fn export(&self, opts: Option<&Bound<PyDict>>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("export".to_string());
@@ -142,6 +150,7 @@ impl XvcPipeline {
         self.xvc_run(cli_opts)
     }
 
+    #[pyo3(signature = (**opts))]
     fn import(&self, opts: Option<&Bound<PyDict>>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("import".to_string());
@@ -159,6 +168,7 @@ impl XvcPipeline {
         self.xvc_run(cli_opts)
     }
 
+    #[pyo3(signature = (**opts))]
     fn step(&self, opts: Option<&Bound<PyDict>>) -> PyResult<XvcPipelineStep> {
         Ok(XvcPipelineStep {
             xvc_pipeline_opts: self.clone(),
@@ -185,6 +195,7 @@ impl XvcPipelineStep {
 
 #[pymethods]
 impl XvcPipelineStep {
+    #[pyo3(signature = (**opts))]
     fn new(&self, opts: Option<&Bound<PyDict>>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("new".to_string());
@@ -198,9 +209,10 @@ impl XvcPipelineStep {
         )?;
         update_cli_opt(opts, &mut cli_opts, &["command"], "--command")?;
         update_cli_opt(opts, &mut cli_opts, &["when"], "--when")?;
-        self.xvc_run(cli_opts)
+       self.xvc_run(cli_opts)
     }
 
+    #[pyo3(signature = (**opts))]
     fn update(&self, opts: Option<&Bound<PyDict>>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("update".to_string());
@@ -217,6 +229,7 @@ impl XvcPipelineStep {
         self.xvc_run(cli_opts)
     }
 
+    #[pyo3(signature = (**opts))]
     fn dependency(&self, opts: Option<&Bound<PyDict>>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("dependency".to_string());
@@ -242,6 +255,7 @@ impl XvcPipelineStep {
         self.xvc_run(cli_opts)
     }
 
+    #[pyo3(signature = (**opts))]
     fn output(&self, opts: Option<&Bound<PyDict>>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("output".to_string());
@@ -259,6 +273,7 @@ impl XvcPipelineStep {
         self.xvc_run(cli_opts)
     }
 
+    #[pyo3(signature = (**opts))]
     fn show(&self, opts: Option<&Bound<PyDict>>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("show".to_string());
