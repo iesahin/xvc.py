@@ -19,7 +19,6 @@ pub struct PyCommandOutput {
 
 /// Runs the supplied xvc command.
 pub fn run(xvc_root_opt: XvcRootOpt, args: &[&str]) -> PyResult<PyCommandOutput> {
-    println!("Running command: {:?}", args);
     let cli_opts = XvcCLI::from_str_slice(args).map_err(XvcPyError)?;
     dispatch_with_root(xvc_root_opt, cli_opts)
 }
@@ -39,9 +38,6 @@ pub fn run(xvc_root_opt: XvcRootOpt, args: &[&str]) -> PyResult<PyCommandOutput>
 /// The xvc_root_opt is passed within a cell to make it updatable in xvc init command. Otherwise
 /// the return value should be the same with sent value. 
 pub fn dispatch_with_root(xvc_root_opt: XvcRootOpt, cli_opts: XvcCLI) -> PyResult<PyCommandOutput> {
-    println!("Dispatching command: {:?}", cli_opts.command);
-    println!("workdir: {:?}", cli_opts.workdir);
-
     let verbosity = if cli_opts.quiet {
         XvcVerbosity::Quiet
     } else {
