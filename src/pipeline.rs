@@ -39,6 +39,8 @@ impl XvcPipeline {
 impl XvcPipeline {
 
     #[pyo3(signature = (**opts))]
+    #[allow(clippy::new_ret_no_self)]
+    #[allow(clippy::wrong_self_convention)]
     fn new(&self, opts: Option<&Bound<PyDict>>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("new".to_string());
