@@ -75,9 +75,7 @@ impl XvcFile {
         update_targets(targets, cli_opts.as_mut())?;
         watch!(self);
 
-        Ok(format!("{:?}", cli_opts))
-        
-        // self.run(cli_opts)
+        self.run(cli_opts)
     }
 
     #[pyo3( signature = (*targets, **opts))]

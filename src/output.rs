@@ -139,7 +139,7 @@ pub fn dispatch_with_root(xvc_root_opt: XvcRootOpt, cli_opts: XvcCLI) -> PyResul
                     },
                 }
             }
-            output_str
+            output_str.replace("\\n", "\n")
         });
 
         if let Some(ref xvc_root) = xvc_root_opt {
