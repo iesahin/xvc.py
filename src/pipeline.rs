@@ -198,6 +198,8 @@ impl XvcPipelineStep {
 #[pymethods]
 impl XvcPipelineStep {
     #[pyo3(signature = (**opts))]
+    #[allow(clippy::wrong_self_convention)]
+    #[allow(clippy::new_ret_no_self)]
     fn new(&self, opts: Option<&Bound<PyDict>>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("new".to_string());
