@@ -35,42 +35,34 @@ impl XvcFile {
     #[pyo3( signature = (*targets, **opts))]
     fn track(&self, targets: &Bound<PyTuple>, opts: Option<&Bound<PyDict>>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
-        dbg!("{:?}", &cli_opts);
         cli_opts.push("track".to_string());
 
-        dbg!("{:?}", &cli_opts);
         update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
-        dbg!("{:?}", &cli_opts);
         update_cli_opt(
             opts,
             &mut cli_opts,
             &["recheck-method", "recheck_method"],
             "--recheck-method",
         )?;
-        dbg!("{:?}", &cli_opts);
         update_cli_flag(
             opts,
             &mut cli_opts,
             &["no-commit", "no_commit"],
             "--no-commit",
         )?;
-        dbg!("{:?}", &cli_opts);
         update_cli_opt(
             opts,
             &mut cli_opts,
             &["text-or-binary", "text_or_binary"],
             "--text-or-binary",
         )?;
-        dbg!("{:?}", &cli_opts);
         update_cli_flag(opts, &mut cli_opts, &["force"], "--force")?;
-        dbg!("{:?}", &cli_opts);
         update_cli_flag(
             opts,
             &mut cli_opts,
             &["no-parallel", "no_parallel"],
             "--no-parallel",
         )?;
-        dbg!("{:?}", &cli_opts);
 
         update_targets(targets, cli_opts.as_mut())?;
         watch!(self);
