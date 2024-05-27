@@ -77,7 +77,6 @@ pub fn dispatch_with_root(xvc_root_opt: XvcRootOpt, cli_opts: XvcCLI) -> PyResul
         let output_thread = s.spawn(move |_| {
             let mut output_str = String::new();
             while let Ok(Some(output_line)) = output_rec.recv() {
-                // output_str.push_str(&output_line);
                 match term_log_level {
                     LevelFilter::Off => match output_line {
                         XvcOutputLine::Output(_) => {}
