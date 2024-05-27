@@ -5,7 +5,7 @@ use crossbeam_channel::bounded;
 use log::LevelFilter;
 use pyo3::PyResult;
 use xvc_rust::{
-    cli::{XvcCLI, XvcSubCommand}, config::XvcVerbosity, core::{aliases, check_ignore, root}, error, file, git_checkout_ref, handle_git_automation, init, logging::{debug, setup_logging, uwr, XvcOutputLine}, pipeline, storage, Error, Result, XvcRootOpt
+    cli::{XvcCLI, XvcSubCommand}, config::XvcVerbosity, core::{aliases, check_ignore, root}, error, file, git_checkout_ref, handle_git_automation, init, logging::{debug, setup_logging, uwr, XvcOutputLine}, pipeline, storage, watch, Error, Result, XvcRootOpt
 };
 
 use crate::XvcPyError;
