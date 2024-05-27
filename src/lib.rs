@@ -57,7 +57,7 @@ pub fn run_xvc(cmd: String) -> PyResult<String> {
         }
     };
 
-    println!("{:?}", cli_opts);
+    watch!(cli_opts);
     let py_output = dispatch_with_root(xvc_root_opt, cli_opts)?;
 
     Ok(py_output.output)
@@ -104,7 +104,7 @@ impl Xvc {
     };
 
 
-    println!("{:?}", cli_opts);
+    watch!(cli_opts);
 
     let xvc_root_opt = self.xvc_root_opt.borrow().to_owned();
     let out = dispatch_with_root(xvc_root_opt, cli_opts)?;
@@ -141,7 +141,7 @@ impl Xvc {
         default_configuration: default_project_config(true),
     };
 
-        println!("{:?}", xvc_config_init_params);
+        watch!(xvc_config_init_params);
         
     let xvc_root_opt = match load_xvc_root(xvc_config_init_params.clone()) {
         Ok(r) => RefCell::new(Some(r)),
@@ -238,7 +238,7 @@ impl Xvc {
         let mut cli_opts = self.cli()?;
         cli_opts.push("root".to_string());
         update_cli_flag(opts, &mut cli_opts, &["absolute"], "--absolute")?;
-        println!("{:?}", cli_opts);
+        watch!(cli_opts);
         self.run(cli_opts)
     }
 

@@ -147,10 +147,8 @@ pub fn dispatch_with_root(xvc_root_opt: XvcRootOpt, cli_opts: XvcCLI) -> PyResul
             }
         }
 
-        println!("Running command: {:?}", cli_opts.command);
-
         let command_thread = s.spawn(move |_| -> PyResult<XvcRootOpt> {
-            println!("Running command: {:?}", cli_opts.command);
+            watch!(&cli_opts.command);
             let res_xvc_root_opt: Result<XvcRootOpt> = match cli_opts.command {
                 XvcSubCommand::Init(opts) => {
                     let use_git = !opts.no_git;
