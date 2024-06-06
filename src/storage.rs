@@ -25,7 +25,6 @@ impl XvcStorage {
     }
 
     fn xvc_run(&self, args: Vec<String>) -> PyResult<String> {
-        dbg!("{}", &args);
         self.xvc_opts.run(args)
     }
 }

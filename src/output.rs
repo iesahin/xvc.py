@@ -38,7 +38,6 @@ pub fn run(xvc_root_opt: XvcRootOpt, args: &[&str]) -> PyResult<PyCommandOutput>
 /// The xvc_root_opt is passed within a cell to make it updatable in xvc init command. Otherwise
 /// the return value should be the same with sent value. 
 pub fn dispatch_with_root(xvc_root_opt: XvcRootOpt, cli_opts: XvcCLI) -> PyResult<PyCommandOutput> {
-    dbg!("{}", &cli_opts);
     let verbosity = if cli_opts.quiet {
         XvcVerbosity::Quiet
     } else {
@@ -51,7 +50,6 @@ pub fn dispatch_with_root(xvc_root_opt: XvcRootOpt, cli_opts: XvcCLI) -> PyResul
         }
     };
 
-    dbg!("{}", verbosity);
 
     let term_log_level = match verbosity {
         XvcVerbosity::Quiet => LevelFilter::Off,
@@ -62,7 +60,6 @@ pub fn dispatch_with_root(xvc_root_opt: XvcRootOpt, cli_opts: XvcCLI) -> PyResul
         XvcVerbosity::Trace => LevelFilter::Trace,
     };
 
-    dbg!("{}", term_log_level);
 
     setup_logging(
         Some(term_log_level),
@@ -83,7 +80,6 @@ pub fn dispatch_with_root(xvc_root_opt: XvcRootOpt, cli_opts: XvcCLI) -> PyResul
             let mut output_str = String::new();
             while let Ok(Some(output_line)) = output_rec.recv() {
                 // output_str.push_str(&output_line);
-                dbg!("{}", &output_line);
                 match term_log_level {
                     LevelFilter::Off => match output_line {
                         XvcOutputLine::Output(_) => {}
@@ -141,12 +137,10 @@ pub fn dispatch_with_root(xvc_root_opt: XvcRootOpt, cli_opts: XvcCLI) -> PyResul
                     },
                 }
             }
-            dbg!("{}", &output_str);
             output_str
         });
 
         if let Some(ref xvc_root) = xvc_root_opt {
-            dbg!(xvc_root);
             if let Some(from_ref) = cli_opts.from_ref {
                 uwr!(
                     git_checkout_ref(&output_snd, xvc_root, from_ref),
@@ -156,7 +150,6 @@ pub fn dispatch_with_root(xvc_root_opt: XvcRootOpt, cli_opts: XvcCLI) -> PyResul
         }
 
         let command_thread = s.spawn(move |_| -> PyResult<XvcRootOpt> {
-            dbg!(&cli_opts.command);
             let res_xvc_root_opt: Result<XvcRootOpt> = match cli_opts.command {
                 XvcSubCommand::Init(opts) => {
                     let use_git = !opts.no_git;

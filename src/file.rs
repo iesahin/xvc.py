@@ -164,7 +164,7 @@ impl XvcFile {
         cli_opts.push("bring".to_string());
         update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
 
-        update_cli_opt(opts, &mut cli_opts, &["remote", "from"], "--remote")?;
+        update_cli_opt(opts, &mut cli_opts, &["remote", "frm"], "--remote")?;
         update_cli_flag(opts, &mut cli_opts, &["force"], "--force")?;
         update_cli_flag(opts, &mut cli_opts, &["no-recheck"], "--no-recheck")?;
         update_cli_opt(
