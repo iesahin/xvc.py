@@ -1,5 +1,6 @@
 use pyo3::prelude::*;
 use pyo3::types::PyDict;
+use xvc_rust::watch;
 
 use crate::Xvc;
 use crate::{update_cli_flag, update_cli_opt};
@@ -19,11 +20,12 @@ impl XvcStorage {
 
     pub fn cli(&self) -> PyResult<Vec<String>> {
         let mut cli_opts = self.xvc_opts.cli()?;
-        cli_opts.push("file".to_string());
+        cli_opts.push("storage".to_string());
         Ok(cli_opts)
     }
 
     fn xvc_run(&self, args: Vec<String>) -> PyResult<String> {
+        dbg!("{}", &args);
         self.xvc_opts.run(args)
     }
 }
@@ -140,6 +142,7 @@ impl XvcStorage {
     #[pyo3(signature = (**opts))]
     fn new_s3(&self, opts: Option<&Bound<PyDict>>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
+        watch!(cli_opts);
         cli_opts.push("new".to_string());
         cli_opts.push("s3".to_string());
         update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
@@ -158,6 +161,7 @@ impl XvcStorage {
             "--bucket-name",
         )?;
         update_cli_opt(opts, &mut cli_opts, &["region"], "--region")?;
+        watch!(cli_opts);
         self.xvc_run(cli_opts)
     }
 
