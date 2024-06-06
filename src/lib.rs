@@ -98,6 +98,7 @@ impl Xvc {
     let cli_opts = match cli::XvcCLI::from_str_slice(&args.iter().map(|s| s.as_str()).collect::<Vec<&str>>()) {
         Ok(opts) => opts,
         Err(e) => {
+            dbg!(&e);
             let out = e.to_string();
             return Ok(out)
         }

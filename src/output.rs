@@ -38,6 +38,7 @@ pub fn run(xvc_root_opt: XvcRootOpt, args: &[&str]) -> PyResult<PyCommandOutput>
 /// The xvc_root_opt is passed within a cell to make it updatable in xvc init command. Otherwise
 /// the return value should be the same with sent value. 
 pub fn dispatch_with_root(xvc_root_opt: XvcRootOpt, cli_opts: XvcCLI) -> PyResult<PyCommandOutput> {
+    dbg!("{}", &cli_opts);
     let verbosity = if cli_opts.quiet {
         XvcVerbosity::Quiet
     } else {
@@ -50,6 +51,8 @@ pub fn dispatch_with_root(xvc_root_opt: XvcRootOpt, cli_opts: XvcCLI) -> PyResul
         }
     };
 
+    dbg!("{}", verbosity);
+
     let term_log_level = match verbosity {
         XvcVerbosity::Quiet => LevelFilter::Off,
         XvcVerbosity::Default => LevelFilter::Error,
@@ -58,6 +61,8 @@ pub fn dispatch_with_root(xvc_root_opt: XvcRootOpt, cli_opts: XvcCLI) -> PyResul
         XvcVerbosity::Debug => LevelFilter::Debug,
         XvcVerbosity::Trace => LevelFilter::Trace,
     };
+
+    dbg!("{}", term_log_level);
 
     setup_logging(
         Some(term_log_level),
@@ -77,13 +82,15 @@ pub fn dispatch_with_root(xvc_root_opt: XvcRootOpt, cli_opts: XvcCLI) -> PyResul
         let output_thread = s.spawn(move |_| {
             let mut output_str = String::new();
             while let Ok(Some(output_line)) = output_rec.recv() {
+                // output_str.push_str(&output_line);
+                dbg!("{}", &output_line);
                 match term_log_level {
                     LevelFilter::Off => match output_line {
                         XvcOutputLine::Output(_) => {}
                         XvcOutputLine::Info(_) => {}
                         XvcOutputLine::Warn(_) => {}
                         XvcOutputLine::Error(_) => {}
-                        XvcOutputLine::Panic(m) => eprintln!("[PANIC] {}", m),
+                        XvcOutputLine::Panic(m) => output_str.push_str(&format!("[PANIC] {}", m)),
                         XvcOutputLine::Tick(_) => todo!(),
                         XvcOutputLine::Debug(_) => {}
                     },
@@ -91,53 +98,55 @@ pub fn dispatch_with_root(xvc_root_opt: XvcRootOpt, cli_opts: XvcCLI) -> PyResul
                         XvcOutputLine::Output(m) => output_str.push_str(&m),
                         XvcOutputLine::Info(_) => {}
                         XvcOutputLine::Warn(_) => {}
-                        XvcOutputLine::Error(m) => eprintln!("[ERROR] {}", m),
-                        XvcOutputLine::Panic(m) => eprintln!("[PANIC] {}", m),
+                        XvcOutputLine::Error(m) => output_str.push_str(&format!("[ERROR] {}", m)),
+                        XvcOutputLine::Panic(m) => output_str.push_str(&format!("[PANIC] {}", m)),
                         XvcOutputLine::Tick(_) => todo!(),
                         XvcOutputLine::Debug(_) => {}
                     },
                     LevelFilter::Warn => match output_line {
                         XvcOutputLine::Output(m) => output_str.push_str(&m),
-                        XvcOutputLine::Warn(m) => eprintln!("[WARN] {}", m),
-                        XvcOutputLine::Error(m) => eprintln!("[ERROR] {}", m),
-                        XvcOutputLine::Panic(m) => eprintln!("[PANIC] {}", m),
+                        XvcOutputLine::Warn(m) => output_str.push_str(&format!("[WARN] {}", m)),
+                        XvcOutputLine::Error(m) => output_str.push_str(&format!("[ERROR] {}", m)),
+                        XvcOutputLine::Panic(m) => output_str.push_str(&format!("[PANIC] {}", m)),
                         XvcOutputLine::Info(_) => {}
                         XvcOutputLine::Tick(_) => todo!(),
                         XvcOutputLine::Debug(_) => {}
                     },
                     LevelFilter::Info => match output_line {
                         XvcOutputLine::Output(m) => output_str.push_str(&m),
-                        XvcOutputLine::Info(m) => eprintln!("[INFO] {}", m),
-                        XvcOutputLine::Warn(m) => eprintln!("[WARN] {}", m),
-                        XvcOutputLine::Error(m) => eprintln!("[ERROR] {}", m),
-                        XvcOutputLine::Panic(m) => eprintln!("[PANIC] {}", m),
+                        XvcOutputLine::Info(m) => output_str.push_str(&format!("[INFO] {}", m)),
+                        XvcOutputLine::Warn(m) => output_str.push_str(&format!("[WARN] {}", m)),
+                        XvcOutputLine::Error(m) => output_str.push_str(&format!("[ERROR] {}", m)),
+                        XvcOutputLine::Panic(m) => output_str.push_str(&format!("[PANIC] {}", m)),
                         XvcOutputLine::Tick(_) => todo!(),
                         XvcOutputLine::Debug(_) => {}
                     },
                     LevelFilter::Debug => match output_line {
                         XvcOutputLine::Output(m) => output_str.push_str(&m),
-                        XvcOutputLine::Info(m) => eprintln!("[INFO] {}", m),
-                        XvcOutputLine::Warn(m) => eprintln!("[WARN] {}", m),
-                        XvcOutputLine::Error(m) => eprintln!("[ERROR] {}", m),
-                        XvcOutputLine::Panic(m) => eprintln!("[PANIC] {}", m),
+                        XvcOutputLine::Info(m) => output_str.push_str(&format!("[INFO] {}", m)),
+                        XvcOutputLine::Warn(m) => output_str.push_str(&format!("[WARN] {}", m)),
+                        XvcOutputLine::Error(m) => output_str.push_str(&format!("[ERROR] {}", m)),
+                        XvcOutputLine::Panic(m) => output_str.push_str(&format!("[PANIC] {}", m)),
+                        XvcOutputLine::Debug(m) => output_str.push_str(&format!("[DEBUG] {}", m)),
                         XvcOutputLine::Tick(_) => todo!(),
-                        XvcOutputLine::Debug(m) => eprintln!("[DEBUG] {}", m),
                     },
                     LevelFilter::Trace => match output_line {
                         XvcOutputLine::Output(m) => output_str.push_str(&m),
-                        XvcOutputLine::Info(m) => eprintln!("[INFO] {}", m),
-                        XvcOutputLine::Warn(m) => eprintln!("[WARN] {}", m),
-                        XvcOutputLine::Error(m) => eprintln!("[ERROR] {}", m),
-                        XvcOutputLine::Debug(m) => eprintln!("[DEBUG] {}", m),
-                        XvcOutputLine::Panic(m) => eprintln!("[PANIC] {}", m),
+                        XvcOutputLine::Info(m) => output_str.push_str(&format!("[INFO] {}", m)),
+                        XvcOutputLine::Warn(m) => output_str.push_str(&format!("[WARN] {}", m)),
+                        XvcOutputLine::Error(m) => output_str.push_str(&format!("[ERROR] {}", m)),
+                        XvcOutputLine::Debug(m) => output_str.push_str(&format!("[DEBUG] {}", m)),
+                        XvcOutputLine::Panic(m) => output_str.push_str(&format!("[PANIC] {}", m)),
                         XvcOutputLine::Tick(_) => todo!(),
                     },
                 }
             }
+            dbg!("{}", &output_str);
             output_str
         });
 
         if let Some(ref xvc_root) = xvc_root_opt {
+            dbg!(xvc_root);
             if let Some(from_ref) = cli_opts.from_ref {
                 uwr!(
                     git_checkout_ref(&output_snd, xvc_root, from_ref),
@@ -147,7 +156,7 @@ pub fn dispatch_with_root(xvc_root_opt: XvcRootOpt, cli_opts: XvcCLI) -> PyResul
         }
 
         let command_thread = s.spawn(move |_| -> PyResult<XvcRootOpt> {
-            watch!(&cli_opts.command);
+            dbg!(&cli_opts.command);
             let res_xvc_root_opt: Result<XvcRootOpt> = match cli_opts.command {
                 XvcSubCommand::Init(opts) => {
                     let use_git = !opts.no_git;
