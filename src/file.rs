@@ -152,7 +152,7 @@ impl XvcFile {
         cli_opts.push("send".to_string());
         update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
 
-        update_cli_opt(opts, &mut cli_opts, &["remote, to"], "--remote")?;
+        update_cli_opt(opts, &mut cli_opts, &["remote", "to"], "--remote")?;
         update_cli_flag(opts, &mut cli_opts, &["force"], "--force")?;
         update_targets(targets, &mut cli_opts)?;
         self.run(cli_opts)
