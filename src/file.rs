@@ -152,7 +152,7 @@ impl XvcFile {
         cli_opts.push("send".to_string());
         update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
 
-        update_cli_opt(opts, &mut cli_opts, &["remote", "to"], "--remote")?;
+        update_cli_opt(opts, &mut cli_opts, &["remote", "to", "storage"], "--storage")?;
         update_cli_flag(opts, &mut cli_opts, &["force"], "--force")?;
         update_targets(targets, &mut cli_opts)?;
         self.run(cli_opts)
@@ -164,7 +164,7 @@ impl XvcFile {
         cli_opts.push("bring".to_string());
         update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
 
-        update_cli_opt(opts, &mut cli_opts, &["remote", "frm"], "--remote")?;
+        update_cli_opt(opts, &mut cli_opts, &["remote", "frm", "storage"], "--storage")?;
         update_cli_flag(opts, &mut cli_opts, &["force"], "--force")?;
         update_cli_flag(opts, &mut cli_opts, &["no-recheck"], "--no-recheck")?;
         update_cli_opt(
@@ -266,7 +266,7 @@ impl XvcFile {
         cli_opts.push("share".to_string());
         update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
 
-        update_cli_opt(opts, &mut cli_opts, &["remote"], "--remote")?;
+        update_cli_opt(opts, &mut cli_opts, &["remote", "storage"], "--storage")?;
         update_cli_opt(opts, &mut cli_opts, &["duration"], "--duration")?;
         update_targets(targets, &mut cli_opts)?;
         self.run(cli_opts)
