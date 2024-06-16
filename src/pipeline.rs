@@ -153,7 +153,7 @@ impl XvcPipeline {
     }
 
     #[pyo3(signature = (**opts))]
-    fn import(&self, opts: Option<&Bound<PyDict>>) -> PyResult<String> {
+    fn import_pipeline(&self, opts: Option<&Bound<PyDict>>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("import".to_string());
         update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
