@@ -1,17 +1,34 @@
-# TODO: Write pytests for xvc pipeline
-#
-# Usage: xvc pipeline [OPTIONS] <COMMAND>
-#
-# Commands:
-#   new     Create a new pipeline
-#   update  Update the name and other attributes of a pipeline
-#   delete  Delete a pipeline
-#   run     Run a pipeline
-#   list    List all pipelines
-#   dag     Generate a dot or mermaid diagram for the pipeline
-#   export  Export the pipeline to a YAML or JSON file to edit
-#   import  Import the pipeline from a file
-#   step    Step creation, dependency, output commands
-#   help    Print this message or the help of the given subcommand(s)
-#   -p, --pipeline-name <PIPELINE_NAME>  Name of the pipeline this command applies to
-#   -h, --help                           Print help
+def test_pipeline_new(xvc_repo_with_dir):
+    assert False
+
+
+def test_pipeline_update(xvc_repo_with_dir):
+    assert False
+
+
+def test_pipeline_delete(xvc_repo_with_dir):
+    assert False
+
+
+def test_pipeline_run(xvc_repo_with_dir):
+    assert False
+
+
+def test_pipeline_list(xvc_repo_with_dir):
+    assert False
+
+
+def test_pipeline_dag(xvc_repo_with_dir):
+    assert False
+
+
+def test_pipeline_export(xvc_repo_with_dir):
+    assert False
+
+
+def test_pipeline_import(xvc_repo_with_dir):
+    assert False
+
+
+def test_pipeline_step(xvc_repo_with_dir):
+    assert False

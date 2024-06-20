@@ -17,4 +17,14 @@ def test_xvc_init(empty_xvc_repo):
 
 
 def test_xvc_root(empty_xvc_repo):
-    assert False
+    assert os.path.exists(".xvc")
+    assert empty_xvc_repo.root() == os.getcwd()
+
+
+# def test_xvc_root(monkeypatch, tmpdir):
+#     monkeypatch.chdir(tmpdir)
+#     os.system("git init")
+#     xvc = Xvc()
+#     xvc.init()
+#     assert os.path.exists(".xvc")
+#     assert str(xvc.root(absolute=True)) == str(tmpdir.realpath())

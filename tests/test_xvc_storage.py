@@ -1,9 +1,50 @@
-# TODO: WRITE pytests for xvc storage
-# Usage: xvc storage <COMMAND>
-#
-# Commands:
-#   list    List all configured storages
-#   remove  Remove a storage configuration
-#   new     Configure a new storage
-#   help    Print this message or the help of the given subcommand(s)
+def test_storage_list(xvc_repo_with_dir):
+    assert False
 
+
+def test_storage_remove(xvc_repo_with_dir):
+    assert False
+
+
+def test_storage_new(xvc_repo_with_dir):
+    assert False
+
+
+def test_storage_new_local(xvc_repo_with_dir):
+    assert False
+
+
+def test_storage_new_generic(xvc_repo_with_dir):
+    assert False
+
+
+def test_storage_new_rsync(xvc_repo_with_dir):
+    assert False
+
+
+def test_storage_new_s3(xvc_repo_with_dir):
+    assert False
+
+
+def test_storage_new_minio(xvc_repo_with_dir):
+    assert False
+
+
+def test_storage_new_digital_ocean(xvc_repo_with_dir):
+    assert False
+
+
+def test_storage_new_r2(xvc_repo_with_dir):
+    assert False
+
+
+def test_storage_new_gcs(xvc_repo_with_dir):
+    assert False
+
+
+def test_storage_new_wasabi(xvc_repo_with_dir):
+    assert False
+
+
+def test_storage_new_help(xvc_repo_with_dir):
+    assert False
