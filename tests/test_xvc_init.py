@@ -18,6 +18,7 @@ def test_xvc_init(empty_xvc_repo):
 
 def test_xvc_root(empty_xvc_repo):
     assert os.path.exists(".xvc")
+    print(os.getcwd())
     assert empty_xvc_repo.root() == os.getcwd()
 
 
