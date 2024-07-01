@@ -9,18 +9,19 @@ def empty_xvc_repo(monkeypatch, tmpdir):
     os.system("git init")
     xvc = Xvc(verbosity=4)
     xvc.init()
-    return xvc
+    return tmpdir
 
 
 def test_xvc_init(empty_xvc_repo):
     assert os.path.exists(".xvc")
 
 
-def test_xvc_root(empty_xvc_repo):
-    assert os.path.exists(".xvc")
-    print(empty_xvc_repo)
+def test_xvc_root(monkeypatch, empty_xvc_repo):
+    monkeypatch.chdir(empty_xvc_repo)
     print(os.getcwd())
-    assert empty_xvc_repo.root() == os.getcwd()
+    print(os.listdir())
+    xvc = Xvc(verbosity=4)
+    assert xvc.root() == os.getcwd()
 
 
 # def test_xvc_root(monkeypatch, tmpdir):
