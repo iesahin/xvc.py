@@ -11,7 +11,7 @@ use pyo3::prelude::*;
 use pyo3::types::{PyDict, PyTuple};
 use xvc_rust::core::default_project_config;
 use xvc_rust::core::types::xvcroot::load_xvc_root;
-use xvc_rust::{cli, watch, AbsolutePath, XvcConfigInitParams, XvcRootOpt};
+use xvc_rust::{cli, watch, AbsolutePath, XvcConfigParams, XvcRootOpt};
 use xvc_rust::error::Error as XvcError;
 
 pub use pipeline::XvcPipeline;
@@ -38,7 +38,7 @@ pub fn run_xvc(cmd: String) -> PyResult<String> {
     };
 
 
-    let xvc_config_params = XvcConfigInitParams {
+    let xvc_config_params = XvcConfigParams {
         current_dir: AbsolutePath::from(&cli_opts.workdir),
         include_system_config: !cli_opts.no_system_config,
         include_user_config: !cli_opts.no_user_config,
@@ -82,7 +82,7 @@ fn xvc(_py: Python<'_>, m: &Bound<PyModule>) -> PyResult<()> {
 #[pyclass]
 #[derive(Clone, Debug)]
 pub struct Xvc {
-    xvc_config_init_params: XvcConfigInitParams,
+    xvc_config_params: XvcConfigParams,
     verbosity: Option<u8>,
     quiet: Option<bool>,
     debug: Option<bool>,
@@ -107,7 +107,9 @@ impl Xvc {
     watch!(cli_opts);
 
     let xvc_root_opt = self.xvc_root_opt.borrow().to_owned();
+    watch!(&xvc_root_opt);
     let out = dispatch_with_root(xvc_root_opt, cli_opts)?;
+    watch!(&out.xvc_root_opt);
     self.xvc_root_opt.replace(out.xvc_root_opt);
     Ok(out.output)
 }
@@ -130,7 +132,7 @@ impl Xvc {
         to_branch: Option<String>,
     ) -> PyResult<Self> {
 
-    let xvc_config_init_params = XvcConfigInitParams {
+    let xvc_config_params = XvcConfigParams {
         current_dir: AbsolutePath::from(workdir.clone().unwrap_or_else(|| ".".to_owned())),
         include_system_config: !no_system_config.unwrap_or_default(),
         include_user_config: !no_user_config.unwrap_or_default(),
@@ -141,9 +143,9 @@ impl Xvc {
         default_configuration: default_project_config(true),
     };
 
-        watch!(xvc_config_init_params);
+        watch!(xvc_config_params);
         
-    let xvc_root_opt = match load_xvc_root(xvc_config_init_params.clone()) {
+    let xvc_root_opt = match load_xvc_root(xvc_config_params.clone()) {
         Ok(r) => RefCell::new(Some(r)),
         Err(e) => {
             e.debug();
@@ -153,7 +155,7 @@ impl Xvc {
         watch!(&xvc_root_opt);
 
         Ok(Self {
-            xvc_config_init_params,
+            xvc_config_params,
             verbosity,
             quiet,
             debug,
@@ -183,20 +185,20 @@ impl Xvc {
             cli_opts.push(workdir.to_string());
         }
 
-        if !self.xvc_config_init_params.include_system_config {
+        if !self.xvc_config_params.include_system_config {
             cli_opts.push("--no-system-config".to_string());
         }
 
-        if !self.xvc_config_init_params.include_user_config{
+        if !self.xvc_config_params.include_user_config{
             cli_opts.push("--no-user-config".to_string());
         }
 
         // TODO: We don't consider project and local config options for now.
-        //if !self.xvc_config_init_params.include_project_config {
+        //if !self.xvc_config_params.include_project_config {
         //    cli_opts.push("--no-project-config".to_string());
         //}
 
-        if !self.xvc_config_init_params.include_environment_config {
+        if !self.xvc_config_params.include_environment_config {
             cli_opts.push("--no-env-config".to_string());
         }
 
