@@ -4,7 +4,7 @@ import os
 
 def test_file_track_symlink(xvc_repo_with_dir):
     print(os.listdir())
-    xvc_repo_with_dir.track("dir-0001/file-0001", recheck_method="symlink")
+    xvc_repo_with_dir.file().track("dir-0001/file-0001", recheck_method="symlink")
     assert os.path.islink("dir-0001/file-0001")
 
 
