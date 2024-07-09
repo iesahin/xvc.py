@@ -24,9 +24,12 @@ def test_file_track_copy(xvc_repo_with_dir):
     )
 
 
-# def test_file_recheck(xvc_repo_with_dir):
-#     assert False
-#
+def test_file_recheck(xvc_repo_with_dir):
+    os.remove("dir-0001/file-0001.bin")
+    xvc_repo_with_dir.file().recheck("dir-0001/file-0001.bin")
+    assert os.path.islink("dir-0001/file-0001.bin")
+
+
 #
 # def test_file_carry_in(xvc_repo_with_dir):
 #     assert False
