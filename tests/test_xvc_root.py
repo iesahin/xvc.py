@@ -1,22 +1,8 @@
-from xvc import Xvc
+import xvc
 import pytest
 import os
 
 
-@pytest.fixture
-def empty_xvc_repo(monkeypatch, tmpdir):
-    monkeypatch.chdir(tmpdir)
-    os.system("git init")
-    xvc = Xvc(verbosity=4)
-    xvc.init()
-    del xvc
-    return tmpdir
-
-
-def test_xvc_root(monkeypatch, empty_xvc_repo):
-    monkeypatch.chdir(empty_xvc_repo)
-    assert os.path.exists(".xvc")
-    print(os.getcwd())
-    print(os.listdir())
-    xvc = Xvc(verbosity=4)
-    assert xvc.root() == os.getcwd()
+def test_xvc_root(empty_xvc_repo):
+    print(empty_xvc_repo.root())
+    assert ".xvc" in os.listdir(empty_xvc_repo.root())
