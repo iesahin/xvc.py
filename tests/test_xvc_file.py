@@ -1,5 +1,7 @@
 import os
 import shutil
+
+import xvc
 # TODO: write pytests for xvc file
 
 
@@ -41,12 +43,13 @@ def test_file_carry_in(xvc_repo_with_dir):
     )
 
 
-#
-#
-# def test_file_copy(xvc_repo_with_dir):
-#     assert False
-#
-#
+def test_file_copy(xvc_repo_with_dir):
+    xvc_repo_with_dir.file().track("dir-0001/file-0001.bin")
+    os.remove("dir-0001/file-0001.bin")
+    xvc_repo_with_dir.file().copy("dir-0001/file-0001.bin", "dir-0001/file-0005.bin")
+    assert os.path.isfile("dir-0001/file-0005.bin")
+
+
 # def test_file_move(xvc_repo_with_dir):
 #     assert False
 #
