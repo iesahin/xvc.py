@@ -4,7 +4,7 @@ import os
 
 def test_file_hash(xvc_repo_with_dir):
     hash_string = xvc_repo_with_dir.file().hash("dir-0001/file-0002.bin")
-    assert hash_string.starts_with(
+    assert hash_string.startswith(
         "6432c99dec9e4a6c208ab78cfb58749ece5090fa8e279e6fd5a8cfd431e053f5"
     )
 
