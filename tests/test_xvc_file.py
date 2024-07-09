@@ -52,7 +52,7 @@ def test_file_copy(xvc_repo_with_dir):
 
 def test_file_move(xvc_repo_with_dir):
     xvc_repo_with_dir.file().track("dir-0001/file-0002.bin", recheck_method="symlink")
-    xvc_repo_with_dir.file().move("dir-0001/file-0002.bin", "dir-0001/file-0005.bin")
+    xvc_repo_with_dir.file().mv("dir-0001/file-0002.bin", "dir-0001/file-0005.bin")
     assert os.path.islink("dir-0001/file-0005.bin")
     assert not os.path.islink("dir-0001/file-0002.bin")
 
