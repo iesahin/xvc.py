@@ -196,8 +196,8 @@ impl XvcFile {
         self.run(cli_opts)
     }
 
-    #[pyo3( signature = (**opts))]
-    fn move_(&self, opts: Option<&Bound<PyDict>>) -> PyResult<String> {
+    #[pyo3( signature = (source, destination, **opts))]
+    fn mv(&self, source: String, destination: String, opts: Option<&Bound<PyDict>>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("move".to_string());
         update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
@@ -210,8 +210,8 @@ impl XvcFile {
         )?;
         update_cli_flag(opts, &mut cli_opts, &["force"], "--force")?;
         update_cli_flag(opts, &mut cli_opts, &["no-recheck"], "--no-recheck")?;
-        update_cli_opt(opts, &mut cli_opts, &["source"], "--source")?;
-        update_cli_opt(opts, &mut cli_opts, &["destination"], "--destination")?;
+        cli_opts.push(source);
+        cli_opts.push(destination);
         self.run(cli_opts)
     }
 
