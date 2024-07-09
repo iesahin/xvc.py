@@ -9,7 +9,9 @@ use file::XvcFile;
 use output::dispatch_with_root;
 use pyo3::prelude::*;
 use pyo3::types::{PyDict, PyTuple};
+use xvc_rust::cli::XvcSubCommand;
 use xvc_rust::core::default_project_config;
+use xvc_rust::core::root::RootCLI;
 use xvc_rust::core::types::xvcroot::load_xvc_root;
 use xvc_rust::{cli, watch, AbsolutePath, XvcConfigParams, XvcRootOpt};
 use xvc_rust::error::Error as XvcError;
@@ -106,11 +108,16 @@ impl Xvc {
 
     watch!(cli_opts);
 
-    let xvc_root_opt = self.xvc_root_opt.borrow().to_owned();
+
+    let cmd = &cli_opts.command.clone();
+    let xvc_root_opt = self.xvc_root_opt.take();
     watch!(&xvc_root_opt);
+
     let out = dispatch_with_root(xvc_root_opt, cli_opts)?;
+
     watch!(&out.xvc_root_opt);
     self.xvc_root_opt.replace(out.xvc_root_opt);
+    
     Ok(out.output)
 }
 }
@@ -241,6 +248,7 @@ impl Xvc {
         cli_opts.push("root".to_string());
         update_cli_flag(opts, &mut cli_opts, &["absolute"], "--absolute")?;
         watch!(cli_opts);
+        assert!(self.xvc_root_opt.borrow().is_some());
         self.run(cli_opts)
     }
 
@@ -275,7 +283,11 @@ impl Xvc {
         update_cli_flag(opts, &mut cli_opts, &["no-git"], "--no-git")?;
         update_cli_flag(opts, &mut cli_opts, &["force"], "--force")?;
 
-        self.run(cli_opts)
+        let out = self.run(cli_opts);
+        assert!(self.xvc_root_opt.borrow().is_some());
+
+        out
+
     }
 
     /// Show help

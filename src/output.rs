@@ -174,7 +174,8 @@ pub fn dispatch_with_root(xvc_root_opt: XvcRootOpt, cli_opts: XvcCLI) -> PyResul
                 }
 
                 // following commands can only be run inside a repository
-                XvcSubCommand::Root(opts) => { root::run(
+                XvcSubCommand::Root(opts) => { 
+                    root::run(
                     &output_snd,
                     xvc_root_opt
                         .as_ref()
@@ -240,9 +241,11 @@ pub fn dispatch_with_root(xvc_root_opt: XvcRootOpt, cli_opts: XvcCLI) -> PyResul
                 }
             };
 
-            // FIXME: Handle error more gracefully
-            let xvc_root_opt = res_xvc_root_opt.unwrap();
-            
+            let xvc_root_opt = match res_xvc_root_opt {
+                Ok(xvc_root_opt) => xvc_root_opt, 
+                Err(e) => { error!(&output_snd, "{}", e); None
+                },
+            };
 
             if let Some(ref xvc_root) = xvc_root_opt { 
                 if !cli_opts.skip_git {
@@ -257,6 +260,8 @@ pub fn dispatch_with_root(xvc_root_opt: XvcRootOpt, cli_opts: XvcCLI) -> PyResul
             }
             }
 
+
+            assert!(xvc_root_opt.is_some());
             Ok(xvc_root_opt)
         }).join();
 
