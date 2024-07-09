@@ -10,9 +10,11 @@ def test_file_track_symlink(xvc_repo_with_dir):
 
 #
 #
-# def test_file_hash(xvc_repo_with_dir):
-#     assert False
-#
+def test_file_hash(xvc_repo_with_dir):
+    print(xvc_repo_with_dir.file().hash("dir-0001/file-0002.bin"))
+    assert False
+
+
 #
 # def test_file_recheck(xvc_repo_with_dir):
 #     assert False
