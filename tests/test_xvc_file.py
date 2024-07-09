@@ -2,9 +2,10 @@ import os
 # TODO: write pytests for xvc file
 
 
-def test_file_track(xvc_repo_with_dir):
+def test_file_track_symlink(xvc_repo_with_dir):
     print(os.listdir())
-    assert False
+    xvc_repo_with_dir.track("dir-0001/file-0001", recheck_method="symlink")
+    assert os.path.islink("dir-0001/file-0001")
 
 
 def test_file_hash(xvc_repo_with_dir):
