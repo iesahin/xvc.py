@@ -10,7 +10,6 @@ def test_file_hash(xvc_repo_with_dir):
 
 
 def test_file_track_symlink(xvc_repo_with_dir):
-    print(os.listdir())
     xvc_repo_with_dir.file().track("dir-0001/file-0001.bin", recheck_method="symlink")
     assert os.path.islink("dir-0001/file-0001.bin")
 
@@ -25,6 +24,7 @@ def test_file_track_copy(xvc_repo_with_dir):
 
 
 def test_file_recheck(xvc_repo_with_dir):
+    xvc_repo_with_dir.file().track("dir-0001/file-0001.bin", recheck_method="symlink")
     os.remove("dir-0001/file-0001.bin")
     xvc_repo_with_dir.file().recheck("dir-0001/file-0001.bin")
     assert os.path.islink("dir-0001/file-0001.bin")
