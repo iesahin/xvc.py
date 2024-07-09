@@ -1,7 +1,9 @@
+import os
 # TODO: write pytests for xvc file
 
 
-def test_file_track(empty_xvc_repo):
+def test_file_track(xvc_repo_with_dir):
+    print(os.listdir())
     assert False
 
 
