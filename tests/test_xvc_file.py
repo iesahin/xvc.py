@@ -80,11 +80,13 @@ def test_file_untrack(xvc_repo_with_dir):
     assert len(os.listdir(".xvc/b3/")) == 3
 
     file_list = xvc_repo_with_dir.file().list().split("\n")
+    assert len([line for line in file_list if line.startswith("FX")]) == 6
     assert len([line for line in file_list if line.startswith("FC")]) == 3
 
     xvc_repo_with_dir.file().untrack("dir-0001/file-0001.bin")
 
     file_list = xvc_repo_with_dir.file().list().split("\n")
+    assert len([line for line in file_list if line.startswith("FX")]) == 7
     assert len([line for line in file_list if line.startswith("FC")]) == 2
 
     assert len(os.listdir(".xvc/b3/")) == 2
