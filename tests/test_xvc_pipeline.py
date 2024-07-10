@@ -10,9 +10,20 @@ def test_pipeline_list(empty_xvc_repo):
     assert pipeline_table == expected
 
 
-# def test_pipeline_new(empty_xvc_repo):
-#     assert False
-#
+def test_pipeline_new(empty_xvc_repo):
+    empty_xvc_repo.pipeline().new("new-pipeline", rundir="dir-0001")
+    pipeline_table = empty_xvc_repo.pipeline().list()
+    print(pipeline_table)
+    expected = """
++---------+---------+
+| Name    | Run Dir |
++===================+
+| default |         |
++---------+---------+
+""".strip()
+    assert pipeline_table == expected
+
+
 # def test_pipeline_update(xvc_repo_with_dir):
 #     assert False
 #
