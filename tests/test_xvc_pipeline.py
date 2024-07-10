@@ -11,7 +11,7 @@ def test_pipeline_list(empty_xvc_repo):
 
 
 def test_pipeline_new(empty_xvc_repo):
-    empty_xvc_repo.pipeline().new("new-pipeline", rundir="dir-0001")
+    empty_xvc_repo.pipeline().new("new-pipeline", workdir="dir-0001")
     pipeline_table = empty_xvc_repo.pipeline().list()
     print(pipeline_table)
     expected = """
