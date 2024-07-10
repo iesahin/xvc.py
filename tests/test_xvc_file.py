@@ -79,7 +79,7 @@ def test_file_remove(xvc_repo_with_dir):
     file_list = xvc_repo_with_dir.file().list().split("\n")
     print(file_list)
     print(os.listdir())
-    print(os.listdir("dir-0001"))
+    print(os.listdir(".xvc/b3/"))
     assert False
 
 
