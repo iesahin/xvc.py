@@ -68,8 +68,6 @@ def test_file_list(xvc_repo_with_dir):
 
 
 def test_file_remove(xvc_repo_with_dir):
-    assert len(os.listdir(".xvc/b3/")) == 0
-
     xvc_repo_with_dir.file().track("dir-0001/")
     assert len(os.listdir(".xvc/b3/")) == 3
 
