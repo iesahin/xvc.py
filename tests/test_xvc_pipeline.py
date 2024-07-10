@@ -58,23 +58,51 @@ def test_pipeline_delete(empty_xvc_repo):
     assert pipeline_table == expected
 
 
-#
-#
-# def test_pipeline_list(xvc_repo_with_dir):
+# TODO: def test_pipeline_export(xvc_repo_with_dir):
 #     assert False
 #
 #
-# def test_pipeline_dag(xvc_repo_with_dir):
+# TODO: def test_pipeline_import(xvc_repo_with_dir):
 #     assert False
 #
 #
-# def test_pipeline_export(xvc_repo_with_dir):
+# TODO: def test_pipeline_step(xvc_repo_with_dir):
+#     assert False
+#
+# TODO: def test_pipeline_step_new(xvc_repo_with_dir):
 #     assert False
 #
 #
-# def test_pipeline_import(xvc_repo_with_dir):
+# TODO: def test_pipeline_step_update(xvc_repo_with_dir):
+#     assert False
+#
+# TODO: def test_pipeline_step_dependency(xvc_repo_with_dir):
+#     assert False
+#
+# TODO: def test_pipeline_step_dependency_file(xvc_repo_with_dir):
+# assert False
+# TODO: def test_pipeline_step_dependency_url(xvc_repo_with_dir):
+#   assert False
+# TODO: def test_pipeline_step_dependency_glob(xvc_repo_with_dir):
+#   assert False
+# TODO: def test_pipeline_step_dependency_glob-items(xvc_repo_with_dir):
+#   assert False
+# TODO: def test_pipeline_step_dependency_step(xvc_repo_with_dir):
+#   assert False
+# TODO: def test_pipeline_step_dependency_param(xvc_repo_with_dir):
+#   assert False
+# TODO: def test_pipeline_step_dependency_regex(xvc_repo_with_dir):
+#   assert False
+# TODO: def test_pipeline_step_dependency_regex-items(xvc_repo_with_dir):
+#   assert False
+# TODO: def test_pipeline_step_dependency_line(xvc_repo_with_dir):
+#   assert False
+# TODO: def test_pipeline_step_dependency_line-items(xvc_repo_with_dir):
+#   assert False
+# TODO: def test_pipeline_step_dependency_generic(xvc_repo_with_dir):
+#   assert False
+#
+# TODO: def test_pipeline_dag(xvc_repo_with_dir):
 #     assert False
 #
 #
-# def test_pipeline_step(xvc_repo_with_dir):
-#     assert False
