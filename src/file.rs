@@ -238,7 +238,7 @@ impl XvcFile {
         update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
 
         update_cli_flag(opts, &mut cli_opts, &["force"], "--force")?;
-        update_cli_opt(
+        update_cli_flag(
             opts,
             &mut cli_opts,
             &["from-cache", "from_cache"],
