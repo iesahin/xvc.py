@@ -63,7 +63,7 @@ def test_file_list(xvc_repo_with_dir):
     assert len([line for line in file_list if line.startswith("DX")]) == 3
 
     xvc_repo_with_dir.file().track("dir-0001/")
-    file_list = xvc_repo_with_dir.file().list().lines()
+    file_list = xvc_repo_with_dir.file().list().split("\n")
     print(file_list)
     assert False
 
