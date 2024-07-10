@@ -43,13 +43,21 @@ def test_pipeline_update(empty_xvc_repo):
     assert pipeline_table == expected
 
 
-#
-# def test_pipeline_delete(xvc_repo_with_dir):
-#     assert False
-#
-#
-# def test_pipeline_run(xvc_repo_with_dir):
-#     assert False
+def test_pipeline_delete(empty_xvc_repo):
+    empty_xvc_repo.pipeline().new(pipeline_name="test")
+    empty_xvc_repo.pipeline().delete(pipeline_name="test")
+    pipeline_table = empty_xvc_repo.pipeline().list()
+    print(pipeline_table)
+    expected = """
++---------+----------+
+| Name    | Run Dir  |
++====================+
+| default |          |
++---------+----------+
+""".strip()
+    assert pipeline_table == expected
+
+
 #
 #
 # def test_pipeline_list(xvc_repo_with_dir):
