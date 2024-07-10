@@ -244,6 +244,12 @@ impl XvcFile {
             &["from-cache", "from_cache"],
             "--from-cache",
         )?;
+        update_cli_opt(
+            opts,
+            &mut cli_opts,
+            &["from-storage", "from_storage"],
+            "--from-storage",
+        )?;
         update_cli_flag(
             opts,
             &mut cli_opts,
