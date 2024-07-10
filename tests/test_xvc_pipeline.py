@@ -49,11 +49,11 @@ def test_pipeline_delete(empty_xvc_repo):
     pipeline_table = empty_xvc_repo.pipeline().list()
     print(pipeline_table)
     expected = """
-+---------+----------+
-| Name    | Run Dir  |
-+====================+
-| default |          |
-+---------+----------+
++---------+---------+
+| Name    | Run Dir |
++===================+
+| default |         |
++---------+---------+
 """.strip()
     assert pipeline_table == expected
 
