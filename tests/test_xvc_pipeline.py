@@ -26,7 +26,7 @@ def test_pipeline_new(empty_xvc_repo):
     assert pipeline_table == expected
 
 
-def test_pipeline_update(empty_xvc_repo)
+def test_pipeline_update(empty_xvc_repo):
     empty_xvc_repo.pipeline().new(pipeline_name="test")
     empty_xvc_repo.pipeline().update(pipeline_name="test", workdir="dir-0001")
     pipeline_table = empty_xvc_repo.pipeline().list()
