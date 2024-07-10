@@ -48,3 +48,19 @@ def test_storage_new_wasabi(xvc_repo_with_dir):
 
 def test_storage_new_help(xvc_repo_with_dir):
     assert False
+
+
+# def test_file_send(xvc_repo_with_dir):
+#     assert False
+#
+#
+# def test_file_bring(xvc_repo_with_dir):
+#     assert False
+#
+#
+# def test_file_share(xvc_repo_with_dir):
+#     assert False
+#
+# def test_file_remove_from_storage(xvc_repo_with_dir):
+#     assert False
+#

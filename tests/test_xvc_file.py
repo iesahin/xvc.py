@@ -57,20 +57,12 @@ def test_file_move(xvc_repo_with_dir):
     assert not os.path.islink("dir-0001/file-0002.bin")
 
 
-#
-#
-# def test_file_list(xvc_repo_with_dir):
-#     assert False
-#
-#
-# def test_file_send(xvc_repo_with_dir):
-#     assert False
-#
-#
-# def test_file_bring(xvc_repo_with_dir):
-#     assert False
-#
-#
+def test_file_list(xvc_repo_with_dir):
+    file_list = xvc_repo_with_dir.file().list()
+    print(file_list)
+    assert False
+
+
 # def test_file_remove(xvc_repo_with_dir):
 #     assert False
 #
@@ -78,9 +70,3 @@ def test_file_move(xvc_repo_with_dir):
 # def test_file_untrack(xvc_repo_with_dir):
 #     assert False
 #
-#
-# def test_file_share(xvc_repo_with_dir):
-#     assert False
-#
-#
-# #
