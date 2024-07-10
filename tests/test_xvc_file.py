@@ -75,7 +75,7 @@ def test_file_remove(xvc_repo_with_dir):
     file_list = xvc_repo_with_dir.file().list().split("\n")
     assert len([line for line in file_list if line.startswith("FC")]) == 3
 
-    xvc_repo_with_dir.file().remove("dir-0001/", from_cache=True)
+    xvc_repo_with_dir.file().remove("dir-0001/*", from_cache=True)
     file_list = xvc_repo_with_dir.file().list().split("\n")
     print(file_list)
     print(os.listdir())
