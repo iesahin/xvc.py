@@ -7,7 +7,7 @@ import os
 def empty_xvc_repo(monkeypatch, tmpdir):
     monkeypatch.chdir(tmpdir)
     os.system("git init")
-    xvc = Xvc(verbosity=3)
+    xvc = Xvc(verbosity=1)
     xvc.init()
     return xvc
 
