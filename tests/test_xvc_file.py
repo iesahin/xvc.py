@@ -68,19 +68,13 @@ def test_file_list(xvc_repo_with_dir):
 
 
 def test_file_remove(xvc_repo_with_dir):
-    file_list = xvc_repo_with_dir.file().list().split("\n")
-    assert len([line for line in file_list if line.startswith("FX")]) == 9
+    assert len(os.listdir(".xvc/b3/")) == 0
 
     xvc_repo_with_dir.file().track("dir-0001/")
-    file_list = xvc_repo_with_dir.file().list().split("\n")
-    assert len([line for line in file_list if line.startswith("FC")]) == 3
+    assert len(os.listdir(".xvc/b3/")) == 3
 
-    xvc_repo_with_dir.file().remove("dir-0001/*", from_cache=True)
-    file_list = xvc_repo_with_dir.file().list().split("\n")
-    print(file_list)
-    print(os.listdir())
-    print(os.listdir(".xvc/b3/"))
-    assert False
+    xvc_repo_with_dir.file().remove("dir-0001/file-0001.bin", from_cache=True)
+    assert len(os.listdir(".xvc/b3/")) == 2
 
 
 #
