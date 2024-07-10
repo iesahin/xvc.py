@@ -15,11 +15,13 @@ def test_pipeline_new(empty_xvc_repo):
     pipeline_table = empty_xvc_repo.pipeline().list()
     print(pipeline_table)
     expected = """
-+---------+---------+
-| Name    | Run Dir |
-+===================+
-| default |         |
-+---------+---------+
++---------+----------+
+| Name    | Run Dir  |
++====================+
+| default |          |
+|---------+----------|
+| test    | dir-0001 |
++---------+----------+
 """.strip()
     assert pipeline_table == expected
 
