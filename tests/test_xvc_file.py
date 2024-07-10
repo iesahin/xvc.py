@@ -75,7 +75,16 @@ def test_file_remove(xvc_repo_with_dir):
     assert len(os.listdir(".xvc/b3/")) == 2
 
 
-#
-# def test_file_untrack(xvc_repo_with_dir):
-#     assert False
-#
+def test_file_untrack(xvc_repo_with_dir):
+    xvc_repo_with_dir.file().track("dir-0001/")
+    assert len(os.listdir(".xvc/b3/")) == 3
+
+    file_list = xvc_repo_with_dir.file().list().split("\n")
+    assert len([line for line in file_list if line.startswith("FC")]) == 3
+
+    xvc_repo_with_dir.file().untrack("dir-0001/file-0001.bin")
+
+    file_list = xvc_repo_with_dir.file().list().split("\n")
+    assert len([line for line in file_list if line.startswith("FC")]) == 2
+
+    assert len(os.listdir(".xvc/b3/")) == 2
