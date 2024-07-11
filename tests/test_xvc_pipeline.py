@@ -79,7 +79,7 @@ def test_pipeline_step_update(empty_xvc_repo):
     assert pipeline_steps.strip() == "hello: echo 'hello world' (always)"
 
 
-def skip_test_pipeline_step_dependency(empty_xvc_repo):
+def test_pipeline_step_dependency(empty_xvc_repo):
     dep_help = empty_xvc_repo.pipeline().step().dependency(help=True)
     expected = """
 Usage: xvc pipeline step dependency [OPTIONS] --step-name <STEP_NAME>
@@ -140,6 +140,7 @@ Options:
   -h, --help
           Print help (see a summary with '-h')
 """.strip()
+
     assert dep_help == expected
 
 
