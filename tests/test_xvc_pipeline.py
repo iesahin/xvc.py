@@ -76,7 +76,7 @@ def test_pipeline_step_new(empty_xvc_repo):
 def test_pipeline_step_update(empty_xvc_repo):
     empty_xvc_repo.pipeline().step().new(step_name="hello", command="echo 'hello xvc'")
     empty_xvc_repo.pipeline().step().update(
-        step_name="hello", command="echo 'world'", when="always"
+        step_name="hello", command="echo 'hello world'", when="always"
     )
     pipeline_steps = empty_xvc_repo.pipeline().step().list()
     assert pipeline_steps.strip() == "hello: echo 'hello world' (always)"
