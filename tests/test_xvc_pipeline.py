@@ -82,9 +82,12 @@ def test_pipeline_step_update(empty_xvc_repo):
     assert pipeline_steps.strip() == "hello: echo 'hello world' (always)"
 
 
-# TODO: def test_pipeline_step_dependency(xvc_repo_with_dir):
-#     assert False
-#
+def test_pipeline_step_dependency(xvc_pipeline_single_step):
+    dep_help = xvc_pipeline_single_step.pipeline().step().dependency(help=True)
+    print(dep_help)
+    assert False
+
+
 # TODO: def test_pipeline_step_dependency_file(xvc_repo_with_dir):
 # assert False
 # TODO: def test_pipeline_step_dependency_url(xvc_repo_with_dir):
