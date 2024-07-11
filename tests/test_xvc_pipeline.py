@@ -58,19 +58,15 @@ def test_pipeline_delete(empty_xvc_repo):
     assert pipeline_table == expected
 
 
-# TODO: def test_pipeline_export(xvc_repo_with_dir):
-#     assert False
-#
-#
-# TODO: def test_pipeline_import(xvc_repo_with_dir):
-#     assert False
-#
-#
-# TODO: def test_pipeline_step(xvc_repo_with_dir):
-#     assert False
-#
-# TODO: def test_pipeline_step_new(xvc_repo_with_dir):
-#     assert False
+def test_pipeline_step_new(xvc_repo_with_dir):
+    xvc_repo_with_dir.pipeline().step().new(
+        step_name="hello", command="echo 'hello xvc'"
+    )
+    pipeline_steps = xvc_repo_with_dir.pipeline().step().list()
+    print(pipeline_steps)
+    assert False
+
+
 #
 #
 # TODO: def test_pipeline_step_update(xvc_repo_with_dir):
@@ -105,4 +101,11 @@ def test_pipeline_delete(empty_xvc_repo):
 # TODO: def test_pipeline_dag(xvc_repo_with_dir):
 #     assert False
 #
+#
+# TODO: def test_pipeline_export(xvc_repo_with_dir):
+#     assert False
+#
+#
+# TODO: def test_pipeline_import(xvc_repo_with_dir):
+#     assert False
 #
