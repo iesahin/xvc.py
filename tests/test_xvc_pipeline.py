@@ -58,6 +58,12 @@ def test_pipeline_delete(empty_xvc_repo):
     assert pipeline_table == expected
 
 
+def test_pipeline_step_list(empty_xvc_repo):
+    empty_xvc_repo.pipeline().step().new(step_name="hello", command="echo 'hello xvc'")
+    pipeline_steps = empty_xvc_repo.pipeline().step().list(names_only=True)
+    assert pipeline_steps.strip() == "hello"
+
+
 def test_pipeline_step_new(xvc_repo_with_dir):
     xvc_repo_with_dir.pipeline().step().new(
         step_name="hello", command="echo 'hello xvc'"
