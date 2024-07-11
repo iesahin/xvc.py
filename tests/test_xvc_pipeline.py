@@ -1,3 +1,6 @@
+from tests.conftest import empty_xvc_repo
+
+
 def test_pipeline_list(empty_xvc_repo):
     pipeline_table = empty_xvc_repo.pipeline().list()
     expected = """
@@ -64,19 +67,21 @@ def test_pipeline_step_list(empty_xvc_repo):
     assert pipeline_steps.strip() == "hello"
 
 
-def test_pipeline_step_new(xvc_repo_with_dir):
-    xvc_repo_with_dir.pipeline().step().new(
-        step_name="hello", command="echo 'hello xvc'"
-    )
-    pipeline_steps = xvc_repo_with_dir.pipeline().step().list()
+def test_pipeline_step_new(empty_xvc_repo):
+    empty_xvc_repo.pipeline().step().new(step_name="hello", command="echo 'hello xvc'")
+    pipeline_steps = empty_xvc_repo.pipeline().step().list()
     assert pipeline_steps.strip() == "hello: echo 'hello xvc' (by_dependencies)"
 
 
-#
-#
-# TODO: def test_pipeline_step_update(xvc_repo_with_dir):
-#     assert False
-#
+def test_pipeline_step_update(empty_xvc_repo):
+    empty_xvc_repo.pipeline().step().new(step_name="hello", command="echo 'hello xvc'")
+    empty_xvc_repo.pipeline().step().update(
+        step_name="hello", command="echo 'world'", when="always"
+    )
+    pipeline_steps = empty_xvc_repo.pipeline().step().list()
+    assert pipeline_steps.strip() == "hello: echo 'hello world' (always)"
+
+
 # TODO: def test_pipeline_step_dependency(xvc_repo_with_dir):
 #     assert False
 #
