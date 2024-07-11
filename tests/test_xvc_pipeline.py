@@ -1,6 +1,3 @@
-from tests.conftest import empty_xvc_repo
-
-
 def test_pipeline_list(empty_xvc_repo):
     pipeline_table = empty_xvc_repo.pipeline().list()
     expected = """
@@ -82,8 +79,8 @@ def test_pipeline_step_update(empty_xvc_repo):
     assert pipeline_steps.strip() == "hello: echo 'hello world' (always)"
 
 
-def test_pipeline_step_dependency(xvc_pipeline_single_step):
-    dep_help = xvc_pipeline_single_step.pipeline().step().dependency(help=True)
+def test_pipeline_step_dependency(empty_xvc_repo):
+    dep_help = empty_xvc_repo.pipeline().step().dependency(help=True)
     expected = """
 Usage: xvc pipeline step dependency [OPTIONS] --step-name <STEP_NAME>
 
