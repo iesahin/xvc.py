@@ -84,7 +84,6 @@ def test_pipeline_step_update(empty_xvc_repo):
 
 def test_pipeline_step_dependency(xvc_pipeline_single_step):
     dep_help = xvc_pipeline_single_step.pipeline().step().dependency(help=True)
-    print(dep_help)
     expected = """
 Usage: xvc pipeline step dependency [OPTIONS] --step-name <STEP_NAME>
 
