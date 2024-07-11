@@ -69,8 +69,7 @@ def test_pipeline_step_new(xvc_repo_with_dir):
         step_name="hello", command="echo 'hello xvc'"
     )
     pipeline_steps = xvc_repo_with_dir.pipeline().step().list()
-    print(pipeline_steps)
-    assert False
+    assert pipeline_steps.strip() == "hello: echo 'hello xvc' (by_dependencies)"
 
 
 #
