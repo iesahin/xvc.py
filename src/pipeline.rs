@@ -237,6 +237,7 @@ impl XvcPipelineStep {
     fn dependency(&self, opts: Option<&Bound<PyDict>>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("dependency".to_string());
+        update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
         update_cli_flag(opts, &mut cli_opts, &["no-recheck"], "--no-recheck")?;
 
         update_cli_opt(
@@ -263,6 +264,7 @@ impl XvcPipelineStep {
     fn output(&self, opts: Option<&Bound<PyDict>>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("output".to_string());
+        update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
         update_cli_flag(opts, &mut cli_opts, &["no-recheck"], "--no-recheck")?;
 
         update_cli_opt(
@@ -278,10 +280,20 @@ impl XvcPipelineStep {
     }
 
     #[pyo3(signature = (**opts))]
+    fn list(&self, opts: Option<&Bound<PyDict>>) -> PyResult<String> {
+        let mut cli_opts = self.cli()?;
+        cli_opts.push("list".to_string());
+        update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
+        update_cli_flag(opts, &mut cli_opts, &["names_only"], "--names-only")?;
+
+        self.xvc_run(cli_opts)
+    }
+
+    #[pyo3(signature = (**opts))]
     fn show(&self, opts: Option<&Bound<PyDict>>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
+        update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
         cli_opts.push("show".to_string());
-        update_cli_flag(opts, &mut cli_opts, &["no-recheck"], "--no-recheck")?;
 
         update_cli_opt(
             opts,
