@@ -85,7 +85,7 @@ def test_pipeline_step_update(empty_xvc_repo):
 def test_pipeline_step_dependency_file(xvc_pipeline_single_step):
     pipeline = xvc_pipeline_single_step.pipeline()
     dependency_file = "dir-0001/file-0001.bin"
-    pipeline.step().dependency(file=dependency_file)
+    pipeline.step().dependency(step_name="hello", file=dependency_file)
     first_run = pipeline.run()
     second_run = pipeline.run()
     os.system(f"xvc-test-helper generate-random-file {dependency_file}")
