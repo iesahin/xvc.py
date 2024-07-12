@@ -97,11 +97,16 @@ def test_pipeline_step_dependency_file(xvc_pipeline_single_step):
 
 def test_pipeline_step_dependency_url(xvc_pipeline_single_step):
     pipeline = xvc_pipeline_single_step.pipeline()
+    expected = """
+[OUT] [hello] hello xvc
+ [DONE] hello (echo 'hello xvc')
+    """.strip()
+
     pipeline.step().dependency(step_name="hello", url="https://xvc.dev")
     first_run = pipeline.run()
     second_run = pipeline.run()
     print(first_run.strip())
-    assert first_run.strip() == "hello xvc"
+    assert first_run.strip() == expected
     assert second_run.strip() == ""
 
 
