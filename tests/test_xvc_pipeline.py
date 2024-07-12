@@ -100,6 +100,7 @@ def test_pipeline_step_dependency_url(xvc_pipeline_single_step):
     pipeline.step().dependency(step_name="hello", url="https://xvc.dev")
     first_run = pipeline.run()
     second_run = pipeline.run()
+    print(first_run.strip())
     assert first_run.strip() == "hello xvc"
     assert second_run.strip() == ""
 
