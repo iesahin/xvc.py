@@ -110,8 +110,20 @@ def test_pipeline_step_dependency_url(xvc_pipeline_single_step):
     assert second_run.strip() == ""
 
 
-# TODO: def test_pipeline_step_dependency_glob(xvc_repo_with_dir):
-#   assert False
+def test_pipeline_step_dependency_glob(xvc_pipeline_single_step):
+    pipeline = xvc_pipeline_single_step.pipeline()
+    dependency_file = "dir-0001/file-0001.bin"
+    pipeline.step().dependency(step_name="hello", glob="dir-0001/*.bin")
+
+    first_run = pipeline.run()
+    second_run = pipeline.run()
+    os.system(f"xvc-test-helper generate-random-file {dependency_file}")
+    third_run = pipeline.run()
+
+    assert first_run == third_run
+    assert second_run.strip() == ""
+
+
 # TODO: def test_pipeline_step_dependency_glob-items(xvc_repo_with_dir):
 #   assert False
 # TODO: def test_pipeline_step_dependency_step(xvc_repo_with_dir):
