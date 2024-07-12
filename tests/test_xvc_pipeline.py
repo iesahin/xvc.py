@@ -80,7 +80,8 @@ def test_pipeline_step_update(empty_xvc_repo):
 
 
 def test_pipeline_step_dependency(empty_xvc_repo):
-    dep_help = empty_xvc_repo.pipeline().step().dependency()
+    dep_help = empty_xvc_repo.pipeline().step().dependency(help=True)
+    assert False
     expected = """
 Usage: xvc pipeline step dependency [OPTIONS] --step-name <STEP_NAME>
 
