@@ -1,3 +1,6 @@
+import os
+
+
 def test_pipeline_list(empty_xvc_repo):
     pipeline_table = empty_xvc_repo.pipeline().list()
     expected = """
@@ -79,8 +82,19 @@ def test_pipeline_step_update(empty_xvc_repo):
     assert pipeline_steps.strip() == "hello: echo 'hello world' (always)"
 
 
-# TODO: def test_pipeline_step_dependency_file(xvc_repo_with_dir):
-# assert False
+def test_pipeline_step_dependency_file(xvc_pipeline_single_step):
+    pipeline = xvc_pipeline_single_step.pipeline()
+    dependency_file = "dir-0001/file-0001.bin"
+    pipeline.step().dependency(file=dependency_file)
+    first_run = pipeline.run()
+    second_run = pipeline.run()
+    os.system(f"xvc-test-helper generate-random-file {dependency_file}")
+    third_run = pipeline.run()
+
+    assert first_run == third_run
+    assert second_run.strip() == ""
+
+
 # TODO: def test_pipeline_step_dependency_url(xvc_repo_with_dir):
 #   assert False
 # TODO: def test_pipeline_step_dependency_glob(xvc_repo_with_dir):
