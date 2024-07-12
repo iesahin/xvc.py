@@ -124,7 +124,7 @@ def test_pipeline_step_dependency_glob(xvc_pipeline_single_step):
     assert second_run.strip() == ""
 
 
-# TODO: def test_pipeline_step_dependency_glob-items(xvc_repo_with_dir):
+# TODO: def test_pipeline_step_dependency_glob_items(xvc_repo_with_dir):
 #   assert False
 # TODO: def test_pipeline_step_dependency_step(xvc_repo_with_dir):
 #   assert False
@@ -132,7 +132,7 @@ def test_pipeline_step_dependency_glob(xvc_pipeline_single_step):
 #   assert False
 # TODO: def test_pipeline_step_dependency_regex(xvc_repo_with_dir):
 #   assert False
-# TODO: def test_pipeline_step_dependency_regex-items(xvc_repo_with_dir):
+# TODO: def test_pipeline_step_dependency_regex_items(xvc_repo_with_dir):
 #   assert False
 # TODO: def test_pipeline_step_dependency_line(xvc_repo_with_dir):
 #   assert False
