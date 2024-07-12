@@ -95,8 +95,15 @@ def test_pipeline_step_dependency_file(xvc_pipeline_single_step):
     assert second_run.strip() == ""
 
 
-# TODO: def test_pipeline_step_dependency_url(xvc_repo_with_dir):
-#   assert False
+def test_pipeline_step_dependency_url(xvc_pipeline_single_step):
+    pipeline = xvc_pipeline_single_step.pipeline()
+    pipeline.step().dependency(step_name="hello", url="https://xvc.dev")
+    first_run = pipeline.run()
+    second_run = pipeline.run()
+    assert first_run.strip() == "hello xvc"
+    assert second_run.strip() == ""
+
+
 # TODO: def test_pipeline_step_dependency_glob(xvc_repo_with_dir):
 #   assert False
 # TODO: def test_pipeline_step_dependency_glob-items(xvc_repo_with_dir):
