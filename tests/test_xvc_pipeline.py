@@ -124,8 +124,26 @@ def test_pipeline_step_dependency_glob(xvc_pipeline_single_step):
     assert second_run.strip() == ""
 
 
-# TODO: def test_pipeline_step_dependency_glob_items(xvc_repo_with_dir):
-#   assert False
+def test_pipeline_step_dependency_glob_items(xvc_repo_with_dir):
+    pipeline = xvc_repo_with_dir.pipeline()
+    dependency_file = "dir-0001/file-0001.bin"
+    xvc_repo_with_dir.pipeline().step().new(
+        step_name="hello", command='echo "CHANGED_FILES: ${XVC_CHANGED_GLOB_ITEMS}"'
+    )
+    pipeline.step().dependency(step_name="hello", glob_items="dir-0001/*.bin")
+
+    first_run = pipeline.run()
+    second_run = pipeline.run()
+    os.system(f"xvc-test-helper generate-random-file {dependency_file}")
+    third_run = pipeline.run()
+    print(first_run)
+    print(second_run)
+    print(third_run)
+
+    assert first_run == third_run
+    assert second_run.strip() == ""
+
+
 # TODO: def test_pipeline_step_dependency_step(xvc_repo_with_dir):
 #   assert False
 # TODO: def test_pipeline_step_dependency_param(xvc_repo_with_dir):
@@ -136,7 +154,7 @@ def test_pipeline_step_dependency_glob(xvc_pipeline_single_step):
 #   assert False
 # TODO: def test_pipeline_step_dependency_line(xvc_repo_with_dir):
 #   assert False
-# TODO: def test_pipeline_step_dependency_line-items(xvc_repo_with_dir):
+# TODO: def test_pipeline_step_dependency_line_items(xvc_repo_with_dir):
 #   assert False
 # TODO: def test_pipeline_step_dependency_generic(xvc_repo_with_dir):
 #   assert False
