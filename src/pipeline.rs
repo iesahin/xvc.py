@@ -249,13 +249,13 @@ impl XvcPipelineStep {
         update_cli_opt(opts, &mut cli_opts, &["file"], "--file")?;
         update_cli_opt(opts, &mut cli_opts, &["url"], "--url")?;
         update_cli_opt(opts, &mut cli_opts, &["glob"], "--glob")?;
-        update_cli_opt(opts, &mut cli_opts, &["glob-items"], "--glob-items")?;
+        update_cli_opt(opts, &mut cli_opts, &["glob_items"], "--glob-items")?;
         update_cli_opt(opts, &mut cli_opts, &["step"], "--step")?;
         update_cli_opt(opts, &mut cli_opts, &["param"], "--param")?;
         update_cli_opt(opts, &mut cli_opts, &["regex"], "--regex")?;
-        update_cli_opt(opts, &mut cli_opts, &["regex-items"], "--regex-items")?;
+        update_cli_opt(opts, &mut cli_opts, &["regex_items"], "--regex-items")?;
         update_cli_opt(opts, &mut cli_opts, &["line", "lines"], "--line")?;
-        update_cli_opt(opts, &mut cli_opts, &["line-items"], "--line-items")?;
+        update_cli_opt(opts, &mut cli_opts, &["line_items"], "--line-items")?;
         update_cli_opt(opts, &mut cli_opts, &["generic"], "--generic")?;
         self.xvc_run(cli_opts)
     }
