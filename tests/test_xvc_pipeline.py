@@ -128,7 +128,7 @@ def test_pipeline_step_dependency_glob_items(xvc_repo_with_dir):
     pipeline = xvc_repo_with_dir.pipeline()
     dependency_file = "dir-0001/file-0001.bin"
     xvc_repo_with_dir.pipeline().step().new(
-        step_name="hello", command='echo "CHANGED_FILES: ${XVC_CHANGED_GLOB_ITEMS}"'
+        step_name="hello", command='echo "CHANGED_FILES: ${XVC_ALL_GLOB_ITEMS}"'
     )
     pipeline.step().dependency(step_name="hello", glob_items="dir-0001/*.bin")
 
