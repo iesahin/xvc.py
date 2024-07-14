@@ -248,7 +248,7 @@ def test_pipeline_step_dependency_line(xvc_repo_with_people_csv):
 def test_pipeline_step_dependency_line_items(xvc_repo_with_people_csv):
     pipeline = xvc_repo_with_people_csv.pipeline()
     pipeline.step().new(
-        step_name="a", command='echo "Lines with A: ${XVC_ADDED_LINE_ITEMS}"'
+        step_name="a", command='echo "Added lines: ${XVC_ADDED_LINE_ITEMS}"'
     )
     pipeline.step().dependency(step_name="a", line_items="people.csv::10-")
     first_run = pipeline.run()
@@ -267,7 +267,7 @@ def test_pipeline_step_dependency_line_items(xvc_repo_with_people_csv):
         third_run.strip()
         == """
 [OUT] [a] Lines with A: Ali,M,13,74,170
-[DONE] a (echo "Lines with A: ${XVC_ADDED_REGEX_ITEMS}")
+[DONE] a (echo "Lines with A: ${XVC_ADDED_LINE_ITEMS}")
 """.strip()
     )
 
