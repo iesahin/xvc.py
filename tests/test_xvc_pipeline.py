@@ -131,7 +131,7 @@ def test_pipeline_step_dependency_glob_items(xvc_repo_with_dir):
     xvc_repo_with_dir.pipeline().step().new(
         step_name="files", command='echo "REMOVED_FILES: ${XVC_REMOVED_GLOB_ITEMS}"'
     )
-    pipeline.step().dependency(step_name="hello", glob_items="dir-0001/*.bin")
+    pipeline.step().dependency(step_name="files", glob_items="dir-0001/*.bin")
 
     first_run = pipeline.run()
     second_run = pipeline.run()
