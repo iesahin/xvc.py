@@ -137,8 +137,12 @@ def test_pipeline_step_dependency_glob_items(xvc_repo_with_dir):
     second_run = pipeline.run()
     os.remove(dependency_file)
     third_run = pipeline.run()
+
+    print("FIRST RUN")
     print(first_run)
+    print("SECOND RUN")
     print(second_run)
+    print("THIRD RUN")
     print(third_run)
 
     assert first_run == third_run
