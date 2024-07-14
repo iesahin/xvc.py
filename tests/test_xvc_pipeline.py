@@ -1,4 +1,5 @@
 import os
+import time
 
 
 def test_pipeline_list(empty_xvc_repo):
@@ -136,6 +137,7 @@ def test_pipeline_step_dependency_glob_items(xvc_repo_with_dir):
     first_run = pipeline.run()
     second_run = pipeline.run()
     os.system(f"xvc-test-helper generate-random-file {dependency_file}")
+    time.sleep(1)
     third_run = pipeline.run()
 
     print("FIRST RUN")
