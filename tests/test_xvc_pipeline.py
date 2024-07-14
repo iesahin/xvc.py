@@ -192,7 +192,7 @@ def test_pipeline_step_dependency_regex(xvc_repo_with_people_csv):
     second_run = pipeline.run()
     print(second_run)
     with open("people.csv", "a") as f:
-        f.write('"Ali",       "M",   13,       74,      170\n')
+        f.write("Ali,M,13,74,170\n")
     third_run = pipeline.run()
     print(third_run)
 
