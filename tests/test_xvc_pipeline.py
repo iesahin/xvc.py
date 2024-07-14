@@ -227,10 +227,28 @@ def test_pipeline_step_dependency_regex_items(xvc_repo_with_people_csv):
     )
 
 
-# TODO: def test_pipeline_step_dependency_line(xvc_repo_with_dir):
-#   assert False
-# TODO: def test_pipeline_step_dependency_line_items(xvc_repo_with_dir):
-#   assert False
+def test_pipeline_step_dependency_line(xvc_repo_with_people_csv):
+    pipeline = xvc_repo_with_people_csv.pipeline()
+    pipeline.step().new(step_name="a", command='echo "New lines added to the file"')
+    pipeline.step().dependency(step_name="a", regex="people.csv::10-")
+
+    first_run = pipeline.run()
+    print(first_run)
+    second_run = pipeline.run()
+    print(second_run)
+    with open("people.csv", "a") as f:
+        f.write("Ali,M,13,74,170\n")
+    third_run = pipeline.run()
+    print(third_run)
+
+    assert first_run.strip() == third_run.strip()
+    assert second_run.strip() == ""
+
+
+def test_pipeline_step_dependency_line_items(xvc_repo_with_dir):
+    assert False
+
+
 # TODO: def test_pipeline_step_dependency_generic(xvc_repo_with_dir):
 #   assert False
 # TODO: def test_pipeline_step_dependency_param(xvc_repo_with_dir):
