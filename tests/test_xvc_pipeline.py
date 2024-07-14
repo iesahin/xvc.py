@@ -266,8 +266,8 @@ def test_pipeline_step_dependency_line_items(xvc_repo_with_people_csv):
     assert (
         third_run.strip()
         == """
-[OUT] [a] Lines with A: Ali,M,13,74,170
-[DONE] a (echo "Lines with A: ${XVC_ADDED_LINE_ITEMS}")
+[OUT] [a] Added lines: Ali,M,13,74,170
+[DONE] a (echo "Added lines: ${XVC_ADDED_LINE_ITEMS}")
 """.strip()
     )
 
