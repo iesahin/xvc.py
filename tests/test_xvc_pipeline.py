@@ -159,7 +159,7 @@ def test_pipeline_step_dependency_step(xvc_pipeline_single_step):
         step_name="world", command="echo 'and the world'"
     )
     pipeline = xvc_pipeline_single_step.pipeline()
-    pipeline.step().dependency(step_name="hello", step="world")
+    pipeline.step().dependency(step_name="world", step="hello")
     first_run = pipeline.run()
 
     print(first_run)
@@ -168,7 +168,7 @@ def test_pipeline_step_dependency_step(xvc_pipeline_single_step):
         first_run.strip()
         == """
         [OUT] [world] and the world
-        """
+        """.strip()
     )
 
 
