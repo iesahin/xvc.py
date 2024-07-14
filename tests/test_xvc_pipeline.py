@@ -182,17 +182,41 @@ def test_pipeline_step_dependency_step(xvc_pipeline_single_step):
     )
 
 
-# TODO: def test_pipeline_step_dependency_param(xvc_repo_with_dir):
-#   assert False
-# TODO: def test_pipeline_step_dependency_regex(xvc_repo_with_dir):
-#   assert False
-# TODO: def test_pipeline_step_dependency_regex_items(xvc_repo_with_dir):
-#   assert False
+def test_pipeline_step_dependency_regex(xvc_repo_with_people_csv):
+    pipeline = xvc_repo_with_people_csv.pipeline()
+    pipeline.step().new(
+        step_name="a", command='echo "Lines with A: ${XVC_REGEX_ADDED_ITEMS}"'
+    )
+    pipeline.step().new(
+        step_name="b", command='echo "Lines with B: ${XVC_REGEX_ADDED_ITEMS}"'
+    )
+    pipeline.step().dependency(step_name="a", regex='people.csv:/^"A.*$/')
+    pipeline.step().dependency(step_name="b", regex='people.csv:/^"B.*$/')
+
+    first_run = pipeline.run()
+    print(first_run)
+    second_run = pipeline.run()
+    priunt(second_run)
+
+    assert (
+        first_run.strip()
+        == """
+        [OUT] [a] Lines with A: "A1","A2"
+    """
+    )
+
+
+def test_pipeline_step_dependency_regex_items(xvc_repo_with_people_csv):
+    assert False
+
+
 # TODO: def test_pipeline_step_dependency_line(xvc_repo_with_dir):
 #   assert False
 # TODO: def test_pipeline_step_dependency_line_items(xvc_repo_with_dir):
 #   assert False
 # TODO: def test_pipeline_step_dependency_generic(xvc_repo_with_dir):
+#   assert False
+# TODO: def test_pipeline_step_dependency_param(xvc_repo_with_dir):
 #   assert False
 #
 # TODO: def test_pipeline_dag(xvc_repo_with_dir):
