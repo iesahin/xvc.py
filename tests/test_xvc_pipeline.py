@@ -202,7 +202,7 @@ def test_pipeline_step_dependency_regex(xvc_repo_with_people_csv):
 
 def test_pipeline_step_dependency_regex_items(xvc_repo_with_people_csv):
     pipeline = xvc_repo_with_people_csv.pipeline()
-    pipeline.step().new(step_name="a", command='zsh -c "echo ${XVC_ALL_REGEX_ITEMS}"')
+    pipeline.step().new(step_name="a", command="env")
     pipeline.step().new(
         step_name="b", command='echo "Lines with B: ${XVC_ALL_REGEX_ITEMS}"'
     )
