@@ -121,8 +121,11 @@ def test_pipeline_step_dependency_glob(xvc_pipeline_single_step):
     os.system(f"xvc-test-helper generate-random-file {dependency_file}")
     third_run = pipeline.run()
 
-    assert first_run == third_run
+    print(first_run)
     print(second_run)
+    print(third_run)
+
+    assert first_run == third_run
     assert second_run.strip().endswith("[DONE] hello (echo 'hello xvc')")
 
 
