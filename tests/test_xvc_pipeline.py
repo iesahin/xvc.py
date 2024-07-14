@@ -194,6 +194,7 @@ def test_pipeline_step_dependency_regex(xvc_repo_with_people_csv):
     with open("people.csv", "a") as f:
         f.write('"Ali",       "M",   13,       74,      170\n')
     third_run = pipeline.run()
+    print(third_run)
 
     assert first_run.strip() == third_run.strip()
     assert second_run.strip() == ""
