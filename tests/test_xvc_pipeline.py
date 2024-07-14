@@ -167,7 +167,10 @@ def test_pipeline_step_dependency_step(xvc_pipeline_single_step):
     assert (
         first_run.strip()
         == """
-        [OUT] [world] and the world
+[OUT] [hello] hello xvc
+[DONE] hello (echo 'hello xvc')
+[OUT] [world] and the world
+[DONE] world (echo 'and the world')
         """.strip()
     )
 
