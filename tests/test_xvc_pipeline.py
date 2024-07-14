@@ -121,6 +121,7 @@ def test_pipeline_step_dependency_glob(xvc_pipeline_single_step):
     third_run = pipeline.run()
 
     assert first_run == third_run
+    print(second_run)
     assert second_run.strip() == ""
 
 
