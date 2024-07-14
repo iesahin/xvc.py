@@ -100,7 +100,7 @@ def test_pipeline_step_dependency_url(xvc_pipeline_single_step):
     pipeline = xvc_pipeline_single_step.pipeline()
     expected = """
 [OUT] [hello] hello xvc
- [DONE] hello (echo 'hello xvc')
+[DONE] hello (echo 'hello xvc')
     """.strip()
 
     pipeline.step().dependency(step_name="hello", url="https://xvc.dev")
