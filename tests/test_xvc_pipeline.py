@@ -208,8 +208,10 @@ def test_pipeline_step_dependency_regex_items(xvc_repo_with_people_csv):
     pipeline.step().new(
         step_name="b", command='echo "Lines with B: ${XVC_ADDED_REGEX_ITEMS}"'
     )
-    pipeline.step().dependency(step_name="a", regex='people.csv:/^"A.*$/')
-    pipeline.step().dependency(step_name="b", regex='people.csv:/^"B.*$/')
+    pipeline.step().dependency(step_name="a", regex_items='people.csv:/^"A.*$/')
+    pipeline.step().dependency(step_name="b", regex_items='people.csv:/^"B.*$/')
+    with open("people.csv", "a") as f:
+        f.write('"Ali",       "M",   13,       74,      170\n')
 
     first_run = pipeline.run()
     print(first_run)
