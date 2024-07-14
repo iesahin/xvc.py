@@ -238,7 +238,7 @@ impl XvcPipelineStep {
         let mut cli_opts = self.cli()?;
         cli_opts.push("dependency".to_string());
         update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
-        update_cli_flag(opts, &mut cli_opts, &["no-recheck"], "--no-recheck")?;
+        update_cli_flag(opts, &mut cli_opts, &["no_recheck"], "--no-recheck")?;
 
         update_cli_opt(
             opts,
