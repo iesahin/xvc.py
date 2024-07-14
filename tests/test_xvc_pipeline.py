@@ -127,15 +127,15 @@ def test_pipeline_step_dependency_glob(xvc_pipeline_single_step):
 
 def test_pipeline_step_dependency_glob_items(xvc_repo_with_dir):
     pipeline = xvc_repo_with_dir.pipeline()
-    dependency_file = "dir-0001/file-0001.bin"
+    dependency_file = "dir-0001/new-file.bin"
     xvc_repo_with_dir.pipeline().step().new(
-        step_name="files", command='echo "REMOVED_FILES: ${XVC_REMOVED_GLOB_ITEMS}"'
+        step_name="files", command='echo "ADDED_FILES: ${XVC_ADDED_GLOB_ITEMS}"'
     )
     pipeline.step().dependency(step_name="files", glob_items="dir-0001/*.bin")
 
     first_run = pipeline.run()
     second_run = pipeline.run()
-    os.remove(dependency_file)
+    os.system(f"xvc-test-helper generate-random-file {dependency_file}")
     third_run = pipeline.run()
 
     print("FIRST RUN")
