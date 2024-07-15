@@ -1,0 +1,14 @@
+
+## Following are required for Xvc to function correctly.
+.xvc/*
+!.xvc/store/
+!.xvc/ec/
+!.xvc/config.toml
+
+
+## Following are required for Xvc to function correctly.
+.xvc/*
+!.xvc/store/
+!.xvc/ec/
+!.xvc/config.toml
+

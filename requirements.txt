@@ -1,0 +1,3 @@
+maturin
+jupyterlab
+pytest-forked
