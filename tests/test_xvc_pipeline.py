@@ -274,6 +274,7 @@ def test_pipeline_step_dependency_line_items(xvc_repo_with_people_csv):
 
 # TODO: def test_pipeline_step_dependency_generic(xvc_repo_with_dir):
 #   assert False
+#
 # TODO: def test_pipeline_step_dependency_param(xvc_repo_with_dir):
 #   assert False
 #
