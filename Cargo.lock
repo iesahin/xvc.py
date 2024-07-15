@@ -3603,7 +3603,7 @@ dependencies = [
 
 [[package]]
 name = "xvc-py"
-version = "0.6.7-alpha-6"
+version = "0.6.7"
 dependencies = [
  "crossbeam",
  "crossbeam-channel",
