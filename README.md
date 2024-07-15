@@ -101,10 +101,9 @@ Now we can initialize Xvc repository. We first init Git in the directory. Xvc tr
 
 Now we can init the Xvc repository
 
-First we create an Xvc instance. You can specify the workdir and this instance will work on that directory. You can use multiple such instances to manage multiple Xvc repositories. 
-
-**WARNING**: Please do not use multiple instances for the same repository. There is an internal id counter that may have conflicting values between two instances and this may lead to data corruption. 
-
+First we create an Xvc instance. You can specify the workdir and this instance
+will work on that directory. For now, only one instance of Xvc can run in a
+Python process. This limitation may be removed in future releases.
 
 ```python
 
