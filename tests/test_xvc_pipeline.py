@@ -292,7 +292,7 @@ numeric_param: 13
         )
         pipeline.step().dependency(
             step_name="read-database-config",
-            param="params.yaml::database.connection.timeout",
+            param="params.yaml::database.connection",
         )
         first_run = pipeline.run()
         print(first_run)
