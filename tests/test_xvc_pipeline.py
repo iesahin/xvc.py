@@ -273,7 +273,7 @@ def test_pipeline_step_dependency_line_items(xvc_repo_with_people_csv):
     )
 
 
-def test_pipeline_step_dependency_param(xvc_repo_with_dir):
+def test_pipeline_step_dependency_param(empty_xvc_repo):
     filename = "params.yaml"
 
     with open(filename, "w") as f:
@@ -286,20 +286,20 @@ database:
     timeout: 5000
 numeric_param: 13
 """)
-        pipeline = xvc_repo_with_dir.pipeline()
+        pipeline = empty_xvc_repo.pipeline()
         pipeline.step().new(
-            step_name="read-database-config", command="rg timeout params.yaml"
+            step_name="read-database-config", command=f"rg timeout {filename}"
         )
         pipeline.step().dependency(
             step_name="read-database-config",
-            param="params.yaml::database.connection",
+            param=f"{filename}::database.port",
         )
         first_run = pipeline.run()
         print(first_run)
         second_run = pipeline.run()
         print(second_run)
 
-        update_yaml("params.yaml", "database.connection.timeout", 10000)
+        update_yaml(filename, "database.connection.timeout", 10000)
         third_run = pipeline.run()
         assert first_run.strip().endswith("5000")
         assert second_run.strip() == ""
