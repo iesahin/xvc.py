@@ -292,7 +292,7 @@ numeric_param: 13
         )
         pipeline.step().dependency(
             step_name="read-database-config",
-            param=f"{filename}::database.port",
+            param=f"{filename}::param",
         )
         first_run = pipeline.run()
         print(first_run)
