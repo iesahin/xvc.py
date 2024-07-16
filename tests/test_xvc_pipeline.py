@@ -1,5 +1,6 @@
 import os
 import pytest
+import yaml
 
 
 def test_pipeline_list(empty_xvc_repo):
@@ -272,11 +273,59 @@ def test_pipeline_step_dependency_line_items(xvc_repo_with_people_csv):
     )
 
 
+def test_pipeline_step_dependency_param(xvc_repo_with_dir):
+    filename = "params.yaml"
+
+    with open(filename, "w") as f:
+        f.write("""
+param: value
+database:
+  server: example.com
+  port: 5432
+  connection:
+    timeout: 5000
+numeric_param: 13
+""")
+        pipeline = xvc_repo_with_dir.pipeline()
+        pipeline.step().new(
+            step_name="read-database-config", command="rg timeout params.yaml"
+        )
+        pipeline.step().dependency(
+            step_name="read-database-config",
+            param="params.yaml::database.connection.timeout",
+        )
+        first_run = pipeline.run()
+        print(first_run)
+        second_run = pipeline.run()
+        print(second_run)
+
+        update_yaml("params.yaml", "database.connection.timeout", 10000)
+        third_run = pipeline.run()
+        assert first_run.strip().endswith("5000")
+        assert second_run.strip() == ""
+        assert third_run.strip().endswith("10000")
+
+
+def update_yaml(file_path, key, new_value):
+    # Read the existing YAML file
+    with open(file_path, "r") as file:
+        data = yaml.safe_load(file)
+
+    # Update the value
+    keys = key.split(".")
+    d = data
+    for k in keys[:-1]:
+        d = d.setdefault(k, {})
+    d[keys[-1]] = new_value
+
+    # Write the updated data back to the YAML file
+    with open(file_path, "w") as file:
+        yaml.safe_dump(data, file)
+
+
 # TODO: def test_pipeline_step_dependency_generic(xvc_repo_with_dir):
 #   assert False
 #
-# TODO: def test_pipeline_step_dependency_param(xvc_repo_with_dir):
-#   assert False
 #
 # TODO: def test_pipeline_dag(xvc_repo_with_dir):
 #     assert False
