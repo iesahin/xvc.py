@@ -320,11 +320,13 @@ def test_pipeline_step_dependency_sqlite_query(empty_xvc_repo):
     filename = "people.db"
     sqlite3.connect(filename).execute("""
 CREATE TABLE people (name, age, sex);
+""")
 
+    sqlite3.connect(filename).execute("""
 INSERT INTO people VALUES ('Alice', 25, 'F'),
     ('Bob', 30, 'M'),
     ('Charlie', 35, 'M');
-                                      """)
+""")
 
     pipeline = empty_xvc_repo.pipeline()
     pipeline.step().new(
