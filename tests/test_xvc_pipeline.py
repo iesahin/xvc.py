@@ -318,11 +318,13 @@ def update_yaml(file_path, key, new_value):
 
 def test_pipeline_step_dependency_sqlite_query(empty_xvc_repo):
     filename = "people.db"
-    sqlite3.connect(filename).execute("""
+    db = sqlite3.connect(filename)
+
+    db.execute("""
 CREATE TABLE people (name, age, sex);
 """)
 
-    sqlite3.connect(filename).execute("""
+    db.execute("""
 INSERT INTO people VALUES ('Alice', 25, 'F'),
     ('Bob', 30, 'M'),
     ('Charlie', 35, 'M');
@@ -342,7 +344,7 @@ INSERT INTO people VALUES ('Alice', 25, 'F'),
     second_run = pipeline.run()
     print(second_run)
     assert second_run.strip() == ""
-    sqlite3.connect(filename).execute("INSERT INTO people VALUES ('David', 40, 'M');")
+    db.execute("INSERT INTO people VALUES ('David', 40, 'M');")
     third_run = pipeline.run()
     print(third_run)
     assert first_run.strip() == third_run.strip()
