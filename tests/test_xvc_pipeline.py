@@ -1,6 +1,7 @@
 import os
 import pytest
 import yaml
+import sqlite3
 
 
 def test_pipeline_list(empty_xvc_repo):
@@ -321,6 +322,36 @@ def update_yaml(file_path, key, new_value):
     # Write the updated data back to the YAML file
     with open(file_path, "w") as file:
         yaml.safe_dump(data, file)
+
+
+def test_pipeline_step_dependency_sqlite_query(empty_xvc_repo):
+    filename = "people.db"
+    sqlite3.connect(filename).execute("""
+CREATE TABLE people (name, age, sex);
+
+INSERT INTO people VALUES ('Alice', 25, 'F'),
+    ('Bob', 30, 'M'),
+    ('Charlie', 35, 'M');
+                                      """)
+
+    pipeline = empty_xvc_repo.pipeline()
+    pipeline.step().new(
+        step_name="query", command="echo 'SELECT AVG(age) FROM people;'"
+    )
+    pipeline.step().dependency(
+        step_name="query",
+        sqlite_file=filename,
+        sqlite_query="SELECT COUNT(*) FROM people;",
+    )
+    first_run = pipeline.run()
+    print(first_run)
+    second_run = pipeline.run()
+    print(second_run)
+    assert second_run.strip() == ""
+    sqlite3.connect(filename).execute("INSERT INTO people VALUES ('David', 40, 'M');")
+    third_run = pipeline.run()
+    print(third_run)
+    assert first_run.strip() == third_run.strip()
 
 
 # TODO: def test_pipeline_step_dependency_generic(xvc_repo_with_dir):
