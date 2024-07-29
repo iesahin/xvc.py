@@ -332,7 +332,7 @@ INSERT INTO people VALUES ('Alice', 25, 'F'),
 
     pipeline = empty_xvc_repo.pipeline()
     pipeline.step().new(
-        step_name="query", command=f"sqlite3 {filename} 'SELECT AVG(age) FROM people;'"
+        step_name="query", command=f'sqlite3 {filename} "SELECT AVG(age) FROM people;"'
     )
     pipeline.step().dependency(
         step_name="query",
