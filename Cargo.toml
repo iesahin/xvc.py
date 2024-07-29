@@ -1,6 +1,6 @@
 [package]
 name = "xvc-py"
-version = "0.6.8"
+version = "0.6.9-alpha.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -11,11 +11,11 @@ crate-type = ["cdylib"]
 [dependencies]
 openssl = { version = "^0.10", features = ["vendored"] }
 log = "^0.4"
-xvc_rust = { package = "xvc", git = "https://github.com/iesahin/xvc", branch = "main", version = "0.6.8" }
+xvc_rust = { package = "xvc", git = "https://github.com/iesahin/xvc", branch = "main", version = "0.6.9" }
 # xvc_rust = { package = "xvc", path = "../xvc/lib/" }
-xvc_logging = { package = "xvc-logging", git = "https://github.com/iesahin/xvc", branch = "main", version = "0.6.8" }
-xvc_walker = { package = "xvc-walker", git = "https://github.com/iesahin/xvc", branch = "main", version = "0.6.8"  }
-crossbeam-channel = "^0.5"                                                 
+xvc_logging = { package = "xvc-logging", git = "https://github.com/iesahin/xvc", branch = "main", version = "0.6.9" }
+xvc_walker = { package = "xvc-walker", git = "https://github.com/iesahin/xvc", branch = "main", version = "0.6.9" }
+crossbeam-channel = "^0.5"
 crossbeam = "^0.8"
 pyo3 = { version = "^0.22", features = ["extension-module", "abi3-py37"] }
 git-version = "^0.3"
