@@ -113,10 +113,6 @@ def test_pipeline_step_dependency_url(xvc_pipeline_single_step):
     assert second_run.strip() == ""
 
 
-## FIXME: Debug and fix glob dependency
-@pytest.mark.skip(
-    reason="Needs to be debugged. The third run doesn't detect the change though the CLI run does. "
-)
 def test_pipeline_step_dependency_glob(xvc_pipeline_single_step):
     pipeline = xvc_pipeline_single_step.pipeline()
     dependency_file = "dir-0001/file-0001.bin"
@@ -135,10 +131,6 @@ def test_pipeline_step_dependency_glob(xvc_pipeline_single_step):
     assert second_run.strip().endswith("[DONE] hello (echo 'hello xvc')")
 
 
-## FIXME: Debug and fix glob_items dependency
-@pytest.mark.skip(
-    reason="Needs to be debugged. The third run doesn't detect the change though the CLI run does. "
-)
 def test_pipeline_step_dependency_glob_items(xvc_repo_with_dir):
     pipeline = xvc_repo_with_dir.pipeline()
     dependency_file = "dir-0001/new-file.bin"
