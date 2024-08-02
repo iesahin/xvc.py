@@ -279,24 +279,37 @@ database:
     timeout: 5000
 numeric_param: 13
 """)
-        pipeline = empty_xvc_repo.pipeline()
-        pipeline.step().new(
-            step_name="read-database-config", command=f"rg timeout {filename}"
-        )
-        pipeline.step().dependency(
-            step_name="read-database-config",
-            param=f"{filename}::database.server",
-        )
-        first_run = pipeline.run()
-        print(first_run)
-        # second_run = pipeline.run()
-        # print(second_run)
-        #
-        # update_yaml(filename, "database.connection.timeout", 10000)
-        # third_run = pipeline.run()
-        assert first_run.strip().endswith("5000")
-        # assert second_run.strip() == ""
-        # assert third_run.strip().endswith("10000")
+    pipeline = empty_xvc_repo.pipeline()
+    pipeline.step().new(
+        step_name="read-database-config", command=f"rg timeout {filename}"
+    )
+    pipeline.step().dependency(
+        step_name="read-database-config",
+        param=f"{filename}::database.connection.timeout",
+    )
+    first_run = pipeline.run()
+    print(first_run)
+    second_run = pipeline.run()
+    print(second_run)
+
+    update_yaml(filename, "database.connection.timeout", 10000)
+    third_run = pipeline.run()
+    assert (
+        first_run.strip()
+        == """
+[OUT] [read-database-config]     timeout: 5000
+[DONE] read-database-config (rg timeout params.yaml)
+""".strip()
+    )
+
+    assert second_run.strip() == ""
+    assert (
+        third_run.strip()
+        == """
+[OUT] [read-database-config]     timeout: 10000
+[DONE] read-database-config (rg timeout params.yaml)
+""".strip()
+    )
 
 
 def update_yaml(file_path, key, new_value):
