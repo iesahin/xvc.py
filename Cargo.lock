@@ -1806,6 +1806,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ff011a302c396a5197692431fc1948019154afc178baf7d8e37367442a4601cf"
 
 [[package]]
+name = "openssl-src"
+version = "300.3.1+3.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7259953d42a81bf137fbbd73bd30a8e1914d6dce43c2b90ed575783a22608b91"
+dependencies = [
+ "cc",
+]
+
+[[package]]
 name = "openssl-sys"
 version = "0.9.103"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1813,6 +1822,7 @@ checksum = "7f9e8deee91df40a943c71b917e5874b951d32a802526c85721ce3b776c929d6"
 dependencies = [
  "cc",
  "libc",
+ "openssl-src",
  "pkg-config",
  "vcpkg",
 ]
@@ -3337,6 +3347,7 @@ checksum = "1e9df38ee2d2c3c5948ea468a8406ff0db0b29ae1ffde1bcf20ef305bcc95c51"
 [[package]]
 name = "xvc"
 version = "0.6.10"
+source = "git+https://github.com/iesahin/xvc?branch=main#59a71275898c584f87b50623ad9567421989db13"
 dependencies = [
  "anyhow",
  "assert_cmd",
@@ -3391,6 +3402,7 @@ dependencies = [
 [[package]]
 name = "xvc-config"
 version = "0.6.10"
+source = "git+https://github.com/iesahin/xvc?branch=main#59a71275898c584f87b50623ad9567421989db13"
 dependencies = [
  "crossbeam",
  "crossbeam-channel",
@@ -3413,6 +3425,7 @@ dependencies = [
 [[package]]
 name = "xvc-core"
 version = "0.6.10"
+source = "git+https://github.com/iesahin/xvc?branch=main#59a71275898c584f87b50623ad9567421989db13"
 dependencies = [
  "anyhow",
  "blake2",
@@ -3460,6 +3473,7 @@ dependencies = [
 [[package]]
 name = "xvc-ecs"
 version = "0.6.10"
+source = "git+https://github.com/iesahin/xvc?branch=main#59a71275898c584f87b50623ad9567421989db13"
 dependencies = [
  "crossbeam-channel",
  "fern",
@@ -3478,6 +3492,7 @@ dependencies = [
 [[package]]
 name = "xvc-file"
 version = "0.6.10"
+source = "git+https://github.com/iesahin/xvc?branch=main#59a71275898c584f87b50623ad9567421989db13"
 dependencies = [
  "anyhow",
  "blake2",
@@ -3532,6 +3547,7 @@ dependencies = [
 [[package]]
 name = "xvc-logging"
 version = "0.6.10"
+source = "git+https://github.com/iesahin/xvc?branch=main#59a71275898c584f87b50623ad9567421989db13"
 dependencies = [
  "crossbeam-channel",
  "fern",
@@ -3541,6 +3557,7 @@ dependencies = [
 [[package]]
 name = "xvc-pipeline"
 version = "0.6.10"
+source = "git+https://github.com/iesahin/xvc?branch=main#59a71275898c584f87b50623ad9567421989db13"
 dependencies = [
  "anyhow",
  "blake2",
@@ -3610,6 +3627,7 @@ dependencies = [
 [[package]]
 name = "xvc-storage"
 version = "0.6.10"
+source = "git+https://github.com/iesahin/xvc?branch=main#59a71275898c584f87b50623ad9567421989db13"
 dependencies = [
  "anyhow",
  "blake2",
@@ -3629,6 +3647,7 @@ dependencies = [
  "jwalk",
  "lazy_static",
  "log",
+ "openssl",
  "paste",
  "path-absolutize",
  "rayon",
@@ -3664,6 +3683,7 @@ dependencies = [
 [[package]]
 name = "xvc-walker"
 version = "0.6.10"
+source = "git+https://github.com/iesahin/xvc?branch=main#59a71275898c584f87b50623ad9567421989db13"
 dependencies = [
  "anyhow",
  "crossbeam",
