@@ -2,6 +2,7 @@ import os
 import pytest
 import yaml
 import sqlite3
+import time
 
 
 def test_pipeline_list(empty_xvc_repo):
@@ -102,7 +103,7 @@ def test_pipeline_step_dependency_url(xvc_pipeline_single_step):
     pipeline = xvc_pipeline_single_step.pipeline()
     expected = """
 [OUT] [hello] hello xvc
-[DONE] hello (echo 'hello xvc')
+[DONE] [hello] (echo 'hello xvc')
     """.strip()
 
     pipeline.step().dependency(step_name="hello", url="https://xvc.dev")
@@ -115,7 +116,7 @@ def test_pipeline_step_dependency_url(xvc_pipeline_single_step):
 
 def test_pipeline_step_dependency_glob(xvc_pipeline_single_step):
     pipeline = xvc_pipeline_single_step.pipeline()
-    dependency_file = "dir-0001/file-0001.bin"
+    dependency_file = "dir-0001/new-file.bin"
     pipeline.step().dependency(step_name="hello", glob="dir-0001/*.bin")
 
     first_run = pipeline.run()
@@ -123,17 +124,14 @@ def test_pipeline_step_dependency_glob(xvc_pipeline_single_step):
     os.system(f"xvc-test-helper generate-random-file {dependency_file}")
     third_run = pipeline.run()
 
-    print(first_run)
-    print(second_run)
-    print(third_run)
-
     assert first_run == third_run
-    assert second_run.strip().endswith("[DONE] hello (echo 'hello xvc')")
+    assert second_run.strip() == ""
 
 
 def test_pipeline_step_dependency_glob_items(xvc_repo_with_dir):
     pipeline = xvc_repo_with_dir.pipeline()
-    dependency_file = "dir-0001/new-file.bin"
+    dependency_dir = "dir-0001"
+    dependency_file = f"{dependency_dir}/new-file.bin"
     xvc_repo_with_dir.pipeline().step().new(
         step_name="files", command='echo "ADDED_FILES: ${XVC_ADDED_GLOB_ITEMS}"'
     )
@@ -151,8 +149,25 @@ def test_pipeline_step_dependency_glob_items(xvc_repo_with_dir):
     print("THIRD RUN")
     print(third_run)
 
-    assert first_run == third_run
+    assert (
+        first_run.strip()
+        == """
+[OUT] [files] ADDED_FILES: dir-0001/file-0001.bin
+dir-0001/file-0002.bin
+dir-0001/file-0003.bin
+[DONE] [files] (echo "ADDED_FILES: ${XVC_ADDED_GLOB_ITEMS}")
+""".strip()
+    )
+
     assert second_run.strip() == ""
+
+    assert (
+        third_run.strip()
+        == """
+[OUT] [files] ADDED_FILES: dir-0001/new-file.bin
+[DONE] [files] (echo "ADDED_FILES: ${XVC_ADDED_GLOB_ITEMS}")
+""".strip()
+    )
 
 
 def test_pipeline_step_dependency_step(xvc_pipeline_single_step):
@@ -169,9 +184,9 @@ def test_pipeline_step_dependency_step(xvc_pipeline_single_step):
         first_run.strip()
         == """
 [OUT] [hello] hello xvc
-[DONE] hello (echo 'hello xvc')
+[DONE] [hello] (echo 'hello xvc')
 [OUT] [world] and the world
-[DONE] world (echo 'and the world')
+[DONE] [world] (echo 'and the world')
         """.strip()
     )
 
@@ -216,7 +231,7 @@ def test_pipeline_step_dependency_regex_items(xvc_repo_with_people_csv):
         third_run.strip()
         == """
 [OUT] [a] Lines with A: Ali,M,13,74,170
-[DONE] a (echo "Lines with A: ${XVC_ADDED_REGEX_ITEMS}")
+[DONE] [a] (echo "Lines with A: ${XVC_ADDED_REGEX_ITEMS}")
 """.strip()
     )
 
@@ -261,7 +276,7 @@ def test_pipeline_step_dependency_line_items(xvc_repo_with_people_csv):
         third_run.strip()
         == """
 [OUT] [a] Added lines: Ali,M,13,74,170
-[DONE] a (echo "Added lines: ${XVC_ADDED_LINE_ITEMS}")
+[DONE] [a] (echo "Added lines: ${XVC_ADDED_LINE_ITEMS}")
 """.strip()
     )
 
@@ -298,7 +313,7 @@ numeric_param: 13
         first_run.strip()
         == """
 [OUT] [read-database-config]     timeout: 5000
-[DONE] read-database-config (rg timeout params.yaml)
+[DONE] [read-database-config] (rg timeout params.yaml)
 """.strip()
     )
 
@@ -307,7 +322,7 @@ numeric_param: 13
         third_run.strip()
         == """
 [OUT] [read-database-config]     timeout: 10000
-[DONE] read-database-config (rg timeout params.yaml)
+[DONE] [read-database-config] (rg timeout params.yaml)
 """.strip()
     )
 
@@ -331,7 +346,7 @@ def update_yaml(file_path, key, new_value):
 
 def test_pipeline_step_dependency_sqlite_query(empty_xvc_repo):
     filename = "people.db"
-    db = sqlite3.connect(filename)
+    db = sqlite3.connect(filename, autocommit=True)
 
     db.execute("""
 CREATE TABLE people (name, age, sex);
@@ -354,10 +369,18 @@ INSERT INTO people VALUES ('Alice', 25, 'F'),
     )
     first_run = pipeline.run()
     print(first_run)
+    assert (
+        first_run.strip()
+        == """
+[OUT] [query] 30.0
+[DONE] [query] (sqlite3 people.db "SELECT AVG(age) FROM people;")
+        """.strip()
+    )
     second_run = pipeline.run()
     print(second_run)
     assert second_run.strip() == ""
-    db.execute("INSERT INTO people VALUES ('David', 40, 'M');")
+    # NOTE: We are not changing the average age
+    db.execute("INSERT INTO people VALUES ('David', 30, 'M');")
     third_run = pipeline.run()
     print(third_run)
     assert first_run.strip() == third_run.strip()
