@@ -3346,6 +3346,7 @@ checksum = "1e9df38ee2d2c3c5948ea468a8406ff0db0b29ae1ffde1bcf20ef305bcc95c51"
 [[package]]
 name = "xvc"
 version = "0.6.8"
+source = "git+https://github.com/iesahin/xvc?branch=main#1fd1e9849c8ad10fba81758d1da25f7ec827b16a"
 dependencies = [
  "anyhow",
  "assert_cmd",
@@ -3401,6 +3402,7 @@ dependencies = [
 [[package]]
 name = "xvc-config"
 version = "0.6.8"
+source = "git+https://github.com/iesahin/xvc?branch=main#1fd1e9849c8ad10fba81758d1da25f7ec827b16a"
 dependencies = [
  "crossbeam",
  "crossbeam-channel",
@@ -3423,6 +3425,7 @@ dependencies = [
 [[package]]
 name = "xvc-core"
 version = "0.6.8"
+source = "git+https://github.com/iesahin/xvc?branch=main#1fd1e9849c8ad10fba81758d1da25f7ec827b16a"
 dependencies = [
  "anyhow",
  "blake2",
@@ -3470,6 +3473,7 @@ dependencies = [
 [[package]]
 name = "xvc-ecs"
 version = "0.6.8"
+source = "git+https://github.com/iesahin/xvc?branch=main#1fd1e9849c8ad10fba81758d1da25f7ec827b16a"
 dependencies = [
  "crossbeam-channel",
  "fern",
@@ -3488,6 +3492,7 @@ dependencies = [
 [[package]]
 name = "xvc-file"
 version = "0.6.8"
+source = "git+https://github.com/iesahin/xvc?branch=main#1fd1e9849c8ad10fba81758d1da25f7ec827b16a"
 dependencies = [
  "anyhow",
  "blake2",
@@ -3542,6 +3547,7 @@ dependencies = [
 [[package]]
 name = "xvc-logging"
 version = "0.6.8"
+source = "git+https://github.com/iesahin/xvc?branch=main#1fd1e9849c8ad10fba81758d1da25f7ec827b16a"
 dependencies = [
  "crossbeam-channel",
  "fern",
@@ -3551,6 +3557,7 @@ dependencies = [
 [[package]]
 name = "xvc-pipeline"
 version = "0.6.8"
+source = "git+https://github.com/iesahin/xvc?branch=main#1fd1e9849c8ad10fba81758d1da25f7ec827b16a"
 dependencies = [
  "anyhow",
  "blake2",
@@ -3619,6 +3626,7 @@ dependencies = [
 [[package]]
 name = "xvc-storage"
 version = "0.6.8"
+source = "git+https://github.com/iesahin/xvc?branch=main#1fd1e9849c8ad10fba81758d1da25f7ec827b16a"
 dependencies = [
  "anyhow",
  "blake2",
@@ -3674,6 +3682,7 @@ dependencies = [
 [[package]]
 name = "xvc-walker"
 version = "0.6.8"
+source = "git+https://github.com/iesahin/xvc?branch=main#1fd1e9849c8ad10fba81758d1da25f7ec827b16a"
 dependencies = [
  "anyhow",
  "crossbeam",
@@ -3766,9 +3775,9 @@ dependencies = [
 
 [[package]]
 name = "zerovec-derive"
-version = "0.10.2"
+version = "0.10.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "97cf56601ee5052b4417d90c8755c6683473c926039908196cf35d99f893ebe7"
+checksum = "6eafa6dfb17584ea3e2bd6e76e0cc15ad7af12b09abdd1ca55961bed9b1063c6"
 dependencies = [
  "proc-macro2",
  "quote",
