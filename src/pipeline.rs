@@ -1,7 +1,7 @@
 use pyo3::prelude::*;
 use pyo3::types::PyDict;
 
-use crate::Xvc;
+use crate::{update_cli_tuple, Xvc};
 use crate::{update_cli_flag, update_cli_opt};
 
 #[pyclass]
@@ -257,6 +257,8 @@ impl XvcPipelineStep {
         update_cli_opt(opts, &mut cli_opts, &["line", "lines"], "--line")?;
         update_cli_opt(opts, &mut cli_opts, &["line_items"], "--line-items")?;
         update_cli_opt(opts, &mut cli_opts, &["generic"], "--generic")?;
+        update_cli_tuple(opts, &mut cli_opts, ("sqlite_file", "sqlite_query"), "--sqlite-query")?;
+
         self.xvc_run(cli_opts)
     }
 

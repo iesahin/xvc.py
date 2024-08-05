@@ -347,6 +347,24 @@ pub fn update_cli_opt(
     Ok(())
 }
 
+pub fn update_cli_tuple(
+    dict: Option<&Bound<PyDict>>,
+    cli: &mut Vec<String>,
+    keys:(&str, &str),
+    cli_opt: &str,
+) -> PyResult<()> {
+    let (first_key, second_key) = keys;
+    if let Some(first_value) = get_string(dict, &[first_key])? {
+        if let Some(second_value) = get_string(dict, &[second_key])? {
+            cli.push(cli_opt.to_string());
+            cli.push(first_value.to_string());
+            cli.push(second_value.to_string());
+        }   
+    }
+    Ok(())
+}
+
+
 pub fn update_targets(tuple: &Bound<PyTuple>, cli: &mut Vec<String>) -> PyResult<()> {
     for target in tuple.iter() {
         cli.push(target.extract::<String>()?);
