@@ -1,6 +1,6 @@
 [package]
 name = "xvc-py"
-version = "0.6.10"
+version = "0.6.11"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -10,11 +10,11 @@ crate-type = ["cdylib"]
 
 [dependencies]
 log = "^0.4"
-xvc_rust = { package = "xvc", git = "https://github.com/iesahin/xvc", branch = "main", version = "0.6.10", features = [
+xvc_rust = { package = "xvc", git = "https://github.com/iesahin/xvc", branch = "main", version = "0.6.11", features = [
   "bundled-openssl",
 ] }
-xvc_logging = { package = "xvc-logging", git = "https://github.com/iesahin/xvc", branch = "main", version = "0.6.10" }
-xvc_walker = { package = "xvc-walker", git = "https://github.com/iesahin/xvc", branch = "main", version = "0.6.10" }
+xvc_logging = { package = "xvc-logging", git = "https://github.com/iesahin/xvc", branch = "main", version = "0.6.11" }
+xvc_walker = { package = "xvc-walker", git = "https://github.com/iesahin/xvc", branch = "main", version = "0.6.11" }
 # xvc_rust = { package = "xvc", path = "../xvc/lib/" }
 # xvc_walker = { package = "xvc-walker", path = "../xvc/walker/" }
 # xvc_logging = { package = "xvc-logging", path = "../xvc/logging/" }
