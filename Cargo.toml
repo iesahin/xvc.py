@@ -21,5 +21,5 @@ xvc_walker = { package = "xvc-walker", git = "https://github.com/iesahin/xvc", b
 # xvc_logging = { package = "xvc-logging", path = "../xvc/logging/" }
 crossbeam-channel = "^0.5"
 crossbeam = "^0.8"
-pyo3 = { version = "^0.22", features = ["extension-module", "abi3-py37"] }
+pyo3 = { version = "^0.23", features = ["extension-module", "abi3-py37"] }
 git-version = "^0.3"

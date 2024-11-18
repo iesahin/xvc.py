@@ -354,9 +354,12 @@ checksum = "ade8366b8bd5ba243f0a58f036cc0ca8a2f069cff1a2351ef1cac6b083e16fc0"
 
 [[package]]
 name = "cc"
-version = "1.0.99"
+version = "1.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "96c51067fd44124faa7f870b4b1c969379ad32b2ba805aa959430ceaa384f695"
+checksum = "fd9de9f2205d5ef3fd67e685b0df337994ddd4495e2a28d185500d0e1edfea47"
+dependencies = [
+ "shlex",
+]
 
 [[package]]
 name = "cfg-if"
@@ -849,10 +852,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7360491ce676a36bf9bb3c56c1aa791658183a54d2744120f27285738d90465a"
 
 [[package]]
-name = "fastrand"
-version = "2.1.0"
+name = "fast-glob"
+version = "0.3.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9fc0510504f03c51ada170672ac806f1f105a88aa97a5281117e1ddc3368e51a"
+checksum = "3afcf4effa2c44390b9912544582d5af29e10dc4c816c5dbebf748e1c7416faa"
+
+[[package]]
+name = "fastrand"
+version = "2.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "486f806e73c5707928240ddc295403b1b93c96a02038563881c4a2fd84b81ac4"
 
 [[package]]
 name = "fern"
@@ -1571,9 +1580,9 @@ checksum = "bbd2bcb4c963f2ddae06a2efc7e9f3591312473c50c6685e1f298068316e66fe"
 
 [[package]]
 name = "libc"
-version = "0.2.155"
+version = "0.2.164"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "97b3888a4aecf77e811145cadf6eef5901f4782c53886191b2f693f24761847c"
+checksum = "433bfe06b8c75da9b2e3fbea6e5329ff87748f0b144ef75306e674c3f6f7c13f"
 
 [[package]]
 name = "libredox"
@@ -1591,6 +1600,7 @@ version = "0.30.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2e99fb7a497b1e3339bc746195567ed8d3e24945ecd636e3619d20b9de9e9149"
 dependencies = [
+ "cc",
  "pkg-config",
  "vcpkg",
 ]
@@ -1692,6 +1702,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "mio"
+version = "1.0.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "80e04d1dcff3aae0704555fe5fee3bcfaf3d1fdf8a7e521d5b9d2b42acb52cec"
+dependencies = [
+ "hermit-abi",
+ "libc",
+ "wasi",
+ "windows-sys 0.52.0",
+]
+
+[[package]]
 name = "native-tls"
 version = "0.2.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1728,7 +1750,7 @@ dependencies = [
  "kqueue",
  "libc",
  "log",
- "mio",
+ "mio 0.8.11",
  "walkdir",
  "windows-sys 0.48.0",
 ]
@@ -1746,16 +1768,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "071dfc062690e90b734c0b2273ce72ad0ffa95f0c74596bc250dcfd960262841"
 dependencies = [
  "autocfg",
-]
-
-[[package]]
-name = "num_cpus"
-version = "1.16.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4161fcb6d602d4d2081af7c3a45852d875a03dd337a6bfdd6e06407b61342a43"
-dependencies = [
- "hermit-abi",
- "libc",
 ]
 
 [[package]]
@@ -1891,6 +1903,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "peak_alloc"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "29c4e8e2dd832fd76346468f822e4e600d30ba4e5aa545a128abf12cfae7ea3e"
+
+[[package]]
 name = "percent-encoding"
 version = "2.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1983,9 +2001,9 @@ dependencies = [
 
 [[package]]
 name = "pyo3"
-version = "0.22.2"
+version = "0.23.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "831e8e819a138c36e212f3af3fd9eeffed6bf1510a805af35b0edee5ffa59433"
+checksum = "7ebb0c0cc0de9678e53be9ccf8a2ab53045e6e3a8be03393ceccc5e7396ccb40"
 dependencies = [
  "cfg-if",
  "indoc",
@@ -2001,9 +2019,9 @@ dependencies = [
 
 [[package]]
 name = "pyo3-build-config"
-version = "0.22.2"
+version = "0.23.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1e8730e591b14492a8945cdff32f089250b05f5accecf74aeddf9e8272ce1fa8"
+checksum = "80e3ce69c4ec34476534b490e412b871ba03a82e35604c3dfb95fcb6bfb60c09"
 dependencies = [
  "once_cell",
  "target-lexicon",
@@ -2011,9 +2029,9 @@ dependencies = [
 
 [[package]]
 name = "pyo3-ffi"
-version = "0.22.2"
+version = "0.23.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5e97e919d2df92eb88ca80a037969f44e5e70356559654962cbb3316d00300c6"
+checksum = "3b09f311c76b36dfd6dd6f7fa6f9f18e7e46a1c937110d283e80b12ba2468a75"
 dependencies = [
  "libc",
  "pyo3-build-config",
@@ -2021,9 +2039,9 @@ dependencies = [
 
 [[package]]
 name = "pyo3-macros"
-version = "0.22.2"
+version = "0.23.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "eb57983022ad41f9e683a599f2fd13c3664d7063a3ac5714cae4b7bee7d3f206"
+checksum = "fd4f74086536d1e1deaff99ec0387481fb3325c82e4e48be0e75ab3d3fcb487a"
 dependencies = [
  "proc-macro2",
  "pyo3-macros-backend",
@@ -2033,9 +2051,9 @@ dependencies = [
 
 [[package]]
 name = "pyo3-macros-backend"
-version = "0.22.2"
+version = "0.23.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ec480c0c51ddec81019531705acac51bcdbeae563557c982aa8263bb96880372"
+checksum = "9e77dfeb76b32bbf069144a5ea0a36176ab59c8db9ce28732d0f06f096bbfbc8"
 dependencies = [
  "heck",
  "proc-macro2",
@@ -2332,9 +2350,9 @@ dependencies = [
 
 [[package]]
 name = "rustix"
-version = "0.38.34"
+version = "0.38.40"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "70dc5ec042f7a43c4a73241207cecc9873a06d45debb38b329f8541d85c2730f"
+checksum = "99e4ea3e1cdc4b559b8e5650f9c8e5998e3e5c1343b4eaf034565f32318d63c0"
 dependencies = [
  "bitflags 2.6.0",
  "errno",
@@ -2539,6 +2557,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "shlex"
+version = "1.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0fda2ff0d084019ba4d7c6f371c95d8fd75ce3524c3cb8fb653a3023f6323e64"
+
+[[package]]
 name = "slab"
 version = "0.4.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2712,12 +2736,13 @@ checksum = "e1fc403891a21bcfb7c37834ba66a547a8f402146eba7265b5a6d88059c9ff2f"
 
 [[package]]
 name = "tempfile"
-version = "3.10.1"
+version = "3.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "85b77fafb263dd9d05cbeac119526425676db3784113aa9295c88498cbf8bff1"
+checksum = "28cce251fcbc87fac86a866eeb0d6c2d536fc16d06f184bb61aeae11aa4cee0c"
 dependencies = [
  "cfg-if",
  "fastrand",
+ "once_cell",
  "rustix",
  "windows-sys 0.52.0",
 ]
@@ -2800,18 +2825,17 @@ dependencies = [
 
 [[package]]
 name = "tokio"
-version = "1.38.0"
+version = "1.41.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ba4f4a02a7a80d6f274636f0aa95c7e383b912d41fe721a31f29e29698585a4a"
+checksum = "22cfb5bee7a6a52939ca9224d6ac897bb669134078daa8735560897f69de4d33"
 dependencies = [
  "backtrace",
  "bytes",
  "libc",
- "mio",
- "num_cpus",
+ "mio 1.0.2",
  "pin-project-lite",
  "socket2",
- "windows-sys 0.48.0",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -2975,9 +2999,9 @@ checksum = "06abde3611657adf66d383f00b093d7faecc7fa57071cce2578660c9f1010821"
 
 [[package]]
 name = "uuid"
-version = "1.8.0"
+version = "1.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a183cf7feeba97b4dd1c0d46788634f6221d87fa961b305bed08c851829efcc0"
+checksum = "f8c5f0a0af699448548ad1a2fbf920fb4bee257eae39953ba95cb84891a0446a"
 dependencies = [
  "getrandom",
  "rand",
@@ -3346,8 +3370,8 @@ checksum = "1e9df38ee2d2c3c5948ea468a8406ff0db0b29ae1ffde1bcf20ef305bcc95c51"
 
 [[package]]
 name = "xvc"
-version = "0.6.10"
-source = "git+https://github.com/iesahin/xvc?branch=main#59a71275898c584f87b50623ad9567421989db13"
+version = "0.6.11"
+source = "git+https://github.com/iesahin/xvc?branch=main#ff50f1e9b3b08b05cacade00678b336c6e4ccf4f"
 dependencies = [
  "anyhow",
  "assert_cmd",
@@ -3401,8 +3425,8 @@ dependencies = [
 
 [[package]]
 name = "xvc-config"
-version = "0.6.10"
-source = "git+https://github.com/iesahin/xvc?branch=main#59a71275898c584f87b50623ad9567421989db13"
+version = "0.6.11"
+source = "git+https://github.com/iesahin/xvc?branch=main#ff50f1e9b3b08b05cacade00678b336c6e4ccf4f"
 dependencies = [
  "crossbeam",
  "crossbeam-channel",
@@ -3424,8 +3448,8 @@ dependencies = [
 
 [[package]]
 name = "xvc-core"
-version = "0.6.10"
-source = "git+https://github.com/iesahin/xvc?branch=main#59a71275898c584f87b50623ad9567421989db13"
+version = "0.6.11"
+source = "git+https://github.com/iesahin/xvc?branch=main#ff50f1e9b3b08b05cacade00678b336c6e4ccf4f"
 dependencies = [
  "anyhow",
  "blake2",
@@ -3446,6 +3470,7 @@ dependencies = [
  "log",
  "paste",
  "path-absolutize",
+ "peak_alloc",
  "rayon",
  "regex",
  "relative-path",
@@ -3472,8 +3497,8 @@ dependencies = [
 
 [[package]]
 name = "xvc-ecs"
-version = "0.6.10"
-source = "git+https://github.com/iesahin/xvc?branch=main#59a71275898c584f87b50623ad9567421989db13"
+version = "0.6.11"
+source = "git+https://github.com/iesahin/xvc?branch=main#ff50f1e9b3b08b05cacade00678b336c6e4ccf4f"
 dependencies = [
  "crossbeam-channel",
  "fern",
@@ -3491,8 +3516,8 @@ dependencies = [
 
 [[package]]
 name = "xvc-file"
-version = "0.6.10"
-source = "git+https://github.com/iesahin/xvc?branch=main#59a71275898c584f87b50623ad9567421989db13"
+version = "0.6.11"
+source = "git+https://github.com/iesahin/xvc?branch=main#ff50f1e9b3b08b05cacade00678b336c6e4ccf4f"
 dependencies = [
  "anyhow",
  "blake2",
@@ -3516,6 +3541,7 @@ dependencies = [
  "parse-size",
  "paste",
  "path-absolutize",
+ "peak_alloc",
  "rayon",
  "reflink",
  "regex",
@@ -3546,18 +3572,19 @@ dependencies = [
 
 [[package]]
 name = "xvc-logging"
-version = "0.6.10"
-source = "git+https://github.com/iesahin/xvc?branch=main#59a71275898c584f87b50623ad9567421989db13"
+version = "0.6.11"
+source = "git+https://github.com/iesahin/xvc?branch=main#ff50f1e9b3b08b05cacade00678b336c6e4ccf4f"
 dependencies = [
  "crossbeam-channel",
  "fern",
  "log",
+ "peak_alloc",
 ]
 
 [[package]]
 name = "xvc-pipeline"
-version = "0.6.10"
-source = "git+https://github.com/iesahin/xvc?branch=main#59a71275898c584f87b50623ad9567421989db13"
+version = "0.6.11"
+source = "git+https://github.com/iesahin/xvc?branch=main#ff50f1e9b3b08b05cacade00678b336c6e4ccf4f"
 dependencies = [
  "anyhow",
  "blake2",
@@ -3612,7 +3639,7 @@ dependencies = [
 
 [[package]]
 name = "xvc-py"
-version = "0.6.10"
+version = "0.6.11"
 dependencies = [
  "crossbeam",
  "crossbeam-channel",
@@ -3626,8 +3653,8 @@ dependencies = [
 
 [[package]]
 name = "xvc-storage"
-version = "0.6.10"
-source = "git+https://github.com/iesahin/xvc?branch=main#59a71275898c584f87b50623ad9567421989db13"
+version = "0.6.11"
+source = "git+https://github.com/iesahin/xvc?branch=main#ff50f1e9b3b08b05cacade00678b336c6e4ccf4f"
 dependencies = [
  "anyhow",
  "blake2",
@@ -3682,17 +3709,20 @@ dependencies = [
 
 [[package]]
 name = "xvc-walker"
-version = "0.6.10"
-source = "git+https://github.com/iesahin/xvc?branch=main#59a71275898c584f87b50623ad9567421989db13"
+version = "0.6.11"
+source = "git+https://github.com/iesahin/xvc?branch=main#ff50f1e9b3b08b05cacade00678b336c6e4ccf4f"
 dependencies = [
  "anyhow",
  "crossbeam",
  "crossbeam-channel",
  "dashmap",
- "globset",
+ "fast-glob",
  "itertools",
+ "jwalk",
  "log",
  "notify",
+ "peak_alloc",
+ "rayon",
  "regex",
  "thiserror",
  "xvc-logging",
