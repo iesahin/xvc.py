@@ -5,7 +5,12 @@ use crossbeam_channel::bounded;
 use log::LevelFilter;
 use pyo3::PyResult;
 use xvc_rust::{
-    cli::{XvcCLI, XvcSubCommand}, config::XvcVerbosity, core::{aliases, check_ignore, root}, error, file, git_checkout_ref, handle_git_automation, init, logging::{debug, setup_logging, uwr, XvcOutputLine}, pipeline, storage, watch, Error, Result, XvcRootOpt
+    cli::{XvcCLI, XvcSubCommand},
+    config::XvcVerbosity,
+    core::{aliases, check_ignore, root},
+    error, file, git_checkout_ref, handle_git_automation, init,
+    logging::{debug, setup_logging, uwr, XvcOutputLine},
+    pipeline, storage, watch, Error, Result, XvcRootOpt,
 };
 
 use crate::XvcPyError;
@@ -14,7 +19,7 @@ const CHANNEL_BOUND: usize = 10000;
 
 pub struct PyCommandOutput {
     pub output: String,
-    pub xvc_root_opt: XvcRootOpt
+    pub xvc_root_opt: XvcRootOpt,
 }
 
 /// Runs the supplied xvc command.
@@ -36,7 +41,7 @@ pub fn run(xvc_root_opt: XvcRootOpt, args: &[&str]) -> PyResult<PyCommandOutput>
 /// initializations.
 ///
 /// The xvc_root_opt is passed within a cell to make it updatable in xvc init command. Otherwise
-/// the return value should be the same with sent value. 
+/// the return value should be the same with sent value.
 pub fn dispatch_with_root(xvc_root_opt: XvcRootOpt, cli_opts: XvcCLI) -> PyResult<PyCommandOutput> {
     let verbosity = if cli_opts.quiet {
         XvcVerbosity::Quiet
@@ -50,7 +55,6 @@ pub fn dispatch_with_root(xvc_root_opt: XvcRootOpt, cli_opts: XvcCLI) -> PyResul
         }
     };
 
-
     let term_log_level = match verbosity {
         XvcVerbosity::Quiet => LevelFilter::Off,
         XvcVerbosity::Default => LevelFilter::Error,
@@ -59,7 +63,6 @@ pub fn dispatch_with_root(xvc_root_opt: XvcRootOpt, cli_opts: XvcCLI) -> PyResul
         XvcVerbosity::Debug => LevelFilter::Debug,
         XvcVerbosity::Trace => LevelFilter::Trace,
     };
-
 
     setup_logging(
         Some(term_log_level),
@@ -149,134 +152,146 @@ pub fn dispatch_with_root(xvc_root_opt: XvcRootOpt, cli_opts: XvcCLI) -> PyResul
             }
         }
 
-        let command_thread = s.spawn(move |_| -> PyResult<XvcRootOpt> {
-            let res_xvc_root_opt: Result<XvcRootOpt> = match cli_opts.command {
-                XvcSubCommand::Init(opts) => {
-                    let use_git = !opts.no_git;
-                    let xvc_root = init::run(xvc_root_opt.as_ref(), opts).map_err(XvcPyError)?;
-                    // FIXME: Do we need a separate xvc_root.record() here to record the EC state?
-                    if use_git {
+        let command_thread = s
+            .spawn(move |_| -> PyResult<XvcRootOpt> {
+                let res_xvc_root_opt: Result<XvcRootOpt> = match cli_opts.command {
+                    XvcSubCommand::Init(opts) => {
+                        let use_git = !opts.no_git;
+                        let xvc_root =
+                            init::run(xvc_root_opt.as_ref(), opts).map_err(XvcPyError)?;
+                        // FIXME: Do we need a separate xvc_root.record() here to record the EC state?
+                        if use_git {
+                            handle_git_automation(
+                                &output_snd,
+                                &xvc_root,
+                                cli_opts.to_branch.as_deref(),
+                                &cli_opts.command_string,
+                            )
+                            .map_err(XvcPyError)?;
+                        }
+                        Ok(Some(xvc_root))
+                    }
+
+                    XvcSubCommand::Aliases(opts) => {
+                        aliases::run(&output_snd, opts).map_err(|e| XvcPyError(e.into()))?;
+                        Ok(xvc_root_opt)
+                    }
+
+                    // following commands can only be run inside a repository
+                    XvcSubCommand::Root(opts) => {
+                        root::run(
+                            &output_snd,
+                            xvc_root_opt
+                                .as_ref()
+                                .ok_or_else(|| XvcPyError(Error::RequiresXvcRepository))?,
+                            opts,
+                        )
+                        .map_err(|e| XvcPyError(e.into()))?;
+
+                        Ok(xvc_root_opt)
+                    }
+
+                    XvcSubCommand::File(opts) => {
+                        file::run(&output_snd, xvc_root_opt.as_ref(), opts)
+                            .map_err(|e| XvcPyError(e.into()))?;
+                        Ok(xvc_root_opt)
+                    }
+
+                    XvcSubCommand::Pipeline(opts) => {
+                        let stdin = io::stdin();
+                        let input = stdin.lock();
+                        pipeline::cmd_pipeline(
+                            input,
+                            &output_snd,
+                            xvc_root_opt
+                                .as_ref()
+                                .ok_or(XvcPyError(Error::RequiresXvcRepository))?,
+                            opts,
+                        )
+                        .map_err(|e| XvcPyError(e.into()))?;
+                        Ok(xvc_root_opt)
+                    }
+
+                    XvcSubCommand::CheckIgnore(opts) => {
+                        let stdin = io::stdin();
+                        let input = stdin.lock();
+
+                        check_ignore::cmd_check_ignore(
+                            input,
+                            &output_snd,
+                            xvc_root_opt
+                                .as_ref()
+                                .ok_or(XvcPyError(Error::RequiresXvcRepository))?,
+                            opts,
+                        )
+                        .map_err(|e| XvcPyError(e.into()))?;
+
+                        Ok(xvc_root_opt)
+                    }
+
+                    XvcSubCommand::Storage(opts) => {
+                        let stdin = io::stdin();
+                        let input = stdin.lock();
+                        storage::cmd_storage(
+                            input,
+                            &output_snd,
+                            xvc_root_opt
+                                .as_ref()
+                                .ok_or(XvcPyError(Error::RequiresXvcRepository))?,
+                            opts,
+                        )
+                        .map_err(|e| XvcPyError(e.into()))?;
+
+                        Ok(xvc_root_opt)
+                    }
+                };
+
+                let xvc_root_opt = match res_xvc_root_opt {
+                    Ok(xvc_root_opt) => xvc_root_opt,
+                    Err(e) => {
+                        error!(&output_snd, "{}", e);
+                        None
+                    }
+                };
+
+                if let Some(ref xvc_root) = xvc_root_opt {
+                    if !cli_opts.skip_git {
+                        xvc_root.record();
                         handle_git_automation(
                             &output_snd,
-                            &xvc_root,
+                            xvc_root,
                             cli_opts.to_branch.as_deref(),
                             &cli_opts.command_string,
+                            // FIXME: Handle this error more gracefully
                         )
-                        .map_err(XvcPyError)?;
+                        .unwrap();
                     }
-                    Ok(Some(xvc_root))
                 }
 
-                XvcSubCommand::Aliases(opts) => {
-                    aliases::run(&output_snd, opts).map_err(|e| XvcPyError(e.into()))?;
-                    Ok(xvc_root_opt)
+                assert!(xvc_root_opt.is_some());
+                Ok(xvc_root_opt)
+            })
+            .join();
 
-                }
-
-                // following commands can only be run inside a repository
-                XvcSubCommand::Root(opts) => { 
-                    root::run(
-                    &output_snd,
-                    xvc_root_opt
-                        .as_ref()
-                        .ok_or_else(|| XvcPyError(Error::RequiresXvcRepository))?,
-                    opts,
-                )
-                .map_err(|e| XvcPyError(e.into()))?;
-
-                    Ok(xvc_root_opt) }
-
-                XvcSubCommand::File(opts) => {
-                    file::run(&output_snd, xvc_root_opt.as_ref(), opts)
-                        .map_err(|e| XvcPyError(e.into()))?;
-                    Ok(xvc_root_opt)
-                }
-
-                XvcSubCommand::Pipeline(opts) => {
-                    let stdin = io::stdin();
-                    let input = stdin.lock();
-                    pipeline::cmd_pipeline(
-                        input,
-                        &output_snd,
-                        xvc_root_opt
-                            .as_ref()
-                            .ok_or(XvcPyError(Error::RequiresXvcRepository))?,
-                        opts,
-                    )
-                    .map_err(|e| XvcPyError(e.into()))?;
-                    Ok(xvc_root_opt)
-                }
-
-                XvcSubCommand::CheckIgnore(opts) => {
-                    let stdin = io::stdin();
-                    let input = stdin.lock();
-
-                    check_ignore::cmd_check_ignore(
-                        input,
-                        &output_snd,
-                        xvc_root_opt
-                            .as_ref()
-                            .ok_or(XvcPyError(Error::RequiresXvcRepository))?,
-                        opts,
-                    )
-                    .map_err(|e| XvcPyError(e.into()))?;
-
-                    Ok(xvc_root_opt)
-                }
-
-                XvcSubCommand::Storage(opts) => {
-                    let stdin = io::stdin();
-                    let input = stdin.lock();
-                    storage::cmd_storage(
-                        input,
-                        &output_snd,
-                        xvc_root_opt
-                            .as_ref()
-                            .ok_or(XvcPyError(Error::RequiresXvcRepository))?,
-                        opts,
-                    )
-                    .map_err(|e| XvcPyError(e.into()))?;
-
-                    Ok(xvc_root_opt)
-                }
-            };
-
-            let xvc_root_opt = match res_xvc_root_opt {
-                Ok(xvc_root_opt) => xvc_root_opt, 
-                Err(e) => { error!(&output_snd, "{}", e); None
-                },
-            };
-
-            if let Some(ref xvc_root) = xvc_root_opt { 
-                if !cli_opts.skip_git {
-                    xvc_root.record();
-                    handle_git_automation(
-                        &output_snd,
-                        xvc_root,
-                        cli_opts.to_branch.as_deref(),
-                        &cli_opts.command_string,
-                        // FIXME: Handle this error more gracefully
-                    ).unwrap();
+        let xvc_root_opt = match command_thread.unwrap() {
+            Ok(xvc_root_opt) => {
+                debug!(output_snd_clone, "Command completed successfully.");
+                xvc_root_opt
             }
+            Err(e) => {
+                error!(output_snd_clone, "{}", e);
+                None
             }
-
-
-            assert!(xvc_root_opt.is_some());
-            Ok(xvc_root_opt)
-        }).join();
-
-        let xvc_root_opt= match command_thread.unwrap() {
-            Ok(xvc_root_opt) => { debug!(output_snd_clone, "Command completed successfully."); 
-            xvc_root_opt }
-            Err(e) => { error!(output_snd_clone, "{}", e); None } 
         };
 
         output_snd_clone.send(None).unwrap();
         let output = output_thread.join().unwrap();
 
-        let res = PyCommandOutput { output, xvc_root_opt };
+        let res = PyCommandOutput {
+            output,
+            xvc_root_opt,
+        };
         Ok(res)
-
     })
     .unwrap();
 
