@@ -5,10 +5,11 @@ use crossbeam_channel::bounded;
 use log::LevelFilter;
 use pyo3::PyResult;
 use xvc_rust::{
+    Error as XvcError,
     cli::{XvcCLI, XvcSubCommand},
     config::XvcVerbosity,
-    core::{aliases, check_ignore, root},
-    error, file, git_checkout_ref, handle_git_automation, init,
+    core::{aliases, check_ignore,heckout_ref, handle_git_automation, root, root},
+    error, file, init,
     logging::{debug, setup_logging, uwr, XvcOutputLine},
     pipeline, storage, watch, Error, Result, XvcRootOpt,
 };
@@ -167,7 +168,7 @@ pub fn dispatch_with_root(xvc_root_opt: XvcRootOpt, cli_opts: XvcCLI) -> PyResul
                                 cli_opts.to_branch.as_deref(),
                                 &cli_opts.command_string,
                             )
-                            .map_err(XvcPyError)?;
+                            .map_err(XvcError).map_err(XvcPyError)?;
                         }
                         Ok(Some(xvc_root))
                     }
