@@ -2,16 +2,16 @@ from xvc import Xvc
 import pytest
 import os
 
-import xvc
-
 
 @pytest.fixture
 def empty_xvc_repo(monkeypatch, tmpdir):
     monkeypatch.chdir(tmpdir)
     os.system("git init")
-    # xvc = Xvc(verbosity=4)
-    xvc = Xvc()
+    assert ".git" in os.listdir()
+    xvc = Xvc(verbosity=4)
+    # xvc = Xvc()
     xvc.init()
+    print(f"empty_xvc_repo: {xvc}")
     return xvc
 
 

@@ -3,9 +3,8 @@ pub mod output;
 pub mod pipeline;
 pub mod storage;
 
-use std::cell::RefCell;
-use std::sync::RwLock;
 use std::sync::Arc;
+use std::sync::RwLock;
 
 use file::XvcFile;
 use output::dispatch_with_root;
@@ -26,6 +25,10 @@ const GIT_VERSION: &str = git_version!(cargo_prefix = "", fallback = "unknown");
 pub fn version() -> PyResult<String> {
     Ok(GIT_VERSION.to_owned())
 }
+
+struct XvcPyError(XvcError);
+type Result<T> = std::result::Result<T, XvcPyError>;
+type XvcPyRootOpt = Arc<RwLock<XvcRootOpt>>;
 
 /// Call Xvc with the command line arguments
 #[pyfunction]
@@ -58,12 +61,10 @@ pub fn run_xvc(cmd: String) -> PyResult<String> {
     };
 
     watch!(cli_opts);
-    let py_output = dispatch_with_root(xvc_root_opt, cli_opts)?;
+    let py_output = dispatch_with_root(&Arc::new(RwLock::new(xvc_root_opt)), cli_opts)?;
 
     Ok(py_output.output)
 }
-
-struct XvcPyError(XvcError);
 
 impl From<XvcPyError> for PyErr {
     fn from(error: XvcPyError) -> PyErr {
@@ -95,7 +96,6 @@ pub struct Xvc {
 
 impl Xvc {
     fn run(&self, args: Vec<String>) -> PyResult<String> {
-
         let cli_opts = match cli::XvcCLI::from_str_slice(
             &args.iter().map(|s| s.as_str()).collect::<Vec<&str>>(),
         ) {
@@ -108,14 +108,7 @@ impl Xvc {
 
         watch!(cli_opts);
 
-        let cmd = &cli_opts.command.clone();
-        let xvc_root_opt = self.xvc_root_opt.read().expect("Failed to lock xvc_root_opt").to_owned();
-               
-        watch!(&xvc_root_opt);
-
-        let out = dispatch_with_root(xvc_root_opt, cli_opts)?;
-
-        watch!(&out.xvc_root_opt);
+        let out = dispatch_with_root(&self.xvc_root_opt, cli_opts)?;
 
         Ok(out.output)
     }
@@ -243,7 +236,18 @@ impl Xvc {
         cli_opts.push("root".to_string());
         update_cli_flag(opts, &mut cli_opts, &["absolute"], "--absolute")?;
         watch!(cli_opts);
-        assert!(self.xvc_root_opt.read().expect("Lock XvcRootOpt").to_owned().is_some());
+        println!(
+            "{}:{} - {:?}",
+            file!(),
+            line!(),
+            &self.xvc_root_opt.read().expect("Lock XvcRootOpt")
+        );
+        // assert!(self
+        //     .xvc_root_opt
+        //     .read()
+        //     .expect("Lock XvcRootOpt")
+        //     .to_owned()
+        //     .is_some());
         self.run(cli_opts)
     }
 
@@ -282,8 +286,13 @@ impl Xvc {
         update_cli_flag(opts, &mut cli_opts, &["no-git"], "--no-git")?;
         update_cli_flag(opts, &mut cli_opts, &["force"], "--force")?;
 
+        watch!(self.xvc_root_opt.read().unwrap());
         let out = self.run(cli_opts);
-        assert!(self.xvc_root_opt.read().expect("Lock XvcRootOpt").is_some());
+        // assert!(
+        //     self.xvc_root_opt.read().expect("Lock XvcRootOpt").is_some(),
+        //     "{:?}",
+        //     self.xvc_root_opt.read().unwrap()
+        // );
 
         out
     }
