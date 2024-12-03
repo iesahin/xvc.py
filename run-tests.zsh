@@ -6,4 +6,4 @@ source "${DIR}/.venv/bin/activate"
 
 maturin develop
 
-pytest tests/test_xvc_root.py
+pytest 
