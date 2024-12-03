@@ -118,6 +118,17 @@ impl Xvc {
 impl Xvc {
     #[allow(clippy::too_many_arguments)]
     #[new]
+    #[pyo3(signature = 
+            (verbosity=None, 
+             quiet=None, 
+             debug=None, 
+             workdir=None, 
+             no_system_config=None, 
+             no_user_config=None,
+             no_env_config=None, 
+             skip_git=None, 
+             from_ref=None, 
+             to_branch=None))]
     fn new(
         verbosity: Option<u8>,
         quiet: Option<bool>,
@@ -236,12 +247,6 @@ impl Xvc {
         cli_opts.push("root".to_string());
         update_cli_flag(opts, &mut cli_opts, &["absolute"], "--absolute")?;
         watch!(cli_opts);
-        println!(
-            "{}:{} - {:?}",
-            file!(),
-            line!(),
-            &self.xvc_root_opt.read().expect("Lock XvcRootOpt")
-        );
         // assert!(self
         //     .xvc_root_opt
         //     .read()
@@ -287,14 +292,7 @@ impl Xvc {
         update_cli_flag(opts, &mut cli_opts, &["force"], "--force")?;
 
         watch!(self.xvc_root_opt.read().unwrap());
-        let out = self.run(cli_opts);
-        // assert!(
-        //     self.xvc_root_opt.read().expect("Lock XvcRootOpt").is_some(),
-        //     "{:?}",
-        //     self.xvc_root_opt.read().unwrap()
-        // );
-
-        out
+        self.run(cli_opts)
     }
 
     /// Show help

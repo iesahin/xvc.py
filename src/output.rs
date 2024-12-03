@@ -16,7 +16,7 @@ use xvc_rust::{
     },
     error, file, init,
     logging::{debug, setup_logging, uwr, XvcOutputLine},
-    pipeline, storage, Error as XvcError, Result as XvcResult, XvcRootOpt,
+    pipeline, storage, Error as XvcError, XvcRootOpt,
 };
 
 use crate::XvcPyError;
@@ -195,7 +195,7 @@ pub fn dispatch_with_root(
 
                 if !cli_opts.skip_git {
                     let xvc_root_opt = xvc_root_opt.read().expect("lock xvc_root").to_owned();
-                    xvc_root_opt.map(|xvc_root| {
+                    if let Some(xvc_root) = xvc_root_opt {
                         xvc_root.record();
                         handle_git_automation(
                             &output_snd,
@@ -205,7 +205,7 @@ pub fn dispatch_with_root(
                             // FIXME: Handle this error more gracefully
                         )
                         .unwrap();
-                    });
+                    }
                 }
 
                 Ok(())
