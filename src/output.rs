@@ -164,18 +164,11 @@ pub fn dispatch_with_root(
 
         let command_thread = s
             .spawn(move |_| -> PyResult<()> {
-                println!("{}:{} - {:?}", file!(), line!(), &cli_opts.command);
                 match cli_opts.command {
                     XvcSubCommand::Init(opts) => {
                         let to_branch = cli_opts.to_branch.as_deref();
                         let xvc_cmd = cli_opts.command_string.as_ref();
                         handle_init(&output_snd, xvc_root_opt, opts, to_branch, xvc_cmd)?;
-                        println!(
-                            "{}:{} - {:?}",
-                            file!(),
-                            line!(),
-                            &xvc_root_opt.read().unwrap()
-                        );
                     }
 
                     XvcSubCommand::Aliases(opts) => {
@@ -345,38 +338,19 @@ fn handle_init(
 ) -> Result<()> {
     let use_git = !opts.no_git;
 
-    println!(
-        "{}:{} - {:?}",
-        file!(),
-        line!(),
-        &xvc_root_opt.read().unwrap()
-    );
-
     {
         let mut xvc_root_opt = xvc_root_opt.write().expect("lock xvc_root");
-        println!("{}:{} - {:?}", file!(), line!(), &xvc_root_opt);
         let xvc_root = init::run(xvc_root_opt.as_ref(), opts).map_err(XvcPyError)?;
-        println!("{}:{} - {:?}", file!(), line!(), &xvc_root);
         *xvc_root_opt = Some(xvc_root);
-        println!("{}:{} - {:?}", file!(), line!(), &xvc_root_opt);
     }
-
-    println!(
-        "{}:{} - {:?}",
-        file!(),
-        line!(),
-        &xvc_root_opt.read().unwrap()
-    );
 
     if use_git {
         let xvc_root_opt = xvc_root_opt.read().expect("lock xvc_root").to_owned();
-        println!("{}:{} - {:?}", file!(), line!(), &xvc_root_opt);
         if let Some(ref xvc_root) = xvc_root_opt {
             handle_git_automation(output_snd, xvc_root, to_branch, xvc_cmd)
                 .map_err(|e: XvcCoreError| XvcPyError(e.into()))?;
         }
     }
 
-    println!("{:?}", xvc_root_opt.read().expect("lock xvc_root"));
     Ok(())
 }

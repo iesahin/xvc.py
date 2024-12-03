@@ -4,14 +4,19 @@ import os
 
 
 @pytest.fixture
-def empty_xvc_repo(monkeypatch, tmpdir):
+def empty_xvc_repo(monkeypatch, tmp_path):
+    tmpdir = tmp_path / "xvc-py-test-repo"
+    tmpdir.mkdir()
     monkeypatch.chdir(tmpdir)
+
     os.system("git init")
     assert ".git" in os.listdir()
-    xvc = Xvc(verbosity=4)
-    # xvc = Xvc()
+
+    # xvc = Xvc(verbosity=4)
+    xvc = Xvc()
     xvc.init()
     print(f"empty_xvc_repo: {xvc}")
+
     return xvc
 
 
@@ -19,6 +24,7 @@ def empty_xvc_repo(monkeypatch, tmpdir):
 def xvc_repo_with_dir(empty_xvc_repo):
     assert ".git" in os.listdir()
     assert ".xvc" in os.listdir()
+
     os.system(
         "xvc-test-helper create-directory-tree --directories 3 --files 3 --seed 42"
     )
@@ -31,10 +37,13 @@ def xvc_repo_with_dir(empty_xvc_repo):
 def xvc_pipeline_single_step(xvc_repo_with_dir):
     assert ".git" in os.listdir()
     assert ".xvc" in os.listdir()
+
     xvc_repo_with_dir.pipeline().step().new(
         step_name="hello", command="echo 'hello xvc'"
     )
+
     print(f"xvc_repo_with_dir: {xvc_repo_with_dir}")
+
     return xvc_repo_with_dir
 
 

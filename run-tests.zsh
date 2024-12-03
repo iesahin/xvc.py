@@ -6,4 +6,4 @@ source "${DIR}/.venv/bin/activate"
 
 maturin develop
 
-pytest 
+pytest tests/test_xvc_file.py::test_file_track_symlink
