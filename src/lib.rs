@@ -3,18 +3,17 @@ pub mod output;
 pub mod pipeline;
 pub mod storage;
 
-use std::cell::RefCell;
+use std::sync::Arc;
+use std::sync::RwLock;
 
 use file::XvcFile;
 use output::dispatch_with_root;
 use pyo3::prelude::*;
 use pyo3::types::{PyDict, PyTuple};
-use xvc_rust::cli::XvcSubCommand;
 use xvc_rust::core::default_project_config;
-use xvc_rust::core::root::RootCLI;
 use xvc_rust::core::types::xvcroot::load_xvc_root;
-use xvc_rust::{cli, watch, AbsolutePath, XvcConfigParams, XvcRootOpt};
 use xvc_rust::error::Error as XvcError;
+use xvc_rust::{cli, watch, AbsolutePath, XvcConfigParams, XvcRootOpt};
 
 pub use pipeline::XvcPipeline;
 pub use storage::XvcStorage;
@@ -22,11 +21,14 @@ pub use storage::XvcStorage;
 use git_version::git_version;
 const GIT_VERSION: &str = git_version!(cargo_prefix = "", fallback = "unknown");
 
-
 #[pyfunction]
 pub fn version() -> PyResult<String> {
     Ok(GIT_VERSION.to_owned())
 }
+
+struct XvcPyError(XvcError);
+type Result<T> = std::result::Result<T, XvcPyError>;
+type XvcPyRootOpt = Arc<RwLock<XvcRootOpt>>;
 
 /// Call Xvc with the command line arguments
 #[pyfunction]
@@ -38,7 +40,6 @@ pub fn run_xvc(cmd: String) -> PyResult<String> {
             return Ok(e.to_string());
         }
     };
-
 
     let xvc_config_params = XvcConfigParams {
         current_dir: AbsolutePath::from(&cli_opts.workdir),
@@ -60,12 +61,10 @@ pub fn run_xvc(cmd: String) -> PyResult<String> {
     };
 
     watch!(cli_opts);
-    let py_output = dispatch_with_root(xvc_root_opt, cli_opts)?;
+    let py_output = dispatch_with_root(&Arc::new(RwLock::new(xvc_root_opt)), cli_opts)?;
 
     Ok(py_output.output)
 }
-
-struct XvcPyError(XvcError);
 
 impl From<XvcPyError> for PyErr {
     fn from(error: XvcPyError) -> PyErr {
@@ -92,40 +91,44 @@ pub struct Xvc {
     skip_git: Option<bool>,
     from_ref: Option<String>,
     to_branch: Option<String>,
-    xvc_root_opt: RefCell<XvcRootOpt>,
+    xvc_root_opt: Arc<RwLock<XvcRootOpt>>,
 }
 
-impl Xvc { 
+impl Xvc {
     fn run(&self, args: Vec<String>) -> PyResult<String> {
-    let cli_opts = match cli::XvcCLI::from_str_slice(&args.iter().map(|s| s.as_str()).collect::<Vec<&str>>()) {
-        Ok(opts) => opts,
-        Err(e) => {
-            let out = e.to_string();
-            return Ok(out)
-        }
-    };
+        let cli_opts = match cli::XvcCLI::from_str_slice(
+            &args.iter().map(|s| s.as_str()).collect::<Vec<&str>>(),
+        ) {
+            Ok(opts) => opts,
+            Err(e) => {
+                let out = e.to_string();
+                return Ok(out);
+            }
+        };
 
+        watch!(cli_opts);
 
-    watch!(cli_opts);
+        let out = dispatch_with_root(&self.xvc_root_opt, cli_opts)?;
 
-
-    let cmd = &cli_opts.command.clone();
-    let xvc_root_opt = self.xvc_root_opt.take();
-    watch!(&xvc_root_opt);
-
-    let out = dispatch_with_root(xvc_root_opt, cli_opts)?;
-
-    watch!(&out.xvc_root_opt);
-    self.xvc_root_opt.replace(out.xvc_root_opt);
-    
-    Ok(out.output)
-}
+        Ok(out.output)
+    }
 }
 
 #[pymethods]
 impl Xvc {
     #[allow(clippy::too_many_arguments)]
     #[new]
+    #[pyo3(signature = 
+            (verbosity=None, 
+             quiet=None, 
+             debug=None, 
+             workdir=None, 
+             no_system_config=None, 
+             no_user_config=None,
+             no_env_config=None, 
+             skip_git=None, 
+             from_ref=None, 
+             to_branch=None))]
     fn new(
         verbosity: Option<u8>,
         quiet: Option<bool>,
@@ -138,27 +141,26 @@ impl Xvc {
         from_ref: Option<String>,
         to_branch: Option<String>,
     ) -> PyResult<Self> {
-
-    let xvc_config_params = XvcConfigParams {
-        current_dir: AbsolutePath::from(workdir.clone().unwrap_or_else(|| ".".to_owned())),
-        include_system_config: !no_system_config.unwrap_or_default(),
-        include_user_config: !no_user_config.unwrap_or_default(),
-        project_config_path: None,
-        local_config_path: None,
-        include_environment_config: !no_env_config.unwrap_or_default(),
-        command_line_config: None,
-        default_configuration: default_project_config(true),
-    };
+        let xvc_config_params = XvcConfigParams {
+            current_dir: AbsolutePath::from(workdir.clone().unwrap_or_else(|| ".".to_owned())),
+            include_system_config: !no_system_config.unwrap_or_default(),
+            include_user_config: !no_user_config.unwrap_or_default(),
+            project_config_path: None,
+            local_config_path: None,
+            include_environment_config: !no_env_config.unwrap_or_default(),
+            command_line_config: None,
+            default_configuration: default_project_config(true),
+        };
 
         watch!(xvc_config_params);
-        
-    let xvc_root_opt = match load_xvc_root(xvc_config_params.clone()) {
-        Ok(r) => RefCell::new(Some(r)),
-        Err(e) => {
-            e.debug();
-            RefCell::new(None)
-        }
-    };
+
+        let xvc_root_opt = match load_xvc_root(xvc_config_params.clone()) {
+            Ok(r) => Arc::new(RwLock::new(Some(r))),
+            Err(e) => {
+                e.debug();
+                Arc::new(RwLock::new(None))
+            }
+        };
         watch!(&xvc_root_opt);
 
         Ok(Self {
@@ -170,7 +172,7 @@ impl Xvc {
             skip_git,
             from_ref,
             to_branch,
-            xvc_root_opt
+            xvc_root_opt,
         })
     }
 
@@ -196,7 +198,7 @@ impl Xvc {
             cli_opts.push("--no-system-config".to_string());
         }
 
-        if !self.xvc_config_params.include_user_config{
+        if !self.xvc_config_params.include_user_config {
             cli_opts.push("--no-user-config".to_string());
         }
 
@@ -225,8 +227,6 @@ impl Xvc {
         Ok(cli_opts)
     }
 
-
-
     fn file(&self) -> PyResult<XvcFile> {
         watch!(self);
         XvcFile::new(self)
@@ -241,19 +241,27 @@ impl Xvc {
         XvcPipeline::init(self, pipeline_name)
     }
 
-
     #[pyo3(signature = (**opts))]
     fn root(&self, opts: Option<&Bound<PyDict>>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("root".to_string());
         update_cli_flag(opts, &mut cli_opts, &["absolute"], "--absolute")?;
         watch!(cli_opts);
-        assert!(self.xvc_root_opt.borrow().is_some());
+        // assert!(self
+        //     .xvc_root_opt
+        //     .read()
+        //     .expect("Lock XvcRootOpt")
+        //     .to_owned()
+        //     .is_some());
         self.run(cli_opts)
     }
 
     #[pyo3(signature = (*targets, **opts))]
-    fn check_ignore(&self, targets: &Bound<PyTuple>, opts: Option<&Bound<PyDict>>) -> PyResult<String> {
+    fn check_ignore(
+        &self,
+        targets: &Bound<PyTuple>,
+        opts: Option<&Bound<PyDict>>,
+    ) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("check-ignore".to_string());
 
@@ -283,11 +291,8 @@ impl Xvc {
         update_cli_flag(opts, &mut cli_opts, &["no-git"], "--no-git")?;
         update_cli_flag(opts, &mut cli_opts, &["force"], "--force")?;
 
-        let out = self.run(cli_opts);
-        assert!(self.xvc_root_opt.borrow().is_some());
-
-        out
-
+        watch!(self.xvc_root_opt.read().unwrap());
+        self.run(cli_opts)
     }
 
     /// Show help
@@ -350,7 +355,7 @@ pub fn update_cli_opt(
 pub fn update_cli_tuple(
     dict: Option<&Bound<PyDict>>,
     cli: &mut Vec<String>,
-    keys:(&str, &str),
+    keys: (&str, &str),
     cli_opt: &str,
 ) -> PyResult<()> {
     let (first_key, second_key) = keys;
@@ -359,11 +364,10 @@ pub fn update_cli_tuple(
             cli.push(cli_opt.to_string());
             cli.push(first_value.to_string());
             cli.push(second_value.to_string());
-        }   
+        }
     }
     Ok(())
 }
-
 
 pub fn update_targets(tuple: &Bound<PyTuple>, cli: &mut Vec<String>) -> PyResult<()> {
     for target in tuple.iter() {

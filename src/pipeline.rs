@@ -1,8 +1,8 @@
 use pyo3::prelude::*;
 use pyo3::types::PyDict;
 
-use crate::{update_cli_tuple, Xvc};
 use crate::{update_cli_flag, update_cli_opt};
+use crate::{update_cli_tuple, Xvc};
 
 #[pyclass]
 #[derive(Clone, Debug)]
@@ -37,7 +37,6 @@ impl XvcPipeline {
 
 #[pymethods]
 impl XvcPipeline {
-
     #[pyo3(signature = (**opts))]
     #[allow(clippy::new_ret_no_self)]
     #[allow(clippy::wrong_self_convention)]
@@ -213,7 +212,7 @@ impl XvcPipelineStep {
         )?;
         update_cli_opt(opts, &mut cli_opts, &["command"], "--command")?;
         update_cli_opt(opts, &mut cli_opts, &["when"], "--when")?;
-       self.xvc_run(cli_opts)
+        self.xvc_run(cli_opts)
     }
 
     #[pyo3(signature = (**opts))]
@@ -257,7 +256,12 @@ impl XvcPipelineStep {
         update_cli_opt(opts, &mut cli_opts, &["line", "lines"], "--line")?;
         update_cli_opt(opts, &mut cli_opts, &["line_items"], "--line-items")?;
         update_cli_opt(opts, &mut cli_opts, &["generic"], "--generic")?;
-        update_cli_tuple(opts, &mut cli_opts, ("sqlite_file", "sqlite_query"), "--sqlite-query")?;
+        update_cli_tuple(
+            opts,
+            &mut cli_opts,
+            ("sqlite_file", "sqlite_query"),
+            "--sqlite-query",
+        )?;
 
         self.xvc_run(cli_opts)
     }

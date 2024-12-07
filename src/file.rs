@@ -63,6 +63,12 @@ impl XvcFile {
             &["no-parallel", "no_parallel"],
             "--no-parallel",
         )?;
+        update_cli_flag(
+            opts,
+            &mut cli_opts,
+            &["include-git-files", "include_git_files"],
+            "--include-git-files",
+        )?;
 
         update_targets(targets, cli_opts.as_mut())?;
         watch!(self);
@@ -142,6 +148,7 @@ impl XvcFile {
         update_cli_opt(opts, &mut cli_opts, &["format"], "--format")?;
         update_cli_opt(opts, &mut cli_opts, &["sort"], "--sort")?;
         update_cli_flag(opts, &mut cli_opts, &["no-summary"], "--no-summary")?;
+        update_cli_flag(opts, &mut cli_opts, &["include-git-files", "include_git_files"], "--include-git-files")?;
         update_targets(targets, &mut cli_opts)?;
         self.run(cli_opts)
     }
