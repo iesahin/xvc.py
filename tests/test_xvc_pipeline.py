@@ -346,7 +346,7 @@ def update_yaml(file_path, key, new_value):
 
 def test_pipeline_step_dependency_sqlite_query(empty_xvc_repo):
     filename = "people.db"
-    db = sqlite3.connect(filename, autocommit=True)
+    db = sqlite3.connect(filename)
 
     db.execute("""
 CREATE TABLE people (name, age, sex);
