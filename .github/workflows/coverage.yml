@@ -20,7 +20,7 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Build xvc.py
-        run: maturin build
+        run: maturin develop
 
       - name: Run tests and collect coverage
         run: pytest --cov-branch --cov-report=xml
