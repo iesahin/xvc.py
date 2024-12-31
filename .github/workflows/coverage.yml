@@ -1,0 +1,44 @@
+name: coverage
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: sudo apt update -y && sudo apt-get install -y libssl-dev openssl pkg-config ripgrep
+
+      - name: Git config for automated Git tests
+        run: git config --global user.name 'Xvc Rabbit' && git config --global user.email 'rabbit@xvc.dev' && git config --global init.defaultBranch main
+
+      - name: Install requirements
+        run: pip install -r requirements.txt
+
+      - name: Add cargo bin to PATH
+        run: echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+
+      - name: Install xvc-test-helper
+        run: cargo install xvc-test-helper
+
+      - name: Build xvc.py
+        run: maturin build
+
+      - name: Install xvc.py
+        run: pip install target/wheels/xvc*
+
+      - name: Run tests and collect coverage
+        run: pytest --forked --cov --cov-report=xml
+
+      - name: Upload coverage to Codecov (arg token)
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          verbose: true

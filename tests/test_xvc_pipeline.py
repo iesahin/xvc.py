@@ -346,7 +346,7 @@ def update_yaml(file_path, key, new_value):
 
 def test_pipeline_step_dependency_sqlite_query(empty_xvc_repo):
     filename = "people.db"
-    db = sqlite3.connect(filename, autocommit=True)
+    db = sqlite3.connect(filename)
 
     db.execute("""
 CREATE TABLE people (name, age, sex);
@@ -357,6 +357,7 @@ INSERT INTO people VALUES ('Alice', 25, 'F'),
     ('Bob', 30, 'M'),
     ('Charlie', 35, 'M');
 """)
+    db.commit()
 
     pipeline = empty_xvc_repo.pipeline()
     pipeline.step().new(
@@ -381,6 +382,7 @@ INSERT INTO people VALUES ('Alice', 25, 'F'),
     assert second_run.strip() == ""
     # NOTE: We are not changing the average age
     db.execute("INSERT INTO people VALUES ('David', 30, 'M');")
+    db.commit()
     third_run = pipeline.run()
     print(third_run)
     assert first_run.strip() == third_run.strip()

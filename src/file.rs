@@ -148,7 +148,24 @@ impl XvcFile {
         update_cli_opt(opts, &mut cli_opts, &["format"], "--format")?;
         update_cli_opt(opts, &mut cli_opts, &["sort"], "--sort")?;
         update_cli_flag(opts, &mut cli_opts, &["no-summary"], "--no-summary")?;
-        update_cli_flag(opts, &mut cli_opts, &["include-git-files", "include_git_files"], "--include-git-files")?;
+        update_cli_flag(
+            opts,
+            &mut cli_opts,
+            &["include-git-files", "include_git_files"],
+            "--include-git-files",
+        )?;
+        update_cli_flag(
+            opts,
+            &mut cli_opts,
+            &[
+                "show-dirs",
+                "show-directories",
+                "show_directories",
+                "show_dirs",
+                "d",
+            ],
+            "--show-directories",
+        )?;
         update_targets(targets, &mut cli_opts)?;
         self.run(cli_opts)
     }
@@ -159,7 +176,12 @@ impl XvcFile {
         cli_opts.push("send".to_string());
         update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
 
-        update_cli_opt(opts, &mut cli_opts, &["remote", "to", "storage"], "--storage")?;
+        update_cli_opt(
+            opts,
+            &mut cli_opts,
+            &["remote", "to", "storage"],
+            "--storage",
+        )?;
         update_cli_flag(opts, &mut cli_opts, &["force"], "--force")?;
         update_targets(targets, &mut cli_opts)?;
         self.run(cli_opts)
@@ -171,7 +193,12 @@ impl XvcFile {
         cli_opts.push("bring".to_string());
         update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
 
-        update_cli_opt(opts, &mut cli_opts, &["remote", "frm", "storage"], "--storage")?;
+        update_cli_opt(
+            opts,
+            &mut cli_opts,
+            &["remote", "frm", "storage"],
+            "--storage",
+        )?;
         update_cli_flag(opts, &mut cli_opts, &["force"], "--force")?;
         update_cli_flag(opts, &mut cli_opts, &["no-recheck"], "--no-recheck")?;
         update_cli_opt(
@@ -185,7 +212,12 @@ impl XvcFile {
     }
 
     #[pyo3( signature = (source, destination, **opts))]
-    fn copy(&self, source: String, destination: String, opts: Option<&Bound<PyDict>>) -> PyResult<String> {
+    fn copy(
+        &self,
+        source: String,
+        destination: String,
+        opts: Option<&Bound<PyDict>>,
+    ) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("copy".to_string());
         update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
@@ -204,7 +236,12 @@ impl XvcFile {
     }
 
     #[pyo3( signature = (source, destination, **opts))]
-    fn mv(&self, source: String, destination: String, opts: Option<&Bound<PyDict>>) -> PyResult<String> {
+    fn mv(
+        &self,
+        source: String,
+        destination: String,
+        opts: Option<&Bound<PyDict>>,
+    ) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("move".to_string());
         update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
