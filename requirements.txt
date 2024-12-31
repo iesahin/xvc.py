@@ -1,3 +1,5 @@
 maturin
 jupyterlab
 pytest-forked
+pytest-cov
+coverage

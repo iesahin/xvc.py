@@ -1,0 +1,33 @@
+name: coverage
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: apt update -y && apt-get install -y libssl-dev openssl pkg-config
+
+      - name: Install requirements
+        run: pip install -r requirements.txt
+
+      - name: Build xvc.py
+        run: maturin build
+
+      - name: Run tests and collect coverage
+        run: pytest --cov app
+
+      - name: Upload coverage to Codecov (arg token)
+        uses: codecov/codecov-action@main
+        with:
+          fail_ci_if_error: true
+          token: ${{ secrets.CODECOV_TOKEN }}
+          verbose: true
