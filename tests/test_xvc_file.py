@@ -67,7 +67,7 @@ def test_file_list(xvc_repo_with_dir):
     assert len([line for line in file_list if line.startswith("FC")]) == 3
     assert len([line for line in file_list if line.startswith("FX")]) == 6
 
-    file_list = xvc_repo_with_dir.file(show_directories=True).list().split("\n")
+    file_list = xvc_repo_with_dir.file().list(show_directories=True).split("\n")
     assert len([line for line in file_list if line.startswith("DX")]) == 3
 
 
