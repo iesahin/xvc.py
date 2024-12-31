@@ -157,7 +157,13 @@ impl XvcFile {
         update_cli_flag(
             opts,
             &mut cli_opts,
-            &["show-dirs", "show-directories", "d"],
+            &[
+                "show-dirs",
+                "show-directories",
+                "show_directories",
+                "show_dirs",
+                "d",
+            ],
             "--show-directories",
         )?;
         update_targets(targets, &mut cli_opts)?;
