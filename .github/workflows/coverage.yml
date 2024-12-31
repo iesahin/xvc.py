@@ -22,6 +22,12 @@ jobs:
       - name: Install requirements
         run: pip install -r requirements.txt
 
+      - name: Add cargo bin to PATH
+        run: echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+
+      - name: Install xvc-test-helper
+        run: cargo install xvc-test-helper
+
       - name: Build xvc.py
         run: maturin build
 
