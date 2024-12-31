@@ -35,7 +35,7 @@ jobs:
         run: pip install target/wheels/xvc*
 
       - name: Run tests and collect coverage
-        run: pytest --forked --cov-branch --cov-report=xml
+        run: pytest --forked --cov --cov-report=xml
 
       - name: Upload coverage to Codecov (arg token)
         uses: codecov/codecov-action@v5
