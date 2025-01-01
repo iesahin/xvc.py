@@ -125,7 +125,7 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: wheels
+          merge-multiple: true
       - name: Publish to PyPI
         uses: PyO3/maturin-action@v1
         env:
