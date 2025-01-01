@@ -7,8 +7,8 @@ name: publish-to-pypi
 
 on:
   push:
-    branches:
-      - main
+    # brances:
+    #   - main
     tags:
       - "v*.*.*"
   # pull_request:
