@@ -11,9 +11,7 @@ use xvc_logging::XvcOutputSender;
 use xvc_rust::{
     cli::{XvcCLI, XvcSubCommand},
     config::XvcVerbosity,
-    core::{
-        aliases, check_ignore, git_checkout_ref, handle_git_automation, root, Error as XvcCoreError,
-    },
+    core::{check_ignore, git_checkout_ref, handle_git_automation, root, Error as XvcCoreError},
     error, file, init,
     logging::{debug, setup_logging, uwr, XvcOutputLine},
     pipeline, storage, Error as XvcError, XvcRootOpt,
@@ -156,7 +154,7 @@ pub fn dispatch_with_root(
             let xvc_root_opt = xvc_root_opt.read().expect("Lock xvc_root").to_owned();
             if let Some(ref xvc_root) = xvc_root_opt {
                 uwr!(
-                    git_checkout_ref(&output_snd, xvc_root, from_ref),
+                    git_checkout_ref(&output_snd, xvc_root, &from_ref),
                     output_snd
                 );
             }
@@ -169,10 +167,6 @@ pub fn dispatch_with_root(
                         let to_branch = cli_opts.to_branch.as_deref();
                         let xvc_cmd = cli_opts.command_string.as_ref();
                         handle_init(&output_snd, xvc_root_opt, opts, to_branch, xvc_cmd)?;
-                    }
-
-                    XvcSubCommand::Aliases(opts) => {
-                        handle_aliases(&output_snd, opts)?;
                     }
 
                     // following commands can only be run inside a repository
@@ -190,6 +184,14 @@ pub fn dispatch_with_root(
 
                     XvcSubCommand::Storage(opts) => {
                         handle_storage(&output_snd, xvc_root_opt, opts)?
+                    }
+                    XvcSubCommand::_Comp(_) => {
+                        output_snd
+                            .send(Some(XvcOutputLine::Error(
+                                "This command only used for completions".into(),
+                            )))
+                            // FIXME: reuse Crossbeam errors to xvc::Error
+                            .map_err(|e| XvcPyError(XvcCoreError::from(e).into()))?;
                     }
                 };
 
@@ -321,11 +323,6 @@ fn handle_root(
         opts,
     )
     .map_err(|e| XvcPyError(e.into()))?;
-    Ok(())
-}
-
-fn handle_aliases(output_snd: &XvcOutputSender, opts: aliases::AliasesCLI) -> Result<()> {
-    aliases::run(output_snd, opts).map_err(|e| XvcPyError(e.into()))?;
     Ok(())
 }
 
