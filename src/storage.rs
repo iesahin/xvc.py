@@ -39,12 +39,15 @@ impl XvcStorage {
 
         self.xvc_run(cli_opts)
     }
+
     #[pyo3(signature = (name, **opts))]
     fn remove(&self, name: &str, opts: Option<&Bound<PyDict>>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("remove".to_string());
-        cli_opts.push(name.to_string());
         update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
+
+        cli_opts.push("--name".to_string());
+        cli_opts.push(name.to_string());
 
         self.xvc_run(cli_opts)
     }
