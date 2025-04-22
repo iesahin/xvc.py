@@ -142,6 +142,25 @@ impl XvcStorage {
     }
 
     #[pyo3(signature = (**opts))]
+    fn new_rclone(&self, opts: Option<&Bound<PyDict>>) -> PyResult<String> {
+        let mut cli_opts = self.cli()?;
+        cli_opts.push("new".to_string());
+        cli_opts.push("rclone".to_string());
+        update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
+
+        update_cli_opt(opts, &mut cli_opts, &["name"], "--name")?;
+        update_cli_opt(opts, &mut cli_opts, &["remote"], "--remote")?;
+        update_cli_opt(
+            opts,
+            &mut cli_opts,
+            &["storage_prefix", "storage-prefix"],
+            "--storage-prefix",
+        )?;
+
+        self.xvc_run(cli_opts)
+    }
+
+    #[pyo3(signature = (**opts))]
     fn new_s3(&self, opts: Option<&Bound<PyDict>>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         watch!(cli_opts);
