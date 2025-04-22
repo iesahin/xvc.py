@@ -7,14 +7,14 @@ use crossbeam::thread;
 use crossbeam_channel::bounded;
 use log::LevelFilter;
 use pyo3::PyResult;
-use xvc_logging::XvcOutputSender;
+
+use xvc_config::XvcVerbosity;
+use xvc_logging::{debug, setup_logging, uwr, XvcOutputLine, XvcOutputSender};
+
 use xvc_rust::{
     cli::{XvcCLI, XvcSubCommand},
-    config::XvcVerbosity,
     core::{check_ignore, git_checkout_ref, handle_git_automation, root, Error as XvcCoreError},
-    error, file, init,
-    logging::{debug, setup_logging, uwr, XvcOutputLine},
-    pipeline, storage, Error as XvcError, XvcRootOpt,
+    error, file, init, pipeline, storage, Error as XvcError, XvcRootOpt,
 };
 
 use crate::XvcPyError;
