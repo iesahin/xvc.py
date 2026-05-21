@@ -1,8 +1,8 @@
 use pyo3::prelude::*;
 use pyo3::types::PyDict;
 
-use crate::{update_cli_flag, update_cli_opt};
-use crate::{update_cli_tuple, Xvc};
+use crate::update_cli;
+use crate::Xvc;
 
 #[pyclass]
 #[derive(Clone, Debug)]
@@ -43,15 +43,9 @@ impl XvcPipeline {
     fn new(&self, opts: Option<&Bound<PyDict>>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("new".to_string());
-        update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
-
-        update_cli_opt(
-            opts,
-            &mut cli_opts,
-            &["name", "pipeline_name", "pipeline-name"],
-            "--pipeline-name",
-        )?;
-        update_cli_opt(opts, &mut cli_opts, &["workdir"], "--workdir")?;
+        update_cli!(opts, &mut cli_opts, flag ["help"] => "--help");
+        update_cli!(opts, &mut cli_opts, ["name", "pipeline_name", "pipeline-name"] => "--pipeline-name");
+        update_cli!(opts, &mut cli_opts, ["workdir"] => "--workdir");
         self.xvc_run(cli_opts)
     }
 
@@ -59,22 +53,11 @@ impl XvcPipeline {
     fn update(&self, opts: Option<&Bound<PyDict>>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("update".to_string());
-        update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
-
-        update_cli_opt(
-            opts,
-            &mut cli_opts,
-            &["name", "pipeline_name", "pipeline-name"],
-            "--pipeline-name",
-        )?;
-        update_cli_opt(opts, &mut cli_opts, &["rename"], "--rename")?;
-        update_cli_opt(opts, &mut cli_opts, &["workdir"], "--workdir")?;
-        update_cli_flag(
-            opts,
-            &mut cli_opts,
-            &["set_default", "set-default"],
-            "--set-default",
-        )?;
+        update_cli!(opts, &mut cli_opts, flag ["help"] => "--help");
+        update_cli!(opts, &mut cli_opts, ["name", "pipeline_name", "pipeline-name"] => "--pipeline-name");
+        update_cli!(opts, &mut cli_opts, ["rename"] => "--rename");
+        update_cli!(opts, &mut cli_opts, ["workdir"] => "--workdir");
+        update_cli!(opts, &mut cli_opts, flag ["set_default", "set-default"] => "--set-default");
         self.xvc_run(cli_opts)
     }
 
@@ -82,14 +65,8 @@ impl XvcPipeline {
     fn delete(&self, opts: Option<&Bound<PyDict>>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("delete".to_string());
-        update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
-
-        update_cli_opt(
-            opts,
-            &mut cli_opts,
-            &["name", "pipeline_name", "pipeline-name"],
-            "--pipeline-name",
-        )?;
+        update_cli!(opts, &mut cli_opts, flag ["help"] => "--help");
+        update_cli!(opts, &mut cli_opts, ["name", "pipeline_name", "pipeline-name"] => "--pipeline-name");
         self.xvc_run(cli_opts)
     }
 
@@ -97,14 +74,8 @@ impl XvcPipeline {
     fn run(&self, opts: Option<&Bound<PyDict>>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("run".to_string());
-        update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
-
-        update_cli_opt(
-            opts,
-            &mut cli_opts,
-            &["name", "pipeline_name", "pipeline-name"],
-            "--pipeline-name",
-        )?;
+        update_cli!(opts, &mut cli_opts, flag ["help"] => "--help");
+        update_cli!(opts, &mut cli_opts, ["name", "pipeline_name", "pipeline-name"] => "--pipeline-name");
         self.xvc_run(cli_opts)
     }
 
@@ -112,7 +83,7 @@ impl XvcPipeline {
     fn list(&self, opts: Option<&Bound<PyDict>>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("list".to_string());
-        update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
+        update_cli!(opts, &mut cli_opts, flag ["help"] => "--help");
 
         self.xvc_run(cli_opts)
     }
@@ -121,16 +92,10 @@ impl XvcPipeline {
     fn dag(&self, opts: Option<&Bound<PyDict>>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("dag".to_string());
-        update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
-
-        update_cli_opt(
-            opts,
-            &mut cli_opts,
-            &["name", "pipeline_name", "pipeline-name"],
-            "--pipeline-name",
-        )?;
-        update_cli_opt(opts, &mut cli_opts, &["file"], "--file")?;
-        update_cli_opt(opts, &mut cli_opts, &["format"], "--format")?;
+        update_cli!(opts, &mut cli_opts, flag ["help"] => "--help");
+        update_cli!(opts, &mut cli_opts, ["name", "pipeline_name", "pipeline-name"] => "--pipeline-name");
+        update_cli!(opts, &mut cli_opts, ["file"] => "--file");
+        update_cli!(opts, &mut cli_opts, ["format"] => "--format");
         self.xvc_run(cli_opts)
     }
 
@@ -138,16 +103,10 @@ impl XvcPipeline {
     fn export(&self, opts: Option<&Bound<PyDict>>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("export".to_string());
-        update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
-
-        update_cli_opt(
-            opts,
-            &mut cli_opts,
-            &["name", "pipeline_name", "pipeline-name"],
-            "--pipeline-name",
-        )?;
-        update_cli_opt(opts, &mut cli_opts, &["file"], "--file")?;
-        update_cli_opt(opts, &mut cli_opts, &["format"], "--format")?;
+        update_cli!(opts, &mut cli_opts, flag ["help"] => "--help");
+        update_cli!(opts, &mut cli_opts, ["name", "pipeline_name", "pipeline-name"] => "--pipeline-name");
+        update_cli!(opts, &mut cli_opts, ["file"] => "--file");
+        update_cli!(opts, &mut cli_opts, ["format"] => "--format");
         self.xvc_run(cli_opts)
     }
 
@@ -155,22 +114,16 @@ impl XvcPipeline {
     fn import_pipeline(&self, opts: Option<&Bound<PyDict>>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("import".to_string());
-        update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
-
-        update_cli_opt(
-            opts,
-            &mut cli_opts,
-            &["name", "pipeline_name", "pipeline-name"],
-            "--pipeline-name",
-        )?;
-        update_cli_opt(opts, &mut cli_opts, &["file"], "--file")?;
-        update_cli_opt(opts, &mut cli_opts, &["format"], "--format")?;
-        update_cli_flag(opts, &mut cli_opts, &["overwrite"], "--overwrite")?;
+        update_cli!(opts, &mut cli_opts, flag ["help"] => "--help");
+        update_cli!(opts, &mut cli_opts, ["name", "pipeline_name", "pipeline-name"] => "--pipeline-name");
+        update_cli!(opts, &mut cli_opts, ["file"] => "--file");
+        update_cli!(opts, &mut cli_opts, ["format"] => "--format");
+        update_cli!(opts, &mut cli_opts, flag ["overwrite"] => "--overwrite");
         self.xvc_run(cli_opts)
     }
 
-    #[pyo3(signature = (**opts))]
-    fn step(&self, opts: Option<&Bound<PyDict>>) -> PyResult<XvcPipelineStep> {
+    #[pyo3(signature = (**_opts))]
+    fn step(&self, _opts: Option<&Bound<PyDict>>) -> PyResult<XvcPipelineStep> {
         Ok(XvcPipelineStep {
             xvc_pipeline_opts: self.clone(),
         })
@@ -178,7 +131,8 @@ impl XvcPipeline {
 }
 
 #[pyclass]
-struct XvcPipelineStep {
+#[derive(Clone)]
+pub struct XvcPipelineStep {
     xvc_pipeline_opts: XvcPipeline,
 }
 
@@ -202,16 +156,10 @@ impl XvcPipelineStep {
     fn new(&self, opts: Option<&Bound<PyDict>>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("new".to_string());
-        update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
-
-        update_cli_opt(
-            opts,
-            &mut cli_opts,
-            &["name", "step_name", "step-name"],
-            "--step-name",
-        )?;
-        update_cli_opt(opts, &mut cli_opts, &["command"], "--command")?;
-        update_cli_opt(opts, &mut cli_opts, &["when"], "--when")?;
+        update_cli!(opts, &mut cli_opts, flag ["help"] => "--help");
+        update_cli!(opts, &mut cli_opts, ["name", "step_name", "step-name"] => "--step-name");
+        update_cli!(opts, &mut cli_opts, ["command"] => "--command");
+        update_cli!(opts, &mut cli_opts, ["when"] => "--when");
         self.xvc_run(cli_opts)
     }
 
@@ -219,16 +167,19 @@ impl XvcPipelineStep {
     fn update(&self, opts: Option<&Bound<PyDict>>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("update".to_string());
-        update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
+        update_cli!(opts, &mut cli_opts, flag ["help"] => "--help");
+        update_cli!(opts, &mut cli_opts, ["name", "step_name", "step-name"] => "--step-name");
+        update_cli!(opts, &mut cli_opts, ["command"] => "--command");
+        update_cli!(opts, &mut cli_opts, ["when"] => "--when");
+        self.xvc_run(cli_opts)
+    }
 
-        update_cli_opt(
-            opts,
-            &mut cli_opts,
-            &["name", "step_name", "step-name"],
-            "--step-name",
-        )?;
-        update_cli_opt(opts, &mut cli_opts, &["command"], "--command")?;
-        update_cli_opt(opts, &mut cli_opts, &["when"], "--when")?;
+    #[pyo3(signature = (**opts))]
+    fn remove(&self, opts: Option<&Bound<PyDict>>) -> PyResult<String> {
+        let mut cli_opts = self.cli()?;
+        cli_opts.push("remove".to_string());
+        update_cli!(opts, &mut cli_opts, flag ["help"] => "--help");
+        update_cli!(opts, &mut cli_opts, ["name", "step_name", "step-name"] => "--step-name");
         self.xvc_run(cli_opts)
     }
 
@@ -236,32 +187,21 @@ impl XvcPipelineStep {
     fn dependency(&self, opts: Option<&Bound<PyDict>>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("dependency".to_string());
-        update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
-        update_cli_flag(opts, &mut cli_opts, &["no_recheck"], "--no-recheck")?;
-
-        update_cli_opt(
-            opts,
-            &mut cli_opts,
-            &["name", "step_name", "step-name"],
-            "--step-name",
-        )?;
-        update_cli_opt(opts, &mut cli_opts, &["file"], "--file")?;
-        update_cli_opt(opts, &mut cli_opts, &["url"], "--url")?;
-        update_cli_opt(opts, &mut cli_opts, &["glob"], "--glob")?;
-        update_cli_opt(opts, &mut cli_opts, &["glob_items"], "--glob-items")?;
-        update_cli_opt(opts, &mut cli_opts, &["step"], "--step")?;
-        update_cli_opt(opts, &mut cli_opts, &["param"], "--param")?;
-        update_cli_opt(opts, &mut cli_opts, &["regex"], "--regex")?;
-        update_cli_opt(opts, &mut cli_opts, &["regex_items"], "--regex-items")?;
-        update_cli_opt(opts, &mut cli_opts, &["line", "lines"], "--line")?;
-        update_cli_opt(opts, &mut cli_opts, &["line_items"], "--line-items")?;
-        update_cli_opt(opts, &mut cli_opts, &["generic"], "--generic")?;
-        update_cli_tuple(
-            opts,
-            &mut cli_opts,
-            ("sqlite_file", "sqlite_query"),
-            "--sqlite-query",
-        )?;
+        update_cli!(opts, &mut cli_opts, flag ["help"] => "--help");
+        update_cli!(opts, &mut cli_opts, flag ["no_recheck", "no-recheck"] => "--no-recheck");
+        update_cli!(opts, &mut cli_opts, ["name", "step_name", "step-name"] => "--step-name");
+        update_cli!(opts, &mut cli_opts, ["file"] => "--file");
+        update_cli!(opts, &mut cli_opts, ["url"] => "--url");
+        update_cli!(opts, &mut cli_opts, ["glob"] => "--glob");
+        update_cli!(opts, &mut cli_opts, ["glob_items", "glob-items"] => "--glob-items");
+        update_cli!(opts, &mut cli_opts, ["step"] => "--step");
+        update_cli!(opts, &mut cli_opts, ["param"] => "--param");
+        update_cli!(opts, &mut cli_opts, ["regex"] => "--regex");
+        update_cli!(opts, &mut cli_opts, ["regex_items", "regex-items"] => "--regex-items");
+        update_cli!(opts, &mut cli_opts, ["lines"] => "--lines");
+        update_cli!(opts, &mut cli_opts, ["line_items", "line-items"] => "--line-items");
+        update_cli!(opts, &mut cli_opts, ["generic"] => "--generic");
+        update_cli!(opts, &mut cli_opts, tuple ("sqlite_file", "sqlite_query") => "--sqlite-query");
 
         self.xvc_run(cli_opts)
     }
@@ -270,18 +210,12 @@ impl XvcPipelineStep {
     fn output(&self, opts: Option<&Bound<PyDict>>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("output".to_string());
-        update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
-        update_cli_flag(opts, &mut cli_opts, &["no-recheck"], "--no-recheck")?;
-
-        update_cli_opt(
-            opts,
-            &mut cli_opts,
-            &["name", "step_name", "step-name"],
-            "--step-name",
-        )?;
-        update_cli_opt(opts, &mut cli_opts, &["file"], "--output-file")?;
-        update_cli_opt(opts, &mut cli_opts, &["metric"], "--output-metric")?;
-        update_cli_opt(opts, &mut cli_opts, &["image"], "--output-images")?;
+        update_cli!(opts, &mut cli_opts, flag ["help"] => "--help");
+        update_cli!(opts, &mut cli_opts, flag ["no-recheck", "no_recheck"] => "--no-recheck");
+        update_cli!(opts, &mut cli_opts, ["name", "step_name", "step-name"] => "--step-name");
+        update_cli!(opts, &mut cli_opts, ["file"] => "--output-file");
+        update_cli!(opts, &mut cli_opts, ["metric"] => "--output-metric");
+        update_cli!(opts, &mut cli_opts, ["image"] => "--output-images");
         self.xvc_run(cli_opts)
     }
 
@@ -289,8 +223,8 @@ impl XvcPipelineStep {
     fn list(&self, opts: Option<&Bound<PyDict>>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("list".to_string());
-        update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
-        update_cli_flag(opts, &mut cli_opts, &["names_only"], "--names-only")?;
+        update_cli!(opts, &mut cli_opts, flag ["help"] => "--help");
+        update_cli!(opts, &mut cli_opts, flag ["names_only", "names-only"] => "--names-only");
 
         self.xvc_run(cli_opts)
     }
@@ -298,15 +232,9 @@ impl XvcPipelineStep {
     #[pyo3(signature = (**opts))]
     fn show(&self, opts: Option<&Bound<PyDict>>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
-        update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
         cli_opts.push("show".to_string());
-
-        update_cli_opt(
-            opts,
-            &mut cli_opts,
-            &["name", "step_name", "step-name"],
-            "--step-name",
-        )?;
+        update_cli!(opts, &mut cli_opts, flag ["help"] => "--help");
+        update_cli!(opts, &mut cli_opts, ["name", "step_name", "step-name"] => "--step-name");
         self.xvc_run(cli_opts)
     }
 }

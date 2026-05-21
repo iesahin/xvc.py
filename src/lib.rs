@@ -3,6 +3,7 @@ pub mod output;
 pub mod pipeline;
 pub mod storage;
 
+use std::path::Path;
 use std::sync::Arc;
 use std::sync::RwLock;
 
@@ -10,10 +11,9 @@ use file::XvcFile;
 use output::dispatch_with_root;
 use pyo3::prelude::*;
 use pyo3::types::{PyDict, PyTuple};
-use xvc_rust::core::default_project_config;
 use xvc_rust::core::types::xvcroot::load_xvc_root;
 use xvc_rust::error::Error as XvcError;
-use xvc_rust::{cli, watch, AbsolutePath, XvcConfigParams, XvcRootOpt};
+use xvc_rust::{cli, watch, AbsolutePath, XvcLoadParams, XvcRootOpt};
 
 pub use pipeline::XvcPipeline;
 pub use storage::XvcStorage;
@@ -41,18 +41,16 @@ pub fn run_xvc(cmd: String) -> PyResult<String> {
         }
     };
 
-    let xvc_config_params = XvcConfigParams {
-        current_dir: AbsolutePath::from(&cli_opts.workdir),
-        include_system_config: !cli_opts.no_system_config,
-        include_user_config: !cli_opts.no_user_config,
-        project_config_path: None,
-        local_config_path: None,
-        include_environment_config: !cli_opts.no_env_config,
-        command_line_config: Some(cli_opts.consolidate_config_options()),
-        default_configuration: default_project_config(true),
-    };
+    let mut xvc_load_params = XvcLoadParams::new(
+        AbsolutePath::from(cli_opts.workdir.as_deref().unwrap_or(Path::new("."))),
+        None,
+    );
+    xvc_load_params.include_system_config = !cli_opts.no_system_config;
+    xvc_load_params.include_user_config = !cli_opts.no_user_config;
+    xvc_load_params.include_environment_config = !cli_opts.no_env_config;
+    xvc_load_params.command_line_config = Some(cli_opts.consolidate_config_options());
 
-    let xvc_root_opt = match load_xvc_root(xvc_config_params) {
+    let xvc_root_opt = match load_xvc_root(xvc_load_params) {
         Ok(r) => Some(r),
         Err(e) => {
             e.debug();
@@ -83,7 +81,7 @@ fn xvc(_py: Python<'_>, m: &Bound<PyModule>) -> PyResult<()> {
 #[pyclass]
 #[derive(Clone, Debug)]
 pub struct Xvc {
-    xvc_config_params: XvcConfigParams,
+    xvc_load_params: XvcLoadParams,
     verbosity: Option<u8>,
     quiet: Option<bool>,
     debug: Option<bool>,
@@ -141,20 +139,17 @@ impl Xvc {
         from_ref: Option<String>,
         to_branch: Option<String>,
     ) -> PyResult<Self> {
-        let xvc_config_params = XvcConfigParams {
-            current_dir: AbsolutePath::from(workdir.clone().unwrap_or_else(|| ".".to_owned())),
-            include_system_config: !no_system_config.unwrap_or_default(),
-            include_user_config: !no_user_config.unwrap_or_default(),
-            project_config_path: None,
-            local_config_path: None,
-            include_environment_config: !no_env_config.unwrap_or_default(),
-            command_line_config: None,
-            default_configuration: default_project_config(true),
-        };
+        let mut xvc_load_params = XvcLoadParams::new(
+            AbsolutePath::from(workdir.clone().unwrap_or_else(|| ".".to_owned())),
+            None,
+        );
+        xvc_load_params.include_system_config = !no_system_config.unwrap_or_default();
+        xvc_load_params.include_user_config = !no_user_config.unwrap_or_default();
+        xvc_load_params.include_environment_config = !no_env_config.unwrap_or_default();
 
-        watch!(xvc_config_params);
+        watch!(xvc_load_params);
 
-        let xvc_root_opt = match load_xvc_root(xvc_config_params.clone()) {
+        let xvc_root_opt = match load_xvc_root(xvc_load_params.clone()) {
             Ok(r) => Arc::new(RwLock::new(Some(r))),
             Err(e) => {
                 e.debug();
@@ -164,7 +159,7 @@ impl Xvc {
         watch!(&xvc_root_opt);
 
         Ok(Self {
-            xvc_config_params,
+            xvc_load_params,
             verbosity,
             quiet,
             debug,
@@ -194,20 +189,20 @@ impl Xvc {
             cli_opts.push(workdir.to_string());
         }
 
-        if !self.xvc_config_params.include_system_config {
+        if !self.xvc_load_params.include_system_config {
             cli_opts.push("--no-system-config".to_string());
         }
 
-        if !self.xvc_config_params.include_user_config {
+        if !self.xvc_load_params.include_user_config {
             cli_opts.push("--no-user-config".to_string());
         }
 
         // TODO: We don't consider project and local config options for now.
-        //if !self.xvc_config_params.include_project_config {
+        //if !self.xvc_load_params.include_project_config {
         //    cli_opts.push("--no-project-config".to_string());
         //}
 
-        if !self.xvc_config_params.include_environment_config {
+        if !self.xvc_load_params.include_environment_config {
             cli_opts.push("--no-env-config".to_string());
         }
 
@@ -245,14 +240,8 @@ impl Xvc {
     fn root(&self, opts: Option<&Bound<PyDict>>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("root".to_string());
-        update_cli_flag(opts, &mut cli_opts, &["absolute"], "--absolute")?;
+        update_cli!(opts, &mut cli_opts, flag ["absolute"] => "--absolute");
         watch!(cli_opts);
-        // assert!(self
-        //     .xvc_root_opt
-        //     .read()
-        //     .expect("Lock XvcRootOpt")
-        //     .to_owned()
-        //     .is_some());
         self.run(cli_opts)
     }
 
@@ -265,15 +254,8 @@ impl Xvc {
         let mut cli_opts = self.cli()?;
         cli_opts.push("check-ignore".to_string());
 
-        update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
-        update_cli_flag(opts, &mut cli_opts, &["details"], "--details")?;
-        update_cli_opt(
-            opts,
-            &mut cli_opts,
-            &["ignore_filename"],
-            "--ignore-filename",
-        )?;
-        update_cli_flag(opts, &mut cli_opts, &["non_matching"], "--non-matching")?;
+        update_cli!(opts, &mut cli_opts, flag ["help"] => "--help");
+        update_cli!(opts, &mut cli_opts, ["ignore_filename", "ignore-filename"] => "--ignore-filename");
 
         update_targets(targets, &mut cli_opts)?;
 
@@ -286,10 +268,10 @@ impl Xvc {
         let mut cli_opts = self.cli()?;
         cli_opts.push("init".to_string());
 
-        update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
-        update_cli_opt(opts, &mut cli_opts, &["path"], "--path")?;
-        update_cli_flag(opts, &mut cli_opts, &["no-git"], "--no-git")?;
-        update_cli_flag(opts, &mut cli_opts, &["force"], "--force")?;
+        update_cli!(opts, &mut cli_opts, flag ["help"] => "--help");
+        update_cli!(opts, &mut cli_opts, ["path"] => "--path");
+        update_cli!(opts, &mut cli_opts, flag ["no-git", "no_git"] => "--no-git");
+        update_cli!(opts, &mut cli_opts, flag ["force"] => "--force");
 
         watch!(self.xvc_root_opt.read().unwrap());
         self.run(cli_opts)
@@ -367,6 +349,19 @@ pub fn update_cli_tuple(
         }
     }
     Ok(())
+}
+
+#[macro_export]
+macro_rules! update_cli {
+    ($opts:expr, $cli_opts:expr, flag [ $($keys:expr),+ ] => $flag:expr) => {
+        $crate::update_cli_flag($opts, $cli_opts, &[$($keys),+], $flag)?;
+    };
+    ($opts:expr, $cli_opts:expr, [ $($keys:expr),+ ] => $flag:expr) => {
+        $crate::update_cli_opt($opts, $cli_opts, &[$($keys),+], $flag)?;
+    };
+    ($opts:expr, $cli_opts:expr, tuple ( $key1:expr, $key2:expr ) => $flag:expr) => {
+        $crate::update_cli_tuple($opts, $cli_opts, ($key1, $key2), $flag)?;
+    };
 }
 
 pub fn update_targets(tuple: &Bound<PyTuple>, cli: &mut Vec<String>) -> PyResult<()> {

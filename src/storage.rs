@@ -3,7 +3,7 @@ use pyo3::types::PyDict;
 use xvc_rust::watch;
 
 use crate::Xvc;
-use crate::{update_cli_flag, update_cli_opt};
+use crate::update_cli;
 
 #[pyclass]
 #[derive(Clone, Debug)]
@@ -35,7 +35,7 @@ impl XvcStorage {
     fn list(&self, opts: Option<&Bound<PyDict>>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("list".to_string());
-        update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
+        update_cli!(opts, &mut cli_opts, flag ["help"] => "--help");
 
         self.xvc_run(cli_opts)
     }
@@ -44,7 +44,7 @@ impl XvcStorage {
     fn remove(&self, name: &str, opts: Option<&Bound<PyDict>>) -> PyResult<String> {
         let mut cli_opts = self.cli()?;
         cli_opts.push("remove".to_string());
-        update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
+        update_cli!(opts, &mut cli_opts, flag ["help"] => "--help");
 
         cli_opts.push("--name".to_string());
         cli_opts.push(name.to_string());
@@ -57,10 +57,10 @@ impl XvcStorage {
         let mut cli_opts = self.cli()?;
         cli_opts.push("new".to_string());
         cli_opts.push("local".to_string());
-        update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
+        update_cli!(opts, &mut cli_opts, flag ["help"] => "--help");
 
-        update_cli_opt(opts, &mut cli_opts, &["name"], "--name")?;
-        update_cli_opt(opts, &mut cli_opts, &["path"], "--path")?;
+        update_cli!(opts, &mut cli_opts, ["name"] => "--name");
+        update_cli!(opts, &mut cli_opts, ["path"] => "--path");
 
         self.xvc_run(cli_opts)
     }
@@ -70,52 +70,17 @@ impl XvcStorage {
         let mut cli_opts = self.cli()?;
         cli_opts.push("new".to_string());
         cli_opts.push("generic".to_string());
-        update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
+        update_cli!(opts, &mut cli_opts, flag ["help"] => "--help");
 
-        update_cli_opt(opts, &mut cli_opts, &["name"], "--name")?;
-        update_cli_opt(
-            opts,
-            &mut cli_opts,
-            &["init", "init_command", "init-command"],
-            "--init",
-        )?;
-        update_cli_opt(
-            opts,
-            &mut cli_opts,
-            &["list", "list_command", "list-command"],
-            "--list",
-        )?;
-        update_cli_opt(
-            opts,
-            &mut cli_opts,
-            &["download", "download_command", "download-command"],
-            "--download",
-        )?;
-        update_cli_opt(
-            opts,
-            &mut cli_opts,
-            &["upload", "upload_command", "upload-command"],
-            "--upload",
-        )?;
-        update_cli_opt(
-            opts,
-            &mut cli_opts,
-            &["delete", "delete_command", "delete-command"],
-            "--delete",
-        )?;
-        update_cli_opt(
-            opts,
-            &mut cli_opts,
-            &["processes", "max_processes", "max-processes"],
-            "--processes",
-        )?;
-        update_cli_opt(opts, &mut cli_opts, &["url"], "--url")?;
-        update_cli_opt(
-            opts,
-            &mut cli_opts,
-            &["storage_dir", "storage-dir"],
-            "--storage-dir",
-        )?;
+        update_cli!(opts, &mut cli_opts, ["name"] => "--name");
+        update_cli!(opts, &mut cli_opts, ["init", "init_command", "init-command"] => "--init");
+        update_cli!(opts, &mut cli_opts, ["list", "list_command", "list-command"] => "--list");
+        update_cli!(opts, &mut cli_opts, ["download", "download_command", "download-command"] => "--download");
+        update_cli!(opts, &mut cli_opts, ["upload", "upload_command", "upload-command"] => "--upload");
+        update_cli!(opts, &mut cli_opts, ["delete", "delete_command", "delete-command"] => "--delete");
+        update_cli!(opts, &mut cli_opts, ["processes", "max_processes", "max-processes"] => "--processes");
+        update_cli!(opts, &mut cli_opts, ["url"] => "--url");
+        update_cli!(opts, &mut cli_opts, ["storage_dir", "storage-dir"] => "--storage-dir");
 
         self.xvc_run(cli_opts)
     }
@@ -125,18 +90,13 @@ impl XvcStorage {
         let mut cli_opts = self.cli()?;
         cli_opts.push("new".to_string());
         cli_opts.push("rsync".to_string());
-        update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
+        update_cli!(opts, &mut cli_opts, flag ["help"] => "--help");
 
-        update_cli_opt(opts, &mut cli_opts, &["name"], "--name")?;
-        update_cli_opt(opts, &mut cli_opts, &["host"], "--host")?;
-        update_cli_opt(opts, &mut cli_opts, &["port"], "--port")?;
-        update_cli_opt(opts, &mut cli_opts, &["user"], "--user")?;
-        update_cli_opt(
-            opts,
-            &mut cli_opts,
-            &["storage_dir", "storage-dir"],
-            "--storage-dir",
-        )?;
+        update_cli!(opts, &mut cli_opts, ["name"] => "--name");
+        update_cli!(opts, &mut cli_opts, ["host"] => "--host");
+        update_cli!(opts, &mut cli_opts, ["port"] => "--port");
+        update_cli!(opts, &mut cli_opts, ["user"] => "--user");
+        update_cli!(opts, &mut cli_opts, ["storage_dir", "storage-dir"] => "--storage-dir");
 
         self.xvc_run(cli_opts)
     }
@@ -146,16 +106,11 @@ impl XvcStorage {
         let mut cli_opts = self.cli()?;
         cli_opts.push("new".to_string());
         cli_opts.push("rclone".to_string());
-        update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
+        update_cli!(opts, &mut cli_opts, flag ["help"] => "--help");
 
-        update_cli_opt(opts, &mut cli_opts, &["name"], "--name")?;
-        update_cli_opt(opts, &mut cli_opts, &["remote"], "--remote")?;
-        update_cli_opt(
-            opts,
-            &mut cli_opts,
-            &["storage_prefix", "storage-prefix"],
-            "--storage-prefix",
-        )?;
+        update_cli!(opts, &mut cli_opts, ["name"] => "--name");
+        update_cli!(opts, &mut cli_opts, ["remote"] => "--remote");
+        update_cli!(opts, &mut cli_opts, ["storage_prefix", "storage-prefix"] => "--storage-prefix");
 
         self.xvc_run(cli_opts)
     }
@@ -166,22 +121,12 @@ impl XvcStorage {
         watch!(cli_opts);
         cli_opts.push("new".to_string());
         cli_opts.push("s3".to_string());
-        update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
+        update_cli!(opts, &mut cli_opts, flag ["help"] => "--help");
 
-        update_cli_opt(opts, &mut cli_opts, &["name"], "--name")?;
-        update_cli_opt(
-            opts,
-            &mut cli_opts,
-            &["storage_prefix", "storage-prefix"],
-            "--storage-prefix",
-        )?;
-        update_cli_opt(
-            opts,
-            &mut cli_opts,
-            &["bucket_name", "bucket-name"],
-            "--bucket-name",
-        )?;
-        update_cli_opt(opts, &mut cli_opts, &["region"], "--region")?;
+        update_cli!(opts, &mut cli_opts, ["name"] => "--name");
+        update_cli!(opts, &mut cli_opts, ["storage_prefix", "storage-prefix"] => "--storage-prefix");
+        update_cli!(opts, &mut cli_opts, ["bucket_name", "bucket-name"] => "--bucket-name");
+        update_cli!(opts, &mut cli_opts, ["region"] => "--region");
         watch!(cli_opts);
         self.xvc_run(cli_opts)
     }
@@ -191,23 +136,13 @@ impl XvcStorage {
         let mut cli_opts = self.cli()?;
         cli_opts.push("new".to_string());
         cli_opts.push("minio".to_string());
-        update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
+        update_cli!(opts, &mut cli_opts, flag ["help"] => "--help");
 
-        update_cli_opt(opts, &mut cli_opts, &["name"], "--name")?;
-        update_cli_opt(
-            opts,
-            &mut cli_opts,
-            &["storage_prefix", "storage-prefix"],
-            "--storage-prefix",
-        )?;
-        update_cli_opt(
-            opts,
-            &mut cli_opts,
-            &["bucket_name", "bucket-name"],
-            "--bucket-name",
-        )?;
-        update_cli_opt(opts, &mut cli_opts, &["endpoint"], "--endpoint")?;
-        update_cli_opt(opts, &mut cli_opts, &["region"], "--region")?;
+        update_cli!(opts, &mut cli_opts, ["name"] => "--name");
+        update_cli!(opts, &mut cli_opts, ["storage_prefix", "storage-prefix"] => "--storage-prefix");
+        update_cli!(opts, &mut cli_opts, ["bucket_name", "bucket-name"] => "--bucket-name");
+        update_cli!(opts, &mut cli_opts, ["endpoint"] => "--endpoint");
+        update_cli!(opts, &mut cli_opts, ["region"] => "--region");
         self.xvc_run(cli_opts)
     }
 
@@ -216,22 +151,12 @@ impl XvcStorage {
         let mut cli_opts = self.cli()?;
         cli_opts.push("new".to_string());
         cli_opts.push("digital-ocean".to_string());
-        update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
+        update_cli!(opts, &mut cli_opts, flag ["help"] => "--help");
 
-        update_cli_opt(opts, &mut cli_opts, &["name"], "--name")?;
-        update_cli_opt(
-            opts,
-            &mut cli_opts,
-            &["storage_prefix", "storage-prefix"],
-            "--storage-prefix",
-        )?;
-        update_cli_opt(
-            opts,
-            &mut cli_opts,
-            &["bucket_name", "bucket-name"],
-            "--bucket-name",
-        )?;
-        update_cli_opt(opts, &mut cli_opts, &["region"], "--region")?;
+        update_cli!(opts, &mut cli_opts, ["name"] => "--name");
+        update_cli!(opts, &mut cli_opts, ["storage_prefix", "storage-prefix"] => "--storage-prefix");
+        update_cli!(opts, &mut cli_opts, ["bucket_name", "bucket-name"] => "--bucket-name");
+        update_cli!(opts, &mut cli_opts, ["region"] => "--region");
         self.xvc_run(cli_opts)
     }
 
@@ -240,27 +165,12 @@ impl XvcStorage {
         let mut cli_opts = self.cli()?;
         cli_opts.push("new".to_string());
         cli_opts.push("r2".to_string());
-        update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
+        update_cli!(opts, &mut cli_opts, flag ["help"] => "--help");
 
-        update_cli_opt(opts, &mut cli_opts, &["name"], "--name")?;
-        update_cli_opt(
-            opts,
-            &mut cli_opts,
-            &["storage_prefix", "storage-prefix"],
-            "--storage-prefix",
-        )?;
-        update_cli_opt(
-            opts,
-            &mut cli_opts,
-            &["account_id", "account-id"],
-            "--account-id",
-        )?;
-        update_cli_opt(
-            opts,
-            &mut cli_opts,
-            &["bucket_name", "bucket-name"],
-            "--bucket-name",
-        )?;
+        update_cli!(opts, &mut cli_opts, ["name"] => "--name");
+        update_cli!(opts, &mut cli_opts, ["storage_prefix", "storage-prefix"] => "--storage-prefix");
+        update_cli!(opts, &mut cli_opts, ["account_id", "account-id"] => "--account-id");
+        update_cli!(opts, &mut cli_opts, ["bucket_name", "bucket-name"] => "--bucket-name");
         self.xvc_run(cli_opts)
     }
 
@@ -269,22 +179,12 @@ impl XvcStorage {
         let mut cli_opts = self.cli()?;
         cli_opts.push("new".to_string());
         cli_opts.push("gcs".to_string());
-        update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
+        update_cli!(opts, &mut cli_opts, flag ["help"] => "--help");
 
-        update_cli_opt(opts, &mut cli_opts, &["name"], "--name")?;
-        update_cli_opt(
-            opts,
-            &mut cli_opts,
-            &["storage_prefix", "storage-prefix"],
-            "--storage-prefix",
-        )?;
-        update_cli_opt(
-            opts,
-            &mut cli_opts,
-            &["bucket_name", "bucket-name"],
-            "--bucket-name",
-        )?;
-        update_cli_opt(opts, &mut cli_opts, &["region"], "--region")?;
+        update_cli!(opts, &mut cli_opts, ["name"] => "--name");
+        update_cli!(opts, &mut cli_opts, ["storage_prefix", "storage-prefix"] => "--storage-prefix");
+        update_cli!(opts, &mut cli_opts, ["bucket_name", "bucket-name"] => "--bucket-name");
+        update_cli!(opts, &mut cli_opts, ["region"] => "--region");
         self.xvc_run(cli_opts)
     }
 
@@ -293,22 +193,12 @@ impl XvcStorage {
         let mut cli_opts = self.cli()?;
         cli_opts.push("new".to_string());
         cli_opts.push("wasabi".to_string());
-        update_cli_flag(opts, &mut cli_opts, &["help"], "--help")?;
+        update_cli!(opts, &mut cli_opts, flag ["help"] => "--help");
 
-        update_cli_opt(opts, &mut cli_opts, &["name"], "--name")?;
-        update_cli_opt(
-            opts,
-            &mut cli_opts,
-            &["storage_prefix", "storage-prefix"],
-            "--storage-prefix",
-        )?;
-        update_cli_opt(
-            opts,
-            &mut cli_opts,
-            &["bucket_name", "bucket-name"],
-            "--bucket-name",
-        )?;
-        update_cli_opt(opts, &mut cli_opts, &["endpoint"], "--endpoint")?;
+        update_cli!(opts, &mut cli_opts, ["name"] => "--name");
+        update_cli!(opts, &mut cli_opts, ["storage_prefix", "storage-prefix"] => "--storage-prefix");
+        update_cli!(opts, &mut cli_opts, ["bucket_name", "bucket-name"] => "--bucket-name");
+        update_cli!(opts, &mut cli_opts, ["endpoint"] => "--endpoint");
         self.xvc_run(cli_opts)
     }
 }
