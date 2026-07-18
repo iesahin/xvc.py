@@ -1,8 +1,8 @@
 use pyo3::prelude::*;
 use pyo3::types::PyDict;
 
-use crate::update_cli;
 use crate::Xvc;
+use crate::update_cli;
 
 #[pyclass]
 #[derive(Clone, Debug)]

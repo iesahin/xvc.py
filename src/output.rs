@@ -9,12 +9,13 @@ use log::LevelFilter;
 use pyo3::PyResult;
 
 use xvc_config::XvcVerbosity;
-use xvc_logging::{debug, setup_logging, uwr, XvcOutputLine, XvcOutputSender};
+use xvc_logging::{XvcOutputLine, XvcOutputSender, debug, setup_logging, uwr};
 
 use xvc_rust::{
+    Error as XvcError, XvcRootOpt,
     cli::{XvcCLI, XvcSubCommand},
-    core::{check_ignore, git_checkout_ref, handle_git_automation, root, Error as XvcCoreError},
-    error, file, init, pipeline, storage, Error as XvcError, XvcRootOpt,
+    core::{Error as XvcCoreError, check_ignore, git_checkout_ref, handle_git_automation, root},
+    error, file, init, pipeline, storage,
 };
 
 use crate::XvcPyError;
