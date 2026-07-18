@@ -2,8 +2,8 @@ use pyo3::prelude::*;
 use pyo3::types::PyDict;
 use xvc_rust::watch;
 
-use crate::Xvc;
 use crate::update_cli;
+use crate::Xvc;
 
 #[pyclass]
 #[derive(Clone, Debug)]

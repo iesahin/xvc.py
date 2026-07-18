@@ -116,16 +116,16 @@ impl Xvc {
 impl Xvc {
     #[allow(clippy::too_many_arguments)]
     #[new]
-    #[pyo3(signature = 
-            (verbosity=None, 
-             quiet=None, 
-             debug=None, 
-             workdir=None, 
-             no_system_config=None, 
+    #[pyo3(signature =
+            (verbosity=None,
+             quiet=None,
+             debug=None,
+             workdir=None,
+             no_system_config=None,
              no_user_config=None,
-             no_env_config=None, 
-             skip_git=None, 
-             from_ref=None, 
+             no_env_config=None,
+             skip_git=None,
+             from_ref=None,
              to_branch=None))]
     fn new(
         verbosity: Option<u8>,
