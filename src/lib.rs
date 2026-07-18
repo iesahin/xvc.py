@@ -13,7 +13,7 @@ use pyo3::prelude::*;
 use pyo3::types::{PyDict, PyTuple};
 use xvc_rust::core::types::xvcroot::load_xvc_root;
 use xvc_rust::error::Error as XvcError;
-use xvc_rust::{cli, watch, AbsolutePath, XvcLoadParams, XvcRootOpt};
+use xvc_rust::{AbsolutePath, XvcLoadParams, XvcRootOpt, cli, watch};
 
 pub use pipeline::XvcPipeline;
 pub use storage::XvcStorage;
@@ -116,16 +116,16 @@ impl Xvc {
 impl Xvc {
     #[allow(clippy::too_many_arguments)]
     #[new]
-    #[pyo3(signature = 
-            (verbosity=None, 
-             quiet=None, 
-             debug=None, 
-             workdir=None, 
-             no_system_config=None, 
+    #[pyo3(signature =
+            (verbosity=None,
+             quiet=None,
+             debug=None,
+             workdir=None,
+             no_system_config=None,
              no_user_config=None,
-             no_env_config=None, 
-             skip_git=None, 
-             from_ref=None, 
+             no_env_config=None,
+             skip_git=None,
+             from_ref=None,
              to_branch=None))]
     fn new(
         verbosity: Option<u8>,
@@ -353,13 +353,13 @@ pub fn update_cli_tuple(
 
 #[macro_export]
 macro_rules! update_cli {
-    ($opts:expr, $cli_opts:expr, flag [ $($keys:expr),+ ] => $flag:expr) => {
+    ($opts:expr_2021, $cli_opts:expr_2021, flag [ $($keys:expr_2021),+ ] => $flag:expr_2021) => {
         $crate::update_cli_flag($opts, $cli_opts, &[$($keys),+], $flag)?;
     };
-    ($opts:expr, $cli_opts:expr, [ $($keys:expr),+ ] => $flag:expr) => {
+    ($opts:expr_2021, $cli_opts:expr_2021, [ $($keys:expr_2021),+ ] => $flag:expr_2021) => {
         $crate::update_cli_opt($opts, $cli_opts, &[$($keys),+], $flag)?;
     };
-    ($opts:expr, $cli_opts:expr, tuple ( $key1:expr, $key2:expr ) => $flag:expr) => {
+    ($opts:expr_2021, $cli_opts:expr_2021, tuple ( $key1:expr_2021, $key2:expr_2021 ) => $flag:expr_2021) => {
         $crate::update_cli_tuple($opts, $cli_opts, ($key1, $key2), $flag)?;
     };
 }

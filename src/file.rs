@@ -3,7 +3,7 @@ use pyo3::types::{PyDict, PyTuple};
 use xvc_rust::watch;
 
 use crate::update_cli;
-use crate::{update_targets, Xvc};
+use crate::{Xvc, update_targets};
 
 #[pyclass]
 #[derive(Clone, Debug)]
