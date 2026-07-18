@@ -353,13 +353,13 @@ pub fn update_cli_tuple(
 
 #[macro_export]
 macro_rules! update_cli {
-    ($opts:expr, $cli_opts:expr, flag [ $($keys:expr),+ ] => $flag:expr) => {
+    ($opts:expr_2021, $cli_opts:expr_2021, flag [ $($keys:expr_2021),+ ] => $flag:expr_2021) => {
         $crate::update_cli_flag($opts, $cli_opts, &[$($keys),+], $flag)?;
     };
-    ($opts:expr, $cli_opts:expr, [ $($keys:expr),+ ] => $flag:expr) => {
+    ($opts:expr_2021, $cli_opts:expr_2021, [ $($keys:expr_2021),+ ] => $flag:expr_2021) => {
         $crate::update_cli_opt($opts, $cli_opts, &[$($keys),+], $flag)?;
     };
-    ($opts:expr, $cli_opts:expr, tuple ( $key1:expr, $key2:expr ) => $flag:expr) => {
+    ($opts:expr_2021, $cli_opts:expr_2021, tuple ( $key1:expr_2021, $key2:expr_2021 ) => $flag:expr_2021) => {
         $crate::update_cli_tuple($opts, $cli_opts, ($key1, $key2), $flag)?;
     };
 }
