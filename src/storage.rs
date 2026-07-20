@@ -201,4 +201,18 @@ impl XvcStorage {
         update_cli!(opts, &mut cli_opts, ["endpoint"] => "--endpoint");
         self.xvc_run(cli_opts)
     }
+
+    /// Reads credentials from `DROPBOX_ACCESS_TOKEN`, or
+    /// `XVC_STORAGE_ACCESS_TOKEN_<name>` when multiple Dropbox storages are configured.
+    #[pyo3(signature = (**opts))]
+    fn new_dropbox(&self, opts: Option<&Bound<PyDict>>) -> PyResult<String> {
+        let mut cli_opts = self.cli()?;
+        cli_opts.push("new".to_string());
+        cli_opts.push("dropbox".to_string());
+        update_cli!(opts, &mut cli_opts, flag ["help"] => "--help");
+
+        update_cli!(opts, &mut cli_opts, ["name"] => "--name");
+        update_cli!(opts, &mut cli_opts, ["storage_prefix", "storage-prefix"] => "--storage-prefix");
+        self.xvc_run(cli_opts)
+    }
 }
