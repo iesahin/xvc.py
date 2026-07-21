@@ -1,3 +1,8 @@
+## 0.7.1 (unreleased)
+
+- Bump Xvc dependency pin to 0.7.1-alpha.5
+- Add `storage().new_dropbox()` binding for the Dropbox storage backend (`xvc storage new dropbox`)
+
 ## 0.7.1
 
 - Upgrade Xvc API to 0.7.1
