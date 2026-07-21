@@ -1,7 +1,7 @@
 ## 0.7.1 (unreleased)
 
-- Bump Xvc dependency pin to 0.7.1-alpha.4
-- Add `storage().new_dropbox()` binding for the upcoming Dropbox storage backend (`xvc storage new dropbox`)
+- Bump Xvc dependency pin to 0.7.1-alpha.5
+- Add `storage().new_dropbox()` binding for the Dropbox storage backend (`xvc storage new dropbox`)
 
 ## 0.7.1
 
