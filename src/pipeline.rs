@@ -4,7 +4,7 @@ use pyo3::types::PyDict;
 use crate::Xvc;
 use crate::update_cli;
 
-#[pyclass]
+#[pyclass(skip_from_py_object)]
 #[derive(Clone, Debug)]
 pub struct XvcPipeline {
     xvc_opts: Xvc,
@@ -130,7 +130,7 @@ impl XvcPipeline {
     }
 }
 
-#[pyclass]
+#[pyclass(skip_from_py_object)]
 #[derive(Clone)]
 pub struct XvcPipelineStep {
     xvc_pipeline_opts: XvcPipeline,
@@ -215,7 +215,7 @@ impl XvcPipelineStep {
         update_cli!(opts, &mut cli_opts, ["name", "step_name", "step-name"] => "--step-name");
         update_cli!(opts, &mut cli_opts, ["file"] => "--output-file");
         update_cli!(opts, &mut cli_opts, ["metric"] => "--output-metric");
-        update_cli!(opts, &mut cli_opts, ["image"] => "--output-images");
+        update_cli!(opts, &mut cli_opts, ["image"] => "--output-image");
         self.xvc_run(cli_opts)
     }
 

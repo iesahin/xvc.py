@@ -5,7 +5,7 @@ use xvc_rust::watch;
 use crate::Xvc;
 use crate::update_cli;
 
-#[pyclass]
+#[pyclass(skip_from_py_object)]
 #[derive(Clone, Debug)]
 pub struct XvcStorage {
     xvc_opts: Xvc,

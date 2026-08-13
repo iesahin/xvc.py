@@ -5,7 +5,7 @@ use xvc_rust::watch;
 use crate::update_cli;
 use crate::{Xvc, update_targets};
 
-#[pyclass]
+#[pyclass(skip_from_py_object)]
 #[derive(Clone, Debug)]
 pub struct XvcFile {
     xvc_opts: Xvc,
@@ -94,7 +94,7 @@ impl XvcFile {
         update_cli!(opts, &mut cli_opts, flag ["help"] => "--help");
         update_cli!(opts, &mut cli_opts, ["format"] => "--format");
         update_cli!(opts, &mut cli_opts, ["sort"] => "--sort");
-        update_cli!(opts, &mut cli_opts, flag ["no-summary"] => "--no-summary");
+        update_cli!(opts, &mut cli_opts, flag ["no-summary", "no_summary"] => "--no-summary");
         update_cli!(opts, &mut cli_opts, flag ["include-git-files", "include_git_files"] => "--include-git-files");
         update_cli!(opts, &mut cli_opts, flag ["show-dirs", "show-directories", "show_directories", "show_dirs", "d"] => "--show-directories");
         update_targets(targets, &mut cli_opts)?;
@@ -119,7 +119,7 @@ impl XvcFile {
         update_cli!(opts, &mut cli_opts, flag ["help"] => "--help");
         update_cli!(opts, &mut cli_opts, ["remote", "frm", "storage"] => "--storage");
         update_cli!(opts, &mut cli_opts, flag ["force"] => "--force");
-        update_cli!(opts, &mut cli_opts, flag ["no-recheck"] => "--no-recheck");
+        update_cli!(opts, &mut cli_opts, flag ["no-recheck", "no_recheck"] => "--no-recheck");
         update_cli!(opts, &mut cli_opts, ["recheck-as", "recheck_as"] => "--recheck-as");
         update_targets(targets, &mut cli_opts)?;
         self.run(cli_opts)
@@ -137,7 +137,7 @@ impl XvcFile {
         update_cli!(opts, &mut cli_opts, flag ["help"] => "--help");
         update_cli!(opts, &mut cli_opts, ["recheck-method", "recheck_method"] => "--recheck-method");
         update_cli!(opts, &mut cli_opts, flag ["force"] => "--force");
-        update_cli!(opts, &mut cli_opts, flag ["no-recheck"] => "--no-recheck");
+        update_cli!(opts, &mut cli_opts, flag ["no-recheck", "no_recheck"] => "--no-recheck");
         cli_opts.push(source);
         cli_opts.push(destination);
         self.run(cli_opts)
@@ -155,7 +155,7 @@ impl XvcFile {
         update_cli!(opts, &mut cli_opts, flag ["help"] => "--help");
         update_cli!(opts, &mut cli_opts, ["recheck-method", "recheck_method"] => "--recheck-method");
         update_cli!(opts, &mut cli_opts, flag ["force"] => "--force");
-        update_cli!(opts, &mut cli_opts, flag ["no-recheck"] => "--no-recheck");
+        update_cli!(opts, &mut cli_opts, flag ["no-recheck", "no_recheck"] => "--no-recheck");
         cli_opts.push(source);
         cli_opts.push(destination);
         self.run(cli_opts)
@@ -166,7 +166,7 @@ impl XvcFile {
         let mut cli_opts = self.cli()?;
         cli_opts.push("untrack".to_string());
         update_cli!(opts, &mut cli_opts, flag ["help"] => "--help");
-        update_cli!(opts, &mut cli_opts, ["restore-versions", "restore_versions"] => "--recheck-method");
+        update_cli!(opts, &mut cli_opts, ["restore-versions", "restore_versions"] => "--restore-versions");
         update_targets(targets, &mut cli_opts)?;
         self.run(cli_opts)
     }
