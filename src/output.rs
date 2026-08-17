@@ -23,14 +23,35 @@ use crate::{Result, XvcPyRootOpt};
 
 const CHANNEL_BOUND: usize = 10000;
 
+/// Append one output message the way the `xvc` binary prints it.
+///
+/// The CLI sends every message to `println!`. Collecting them with `push_str`
+/// alone glued them together instead, so a command that emits one message per
+/// item - `xvc pipeline step list --names-only`, for one - came back as a
+/// single run-on string. Messages that already end in a newline (a table, or
+/// captured process output) are left alone.
+fn push_line(output: &mut String, line: &str) {
+    output.push_str(line);
+    if !line.ends_with('\n') {
+        output.push('\n');
+    }
+}
+
 pub struct PyCommandOutput {
     pub output: String,
 }
 
 /// Runs the supplied xvc command.
+///
+/// Command line errors and `--help` come back as the output string, the same
+/// way [crate::Xvc] returns them; see [crate::parse_cli].
 pub fn run(xvc_root_opt: &XvcPyRootOpt, args: &[&str]) -> PyResult<PyCommandOutput> {
-    let cli_opts = XvcCLI::from_str_slice(args).map_err(XvcPyError)?;
-    dispatch_with_root(xvc_root_opt, cli_opts)
+    match crate::parse_cli(args) {
+        Ok(cli_opts) => dispatch_with_root(xvc_root_opt, cli_opts),
+        Err(e) => Ok(PyCommandOutput {
+            output: e.to_string(),
+        }),
+    }
 }
 
 /// Dispatch commands to respective functions in the API
@@ -97,53 +118,93 @@ pub fn dispatch_with_root(
                         XvcOutputLine::Info(_) => {}
                         XvcOutputLine::Warn(_) => {}
                         XvcOutputLine::Error(_) => {}
-                        XvcOutputLine::Panic(m) => output_str.push_str(&format!("[PANIC] {}", m)),
+                        XvcOutputLine::Panic(m) => {
+                            push_line(&mut output_str, &format!("[PANIC] {}", m))
+                        }
                         XvcOutputLine::Tick(_) => todo!(),
                         XvcOutputLine::Debug(_) => {}
                     },
                     LevelFilter::Error => match output_line {
-                        XvcOutputLine::Output(m) => output_str.push_str(&m),
+                        XvcOutputLine::Output(m) => push_line(&mut output_str, &m),
                         XvcOutputLine::Info(_) => {}
                         XvcOutputLine::Warn(_) => {}
-                        XvcOutputLine::Error(m) => output_str.push_str(&format!("[ERROR] {}", m)),
-                        XvcOutputLine::Panic(m) => output_str.push_str(&format!("[PANIC] {}", m)),
+                        XvcOutputLine::Error(m) => {
+                            push_line(&mut output_str, &format!("[ERROR] {}", m))
+                        }
+                        XvcOutputLine::Panic(m) => {
+                            push_line(&mut output_str, &format!("[PANIC] {}", m))
+                        }
                         XvcOutputLine::Tick(_) => todo!(),
                         XvcOutputLine::Debug(_) => {}
                     },
                     LevelFilter::Warn => match output_line {
-                        XvcOutputLine::Output(m) => output_str.push_str(&m),
-                        XvcOutputLine::Warn(m) => output_str.push_str(&format!("[WARN] {}", m)),
-                        XvcOutputLine::Error(m) => output_str.push_str(&format!("[ERROR] {}", m)),
-                        XvcOutputLine::Panic(m) => output_str.push_str(&format!("[PANIC] {}", m)),
+                        XvcOutputLine::Output(m) => push_line(&mut output_str, &m),
+                        XvcOutputLine::Warn(m) => {
+                            push_line(&mut output_str, &format!("[WARN] {}", m))
+                        }
+                        XvcOutputLine::Error(m) => {
+                            push_line(&mut output_str, &format!("[ERROR] {}", m))
+                        }
+                        XvcOutputLine::Panic(m) => {
+                            push_line(&mut output_str, &format!("[PANIC] {}", m))
+                        }
                         XvcOutputLine::Info(_) => {}
                         XvcOutputLine::Tick(_) => todo!(),
                         XvcOutputLine::Debug(_) => {}
                     },
                     LevelFilter::Info => match output_line {
-                        XvcOutputLine::Output(m) => output_str.push_str(&m),
-                        XvcOutputLine::Info(m) => output_str.push_str(&format!("[INFO] {}", m)),
-                        XvcOutputLine::Warn(m) => output_str.push_str(&format!("[WARN] {}", m)),
-                        XvcOutputLine::Error(m) => output_str.push_str(&format!("[ERROR] {}", m)),
-                        XvcOutputLine::Panic(m) => output_str.push_str(&format!("[PANIC] {}", m)),
+                        XvcOutputLine::Output(m) => push_line(&mut output_str, &m),
+                        XvcOutputLine::Info(m) => {
+                            push_line(&mut output_str, &format!("[INFO] {}", m))
+                        }
+                        XvcOutputLine::Warn(m) => {
+                            push_line(&mut output_str, &format!("[WARN] {}", m))
+                        }
+                        XvcOutputLine::Error(m) => {
+                            push_line(&mut output_str, &format!("[ERROR] {}", m))
+                        }
+                        XvcOutputLine::Panic(m) => {
+                            push_line(&mut output_str, &format!("[PANIC] {}", m))
+                        }
                         XvcOutputLine::Tick(_) => todo!(),
                         XvcOutputLine::Debug(_) => {}
                     },
                     LevelFilter::Debug => match output_line {
-                        XvcOutputLine::Output(m) => output_str.push_str(&m),
-                        XvcOutputLine::Info(m) => output_str.push_str(&format!("[INFO] {}", m)),
-                        XvcOutputLine::Warn(m) => output_str.push_str(&format!("[WARN] {}", m)),
-                        XvcOutputLine::Error(m) => output_str.push_str(&format!("[ERROR] {}", m)),
-                        XvcOutputLine::Panic(m) => output_str.push_str(&format!("[PANIC] {}", m)),
-                        XvcOutputLine::Debug(m) => output_str.push_str(&format!("[DEBUG] {}", m)),
+                        XvcOutputLine::Output(m) => push_line(&mut output_str, &m),
+                        XvcOutputLine::Info(m) => {
+                            push_line(&mut output_str, &format!("[INFO] {}", m))
+                        }
+                        XvcOutputLine::Warn(m) => {
+                            push_line(&mut output_str, &format!("[WARN] {}", m))
+                        }
+                        XvcOutputLine::Error(m) => {
+                            push_line(&mut output_str, &format!("[ERROR] {}", m))
+                        }
+                        XvcOutputLine::Panic(m) => {
+                            push_line(&mut output_str, &format!("[PANIC] {}", m))
+                        }
+                        XvcOutputLine::Debug(m) => {
+                            push_line(&mut output_str, &format!("[DEBUG] {}", m))
+                        }
                         XvcOutputLine::Tick(_) => todo!(),
                     },
                     LevelFilter::Trace => match output_line {
-                        XvcOutputLine::Output(m) => output_str.push_str(&m),
-                        XvcOutputLine::Info(m) => output_str.push_str(&format!("[INFO] {}", m)),
-                        XvcOutputLine::Warn(m) => output_str.push_str(&format!("[WARN] {}", m)),
-                        XvcOutputLine::Error(m) => output_str.push_str(&format!("[ERROR] {}", m)),
-                        XvcOutputLine::Debug(m) => output_str.push_str(&format!("[DEBUG] {}", m)),
-                        XvcOutputLine::Panic(m) => output_str.push_str(&format!("[PANIC] {}", m)),
+                        XvcOutputLine::Output(m) => push_line(&mut output_str, &m),
+                        XvcOutputLine::Info(m) => {
+                            push_line(&mut output_str, &format!("[INFO] {}", m))
+                        }
+                        XvcOutputLine::Warn(m) => {
+                            push_line(&mut output_str, &format!("[WARN] {}", m))
+                        }
+                        XvcOutputLine::Error(m) => {
+                            push_line(&mut output_str, &format!("[ERROR] {}", m))
+                        }
+                        XvcOutputLine::Debug(m) => {
+                            push_line(&mut output_str, &format!("[DEBUG] {}", m))
+                        }
+                        XvcOutputLine::Panic(m) => {
+                            push_line(&mut output_str, &format!("[PANIC] {}", m))
+                        }
                         XvcOutputLine::Tick(_) => todo!(),
                     },
                 }

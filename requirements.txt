@@ -1,5 +1,5 @@
+# Development requirements for building the bindings and the docs notebook.
+# The test suite lives in xvc-mono (xvc-test/python) and brings its own
+# requirements file.
 maturin
 jupyterlab
-pytest-forked
-pytest-cov
-coverage

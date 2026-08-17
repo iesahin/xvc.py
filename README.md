@@ -873,6 +873,30 @@ I'm planning to add [data label and annotations tracking](https://github.com/ies
 Please check [`docs.xvc.dev`](https://docs.xvc.dev) for documentation.
 
 
+## 🛠️ Development
+
+Build the extension module into the active virtual environment with
+[maturin](https://www.maturin.rs):
+
+```console
+$ pip install -r requirements.txt
+$ maturin develop
+```
+
+The integration tests live in [xvc-mono](https://github.com/iesahin/xvc-mono),
+under `xvc-test/python`, next to Xvc's own integration tests. They are run
+there because they need a specific Xvc to test against, and xvc-mono is what
+pins one; running them from here would test these bindings against whichever
+commit `iesahin/xvc`'s `main` branch was on that day:
+
+```console
+$ git clone --recurse-submodules https://github.com/iesahin/xvc-mono
+$ ./xvc-mono/xvc-test/python/run-tests.sh
+```
+
+That script builds the bindings from the `xvc.py` submodule, so point it at
+your branch (`git -C xvc-mono/xvc.py checkout <branch>`) to test a change.
+Opening a pull request here also asks xvc-mono to run its checks against it.
 
 
 

@@ -3,15 +3,16 @@ pub mod output;
 pub mod pipeline;
 pub mod storage;
 
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::sync::Arc;
 use std::sync::RwLock;
 
+use clap::Parser;
 use file::XvcFile;
 use output::dispatch_with_root;
 use pyo3::prelude::*;
 use pyo3::types::{PyDict, PyTuple};
-use xvc_rust::core::types::xvcroot::load_xvc_root;
+use xvc_rust::core::types::xvcroot::{find_root, load_xvc_root};
 use xvc_rust::error::Error as XvcError;
 use xvc_rust::{AbsolutePath, XvcLoadParams, XvcRootOpt, cli, watch};
 
@@ -30,21 +31,48 @@ struct XvcPyError(XvcError);
 type Result<T> = std::result::Result<T, XvcPyError>;
 type XvcPyRootOpt = Arc<RwLock<XvcRootOpt>>;
 
+/// Parse a command line into [cli::XvcCLI].
+///
+/// [cli::XvcCLI::from_str_slice] goes through [clap::Parser::parse_from], which
+/// prints and calls `std::process::exit` for `--help` and for anything it
+/// cannot parse. That is right for the `xvc` binary and fatal here: it takes
+/// the interpreter down with it, so `xvc.Xvc().file().track(help=True)` would
+/// end a Jupyter kernel. `try_parse_from` returns the message instead, which is
+/// what the callers below already expect.
+fn parse_cli(args: &[&str]) -> std::result::Result<cli::XvcCLI, clap::Error> {
+    cli::XvcCLI::try_parse_from(args).map(|mut cli_opts| {
+        cli_opts.command_string = args.join(" ");
+        cli_opts
+    })
+}
+
+/// Where to look for a repository, and the repository found from there.
+///
+/// `xvc_root_dir` is what makes a command run in an existing repository:
+/// [load_xvc_root] does not search for one, it loads the directory it is given.
+fn load_params_for(workdir: Option<&Path>) -> XvcLoadParams {
+    let workdir = workdir
+        .map(|wd| std::fs::canonicalize(wd).unwrap_or_else(|_| wd.to_path_buf()))
+        .or_else(|| std::env::current_dir().ok())
+        .unwrap_or_else(|| PathBuf::from("."));
+
+    let xvc_root_dir = find_root(&workdir).ok();
+
+    XvcLoadParams::new(AbsolutePath::from(workdir), xvc_root_dir)
+}
+
 /// Call Xvc with the command line arguments
 #[pyfunction]
 pub fn run_xvc(cmd: String) -> PyResult<String> {
     let args: Vec<&str> = cmd.split(' ').collect();
-    let cli_opts = match cli::XvcCLI::from_str_slice(&args) {
+    let cli_opts = match parse_cli(&args) {
         Ok(opts) => opts,
         Err(e) => {
             return Ok(e.to_string());
         }
     };
 
-    let mut xvc_load_params = XvcLoadParams::new(
-        AbsolutePath::from(cli_opts.workdir.as_deref().unwrap_or(Path::new("."))),
-        None,
-    );
+    let mut xvc_load_params = load_params_for(cli_opts.workdir.as_deref());
     xvc_load_params.include_system_config = !cli_opts.no_system_config;
     xvc_load_params.include_user_config = !cli_opts.no_user_config;
     xvc_load_params.include_environment_config = !cli_opts.no_env_config;
@@ -78,7 +106,7 @@ fn xvc(_py: Python<'_>, m: &Bound<PyModule>) -> PyResult<()> {
     Ok(())
 }
 
-#[pyclass]
+#[pyclass(skip_from_py_object)]
 #[derive(Clone, Debug)]
 pub struct Xvc {
     xvc_load_params: XvcLoadParams,
@@ -94,9 +122,7 @@ pub struct Xvc {
 
 impl Xvc {
     fn run(&self, args: Vec<String>) -> PyResult<String> {
-        let cli_opts = match cli::XvcCLI::from_str_slice(
-            &args.iter().map(|s| s.as_str()).collect::<Vec<&str>>(),
-        ) {
+        let cli_opts = match parse_cli(&args.iter().map(|s| s.as_str()).collect::<Vec<&str>>()) {
             Ok(opts) => opts,
             Err(e) => {
                 let out = e.to_string();
@@ -139,10 +165,7 @@ impl Xvc {
         from_ref: Option<String>,
         to_branch: Option<String>,
     ) -> PyResult<Self> {
-        let mut xvc_load_params = XvcLoadParams::new(
-            AbsolutePath::from(workdir.clone().unwrap_or_else(|| ".".to_owned())),
-            None,
-        );
+        let mut xvc_load_params = load_params_for(workdir.as_deref().map(Path::new));
         xvc_load_params.include_system_config = !no_system_config.unwrap_or_default();
         xvc_load_params.include_user_config = !no_user_config.unwrap_or_default();
         xvc_load_params.include_environment_config = !no_env_config.unwrap_or_default();
